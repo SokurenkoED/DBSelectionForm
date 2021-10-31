@@ -1,9 +1,12 @@
-﻿using DBSelectionForm.ViewModels.Base;
+﻿using DBSelectionForm.Infastructure.Commands;
+using DBSelectionForm.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace DBSelectionForm.ViewModels
 {
@@ -23,6 +26,28 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region Команды
 
+        #region ColseApplicationCommand
+
+        public ICommand ColseApplicationCommand { get;}
+        private bool CanColseApplicationCommandExecute(object p) => true;
+        private void OnColseApplicationCommandExecuted(object p)
+        {
+            Application.Current.Shutdown();
+        }
+
+        #endregion
+
+        #endregion
+
+        public MainWindowViewModel()
+        {
+            #region Команды
+
+            ColseApplicationCommand = new LambdaCommand(OnColseApplicationCommandExecuted, CanColseApplicationCommandExecute);
+
+            #endregion
+        }
     }
 }
