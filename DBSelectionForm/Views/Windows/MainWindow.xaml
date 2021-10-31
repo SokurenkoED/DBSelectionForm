@@ -9,14 +9,23 @@
     <Window.DataContext>
         <vs:MainWindowViewModel/>
     </Window.DataContext>
-    <Grid>
-        <TextBox HorizontalAlignment="Left" 
-                 Margin="0,0,0,0" 
-                 Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" 
-                 TextWrapping="Wrap" 
-                 VerticalAlignment="Top" 
-                 Width="264" 
-                 Height="35"/>
-
-    </Grid>
+    <DockPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <StatusBar DockPanel.Dock="Bottom" Grid.Row="3">
+                <StatusBarItem MinWidth="150" MaxWidth="300">
+                    <TextBlock Text="Поиск элементов"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <ProgressBar Width="300" Height="30" Value="66"/>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+        
+    </DockPanel>
 </Window>
