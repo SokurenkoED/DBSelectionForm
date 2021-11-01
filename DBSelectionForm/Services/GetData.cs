@@ -1,18 +1,15 @@
-﻿using DBSelectionForm.Infastructure.Commands.Base;
-using DBSelectionForm.Models;
+﻿using DBSelectionForm.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
-namespace DBSelectionForm.Infastructure.Commands
+namespace DBSelectionForm.Services
 {
-    internal class GetDataCommand : Command
+    class GetData
     {
         private static string LineInterpol(string[] Values1, string[] Values2, string X) // Линейная интерполяция
         {
@@ -24,12 +21,8 @@ namespace DBSelectionForm.Infastructure.Commands
             return (double.Parse(SplitStr[0], formatter) * 3600 + double.Parse(SplitStr[1], formatter) * 60 + double.Parse(SplitStr[2], formatter)).ToString();
         }
 
-        public override bool CanExecute(object parameter) => true;
-
-        public async override void Execute(object parameter)
+        public async static void GetDataMethod(InfoData _InfoData)
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
 
             #region Настроечные данные
 
@@ -42,10 +35,10 @@ namespace DBSelectionForm.Infastructure.Commands
 
             #region Ввод данных из модели
 
-            string SensorName = InfoData.SensorName;
-            string TempTimeFrom = InfoData.TimeFrom.Trim();
-            string TimeFrom = ConvertDataFormat(InfoData.TimeFrom, formatter);
-            string TimeTo = ConvertDataFormat(InfoData.TimeTo, formatter);
+            string SensorName = _InfoData.SensorName;
+            string TempTimeFrom = _InfoData.TimeFrom.Trim();
+            string TimeFrom = ConvertDataFormat(_InfoData.TimeFrom, formatter);
+            string TimeTo = ConvertDataFormat(_InfoData.TimeTo, formatter);
 
             #endregion
 
@@ -58,7 +51,7 @@ namespace DBSelectionForm.Infastructure.Commands
             string[] DateArr;
             string[] DateDayArr;
             string RuteName = SensorName.Substring(2, 3);
-            string RelatePath = InfoData.PathToFolder;
+            string RelatePath = _InfoData.PathToFolder;
             string[] filePaths = Directory.GetFiles(RelatePath);
             List<string> ColdReactor = new List<string>();
 
@@ -180,15 +173,7 @@ namespace DBSelectionForm.Infastructure.Commands
 
             #endregion
 
-            stopWatch.Stop();
-            // Get the elapsed time as a TimeSpan value.
-            TimeSpan ts = stopWatch.Elapsed;
 
-            // Format and display the TimeSpan value.
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-            MessageBox.Show("RunTime " + elapsedTime);
 
         }
     }

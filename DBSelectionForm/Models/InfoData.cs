@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 
 namespace DBSelectionForm.Models
 {
-    internal static class InfoData
+    public class InfoData
     {
-        public static string SensorName;
+        public string SensorName { get; set; }
 
-        public static string TimeFrom;
-        public static string TimeTo;
-        public static string PathToFolder;
+        public string TimeFrom { get; set; }
+
+        public string TimeTo { get; set; }
+
+        public string PathToFolder { get; set; }
+
+        public string InfoProcess { get; set; }
     }
 }

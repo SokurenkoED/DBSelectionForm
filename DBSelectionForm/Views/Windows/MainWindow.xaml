@@ -40,16 +40,10 @@
             <Label Content=" - " HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="27" Margin="405,9,0,0" FontSize="18" Grid.Row="2" />
             <TextBox HorizontalAlignment="Left" Margin="432,0,0,0" Text="{Binding TimeTo}" VerticalAlignment="Center" Width="105" Height="21" Grid.Row="2"  />
 
-            <Button Content="Создать выборку" HorizontalAlignment="Left" Margin="53,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="37" Width="200">
-                <Button.Command>
-                    <cmd:GetDataCommand/>
-                </Button.Command>
+            <Button Command="{Binding GetDataCommand}" Content="Создать выборку" HorizontalAlignment="Left" Margin="53,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="37" Width="200">
             </Button>
 
-            <Button Content="Отмена" HorizontalAlignment="Left" Margin="337,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="37" Width="200">
-                <Button.Command>
-                    <cmd:CloseApplicationCommand/>
-                </Button.Command>
+            <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Left" Margin="337,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="37" Width="200">
             </Button>
 
         </Grid>
