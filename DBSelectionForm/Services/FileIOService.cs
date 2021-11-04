@@ -29,6 +29,7 @@ namespace DBSelectionForm.Services
                 return JsonConvert.DeserializeObject<InfoData>(fileText);
             }
         }
+
         internal void SaveData(InfoData DataList)
         {
             using (StreamWriter writer = File.CreateText(Path))

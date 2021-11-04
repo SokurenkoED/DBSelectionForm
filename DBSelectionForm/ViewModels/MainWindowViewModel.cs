@@ -2,21 +2,47 @@
 using DBSelectionForm.Models;
 using DBSelectionForm.Services;
 using DBSelectionForm.ViewModels.Base;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace DBSelectionForm.ViewModels
 {
+
     internal class MainWindowViewModel : ViewModel
     {
         private readonly string Path = $"{Environment.CurrentDirectory}\\IndoData.json";
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
+        Dispatcher _dispatcher;
+
+
+        #region Сообщения о процессе выполнения
+
+        private ObservableCollection<string> _TextInformation = new AsyncObservableCollection<string>();
+
+        /// <summary>Сообщения о процессе выполнения</summary>
+        public ObservableCollection<string> TextInformation
+        {
+            get => _TextInformation;
+            set
+            {
+                Set(ref _TextInformation, value);
+            }
+        }
+
+        #endregion
 
         #region Время "С"
 
@@ -113,8 +139,28 @@ namespace DBSelectionForm.ViewModels
         private void OnGetDataCommandExecuted(object p)
         {
             _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom };
-            GetData.GetDataMethod(_InfoData);
             _fileIOservice.SaveData(_InfoData);
+
+            
+            Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation));
+            
+        }
+
+        #endregion
+
+        #region OpenFileDialog
+
+        public ICommand OpenFileDialogCommand { get; }
+        private bool CanOpenFileDialogCommandExecute(object p) => true;
+        private void OnOpenFileDialogCommandExecuted(object p)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            //dialog.InitialDirectory = "C:\\Users";
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                PathToFolder =  dialog.FileName;
+            }
         }
 
         #endregion
@@ -123,6 +169,8 @@ namespace DBSelectionForm.ViewModels
 
         public MainWindowViewModel()
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
+
 
             _fileIOservice = new FileIOService(Path);
 
@@ -141,7 +189,7 @@ namespace DBSelectionForm.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
             }
 
 
@@ -150,6 +198,8 @@ namespace DBSelectionForm.ViewModels
             ColseApplicationCommand = new LambdaCommand(OnColseApplicationCommandExecuted, CanColseApplicationCommandExecute);
 
             GetDataCommand = new LambdaCommand(OnGetDataCommandExecuted, CanGetDataCommandExecute);
+
+            OpenFileDialogCommand = new LambdaCommand(OnOpenFileDialogCommandExecuted, CanOpenFileDialogCommandExecute);
 
             #endregion
         }
