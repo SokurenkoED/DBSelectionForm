@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -25,8 +26,54 @@ namespace DBSelectionForm.ViewModels
         private readonly string Path = $"{Environment.CurrentDirectory}\\IndoData.json";
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
-        Dispatcher _dispatcher;
 
+        #region Путь до выходного файла !List
+
+        private string _PathToListFile;
+
+        /// <summary>Путь до выходного файла !List</summary>
+        public string PathToListFile
+        {
+            get => _PathToListFile;
+            set
+            {
+                Set(ref _PathToListFile, value);
+            }
+        }
+
+        #endregion
+
+        #region Путь до базы данных холодного реактора
+
+        private string _PathToDataFile;
+
+        /// <summary>Путь базы данных холодного реактора</summary>
+        public string PathToDataFile
+        {
+            get => _PathToDataFile;
+            set
+            {
+                Set(ref _PathToDataFile, value);
+            }
+        }
+
+        #endregion
+
+        #region Элементы в текстбоксе
+
+        private string _DataToTextBox;
+
+        /// <summary>Элементы в текстбоксе</summary>
+        public string DataToTextBox
+        {
+            get => _DataToTextBox;
+            set
+            {
+                Set(ref _DataToTextBox, value);
+            }
+        }
+
+        #endregion
 
         #region Сообщения о процессе выполнения
 
@@ -108,7 +155,7 @@ namespace DBSelectionForm.ViewModels
 
         #region Заголовок окна
 
-        private string _Title = "Выборка из базы данных";
+        private string _Title = "Работа с базой данных";
 
         /// <summary>Заголовок окна</summary>
         public string Title
@@ -138,7 +185,7 @@ namespace DBSelectionForm.ViewModels
         private bool CanGetDataCommandExecute(object p) => true;
         private void OnGetDataCommandExecuted(object p)
         {
-            _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom };
+            _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile };
             _fileIOservice.SaveData(_InfoData);
 
             
@@ -148,7 +195,7 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
-        #region OpenFileDialog
+        #region OpenFileDialog (находим путь до папки с базой данных)
 
         public ICommand OpenFileDialogCommand { get; }
         private bool CanOpenFileDialogCommandExecute(object p) => true;
@@ -165,33 +212,121 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region OpenFileDialogForDataFileCommand (находим путь до файла data с данными о холодном реакторе)
+
+        public ICommand OpenFileDialogForDataFileCommand { get; }
+        private bool CanOpenFileDialogForDataFileCommandExecute(object p) => true;
+        private void OnOpenFileDialogForDataFileCommandExecuted(object p)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                PathToDataFile = dialog.FileName;
+            }
+        }
+
+        #endregion
+
+        #region OpenFileDialogForExitFileCommand (находим путь до выходного файла)
+
+        public ICommand OpenFileDialogForExitFileCommand { get; }
+        private bool CanOpenFileDialogForExitFileCommandExecute(object p) => true;
+        private void OnOpenFileDialogForExitFileCommandExecuted(object p)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                PathToListFile = dialog.FileName;
+            }
+        }
+
+        #endregion
+
+        #region OpenExitFile
+
+        public ICommand OpenExitFile { get; }
+        private bool CanOpenExitFileExecute(object p) => true;
+        private void OnOpenExitFileExecuted(object p)
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader(PathToListFile, Encoding.Default))
+                {
+                    DataToTextBox = sr.ReadToEnd();
+                }
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile };
+                _fileIOservice.SaveData(_InfoData);
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show($"Ошибка! Файл не был найден!");
+            }
+        }
+
+        #endregion
+
+        #region SaveExitFile
+
+        public ICommand SaveExitFile { get; }
+        private bool CanSaveExitFileExecute(object p) => true;
+        private void OnSaveExitFileExecuted(object p)
+        {
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(PathToListFile, false, System.Text.Encoding.Default))
+                {
+                    sw.WriteLine(DataToTextBox);
+                    MessageBox.Show("Файл сохранен!");
+                }
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile };
+                _fileIOservice.SaveData(_InfoData);
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show($"Ошибка! Файл не был найден!");
+            }
+        }
+
+        #endregion
+
         #endregion
 
         public MainWindowViewModel()
         {
-            _dispatcher = Dispatcher.CurrentDispatcher;
 
+            #region Сохранение и загрузка данных 
 
             _fileIOservice = new FileIOService(Path);
 
-            try
+            _InfoData = _fileIOservice.LoadData();
+
+            if (_InfoData.PathToFolder != null)
             {
-                _InfoData = _fileIOservice.LoadData();
-                if (_InfoData.PathToFolder != null)
-                {
-                    _PathToFolder = _InfoData.PathToFolder;
-                }
+                _PathToFolder = _InfoData.PathToFolder;
+            }
+            if (_InfoData.PathToFolder != null)
+            {
                 _SensorName = _InfoData.SensorName;
-                _TimeFrom = _InfoData.TimeFrom;
-                _TimeTo = _InfoData.TimeTo;
-
-
             }
-            catch (Exception ex)
+            if (_InfoData.PathToFolder != null)
             {
-                //MessageBox.Show(ex.Message);
+                _TimeFrom = _InfoData.TimeFrom;
+            }
+            if (_InfoData.PathToFolder != null)
+            {
+                _TimeTo = _InfoData.TimeTo;
+            }
+            if (_InfoData.PathToDataFile != null)
+            {
+                _PathToDataFile = _InfoData.PathToDataFile;
+            }
+            if (_InfoData.PathToListFile != null)
+            {
+                _PathToListFile = _InfoData.PathToListFile;
             }
 
+
+            #endregion
 
             #region Команды
 
@@ -200,6 +335,20 @@ namespace DBSelectionForm.ViewModels
             GetDataCommand = new LambdaCommand(OnGetDataCommandExecuted, CanGetDataCommandExecute);
 
             OpenFileDialogCommand = new LambdaCommand(OnOpenFileDialogCommandExecuted, CanOpenFileDialogCommandExecute);
+
+            OpenExitFile = new LambdaCommand(OnOpenExitFileExecuted, CanOpenExitFileExecute);
+
+            SaveExitFile = new LambdaCommand(OnSaveExitFileExecuted, CanSaveExitFileExecute);
+
+            OpenFileDialogForDataFileCommand = new LambdaCommand(OnOpenFileDialogForDataFileCommandExecuted, CanOpenFileDialogForDataFileCommandExecute);
+
+            OpenFileDialogForExitFileCommand = new LambdaCommand(OnOpenFileDialogForExitFileCommandExecuted, CanOpenFileDialogForExitFileCommandExecute);
+
+            #endregion
+
+            #region Мусор
+
+
 
             #endregion
         }

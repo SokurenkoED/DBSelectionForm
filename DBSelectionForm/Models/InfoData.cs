@@ -16,6 +16,9 @@ namespace DBSelectionForm.Models
 
         public string PathToFolder { get; set; }
 
-        public string InfoProcess { get; set; }
+        public string PathToListFile { get; set; }
+
+        public string PathToDataFile { get; set; }
+
     }
 }
