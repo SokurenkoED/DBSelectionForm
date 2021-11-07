@@ -6,15 +6,11 @@
         xmlns:vs="clr-namespace:DBSelectionForm.ViewModels"
         xmlns:cmd="clr-namespace:DBSelectionForm.Infastructure.Commands"
         xmlns:l="clr-namespace:DBSelectionForm"
-        Title="{Binding Path=Title}" Height="650" Width="630" WindowStartupLocation="CenterScreen">
+        Title="{Binding Path=Title}" Height="650" Width="650" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vs:MainWindowViewModel/>
     </Window.DataContext>
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem  Header="Файл" FontSize="18" Height="30"></MenuItem>
-            <MenuItem Header="Помощь" FontSize="18" ></MenuItem>
-        </Menu>
         <TabControl>
 
             <TabItem Header="Выборка с БД" FontSize="16">
@@ -26,32 +22,27 @@
                         <RowDefinition/>
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
 
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до папки с данными" HorizontalAlignment="Center"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToFolder}" VerticalAlignment="Center" Width="238" Height="21" Grid.Column="1" Margin="10,0,0,0"  />
-                    <Button Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="21" Width="26" Grid.Column="1" Margin="261,0,0,0"/>
 
-                    <Label HorizontalContentAlignment="Center" Content="Имя датчика" HorizontalAlignment="Center"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" Grid.Row="1" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding SensorName}" VerticalAlignment="Center" Width="237" Height="21" Grid.Row="1" Grid.Column="1" Margin="10,0,0,0"  />
+                    <Label  HorizontalContentAlignment="Center" Content="Путь до папки с данными" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Margin="31,6,0,0" />
+                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToFolder}" VerticalAlignment="Center" Width="238" Height="21" Margin="312,0,0,0"  />
+                    <Button Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="578,0,0,0"/>
 
-                    <Label HorizontalContentAlignment="Center" Content="Период времени" HorizontalAlignment="Center"  VerticalAlignment="Top" Height="30" Width="214" Margin="0,17,0,0" FontSize="16" Grid.Row="2" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding TimeFrom}" VerticalAlignment="Center" Width="104" Height="21" Grid.Row="2" Grid.Column="1" Margin="143,0,0,0"  />
+                    <Label HorizontalContentAlignment="Center" Content="Имя датчика" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" Grid.Row="1" Margin="31,0,0,0" />
+                    <TextBox HorizontalAlignment="Left" Text="{Binding SensorName}" VerticalAlignment="Center" Width="237" Height="21" Grid.Row="1" Margin="313,0,0,0"  />
 
-                    <Label Content=" - " HorizontalAlignment="Left"  VerticalAlignment="Top"  Grid.Row="2" Grid.Column="1" Margin="116,6,0,0" FontSize="18" />
-                    <TextBox HorizontalAlignment="Left" Margin="11,0,0,0" Text="{Binding TimeTo}" VerticalAlignment="Center" Width="105" Height="21" Grid.Row="2" Grid.Column="1"  />
+                    <Label HorizontalContentAlignment="Center" Content="Период времени" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" Margin="31,0,0,0" FontSize="16" Grid.Row="2" />
+                    <TextBox HorizontalAlignment="Left" Text="{Binding TimeTo}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="2" Margin="506,0,0,0"  />
+                    <TextBox HorizontalAlignment="Left" Text="{Binding DayTo}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="2" Margin="465,0,0,0"  />
+
+                    <Label Content=" - " HorizontalAlignment="Left"  VerticalAlignment="Top"  Grid.Row="2" Margin="438,6,0,0" FontSize="18" />
+                    <TextBox HorizontalAlignment="Left" Margin="353,0,0,0" Text="{Binding TimeFrom}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="2"  />
+                    <TextBox HorizontalAlignment="Left" Text="{Binding DayFrom}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="2" Margin="312,0,0,0"  />
 
                     <Grid Grid.Row="4" Grid.ColumnSpan="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Button Command="{Binding GetDataCommand}" Content="Создать выборку" HorizontalAlignment="Center" VerticalAlignment="Center" Height="37" Width="200"/>
+                        <Button Command="{Binding GetDataCommand}" Content="Создать выборку" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Margin="0,0,230,0"/>
 
-                        <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Center" VerticalAlignment="Center" Height="37" Width="200" Grid.Column="1"/>
+                        <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Column="1" Margin="0,0,5,0"/>
                     </Grid>
 
 
@@ -63,6 +54,7 @@
                         <ListBox Grid.Row="1" ItemsSource="{Binding TextInformation}" Margin="5,0,5,5" BorderBrush="Black" FontFamily="Times New Roman" FontSize="16" Background="#FFF0F0F0"/>
                         <Label Content="Информативное окно:" HorizontalAlignment="Left"   VerticalAlignment="Top" FontSize="16" FontFamily="Times New Roman" />
                     </Grid>
+
 
                 </Grid>
             </TabItem>
@@ -76,27 +68,23 @@
                         <RowDefinition/>
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
 
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до файла - базы данных" HorizontalAlignment="Center"  VerticalAlignment="Center" Height="30" Width="246" FontSize="16" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToDataFile}" VerticalAlignment="Center" Width="238" Height="21" Margin="10,0,0,0" Grid.Column="1" />
-                    <Button Command="{Binding OpenFileDialogForDataFileCommand}" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="21" Width="26" Margin="261,0,0,0"/>
+                    <Label  HorizontalContentAlignment="Center" Content="Путь до файла - базы данных" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="246" FontSize="16" Grid.ColumnSpan="2" Margin="33,0,0,0" />
+                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToDataFile}" VerticalAlignment="Top" Width="238" Height="22" Margin="336,18,0,0" />
+                    <Button Command="{Binding OpenFileDialogForDataFileCommand}" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="22" Width="26" Margin="588,18,0,0"/>
 
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до выходного файла" HorizontalAlignment="Center"  VerticalAlignment="Center" Height="30" Width="246" FontSize="16" Grid.Row="1"/>
-                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToListFile}" VerticalAlignment="Center" Width="238" Height="21" Margin="10,0,0,0" Grid.Column="1" Grid.Row="1"/>
-                    <Button Command="{Binding OpenFileDialogForExitFileCommand}" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="21" Width="26" Margin="261,0,0,0" Grid.Row="1"/>
+                    <Label  HorizontalContentAlignment="Center" Content="Путь до выходного файла" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="246" FontSize="16" Grid.Row="1" Margin="33,0,0,0"/>
+                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToListFile}" VerticalAlignment="Center" Width="238" Height="22" Margin="336,0,0,0" Grid.Row="1"/>
+                    <Button Command="{Binding OpenFileDialogForExitFileCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="588,0,0,0" Grid.Row="1"/>
 
-                    <Button Command="{Binding OpenExitFile}" Content="Открыть выходной файл" HorizontalAlignment="Center" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="2"/>
+                    <Button Command="{Binding OpenExitFile}" Content="Открыть выходной файл" HorizontalAlignment="Left" VerticalAlignment="Center" Height="38" Width="200" Grid.Row="2" Margin="56,0,0,0"/>
 
-                    <Button Command="{Binding SaveExitFile}" Content="Сохранить выходной файл" HorizontalAlignment="Center" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="2" Grid.Column="1"/>
+                    <Button Command="{Binding SaveExitFile}" Content="Сохранить выходной файл" HorizontalAlignment="Left" VerticalAlignment="Center" Height="38" Width="200" Grid.Row="2" Margin="355,0,0,0"/>
 
-                    <Button Command="{Binding }" Content="Создать список" HorizontalAlignment="Center" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="4"/>
+                    <Button Command="{Binding GetListFromDBCommand}" Content="Создать список" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="4" Margin="0,0,230,0"/>
 
-                    <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Center" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="4" Grid.Column="1"/>
-                    <TextBox Text="{Binding DataToTextBox}" Margin="5" AcceptsReturn="True" TextWrapping="Wrap" Grid.Row="3" Grid.ColumnSpan="2" BorderBrush="Black" Background="#FFF0F0F0"/>
+                    <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="4" Margin="0,0,5,0" />
+                    <TextBox Text="{Binding DataToTextBox}" Margin="5,5,5,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.Row="3" Grid.ColumnSpan="3" BorderBrush="Black" Background="#FFF0F0F0"/>
 
                 </Grid>
             </TabItem>

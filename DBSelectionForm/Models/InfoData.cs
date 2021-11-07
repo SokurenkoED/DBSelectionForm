@@ -20,5 +20,8 @@ namespace DBSelectionForm.Models
 
         public string PathToDataFile { get; set; }
 
+        public string DayFrom { get; set; }
+
+        public string DayTo { get; set; }
     }
 }
