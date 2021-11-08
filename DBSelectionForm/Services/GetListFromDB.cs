@@ -63,7 +63,7 @@ namespace DBSelectionForm.Services
             {
                 return "6";
             }
-            else if (str.IndexOf("KIN1.OR") != -1 && CheckForNums(str, "KIN1.OR")) // Категория 7
+            else if (str.IndexOf("KIN1.OR") != -1) // Категория 7
             {
                 return "7";
             }
