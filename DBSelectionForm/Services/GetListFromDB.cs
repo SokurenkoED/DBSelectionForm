@@ -151,12 +151,13 @@ namespace DBSelectionForm.Services
                             if (ICArray.Contains(StrArr[0]))
                             {
                                 string str = GetCategory(StrArr[0]);
-                                DBArray.Add($"{StrArr[0]}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}");
-                                DBName.Add(StrArr[0]);
                                 if (str == "-100000") // Если не нашли категорию
                                 {
                                     IsReliable = false;
                                 }
+
+                                DBArray.Add($"{StrArr[0]}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}");
+                                DBName.Add(StrArr[0]);
                             }
                             else if (ICArray.IndexOf($"{StrArr[0].Replace("#0", "")}") != -1)
                             {
@@ -189,6 +190,56 @@ namespace DBSelectionForm.Services
             {
                 Console.WriteLine("Файл " + Path + " не был найден");
             }
+        }
+
+        private static void FindFreshDataInDB(ref List<string> DBArray, string RelatePathToFolder, string EndTime)
+        {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding ANSI = Encoding.GetEncoding(1251);
+            string[] filePaths = Directory.GetFiles(RelatePathToFolder);
+
+            foreach (var SensorName in DBArray)
+            {
+                string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var path in filePaths)
+                {
+                    string filename = Path.GetFileName(path);
+                    string RuteName = StrArr[0].Substring(2, 3);
+                    if (filename.IndexOf(RuteName) != -1)
+                    {
+                        using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
+                        {
+                            string line;
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], SensorName) == 0)
+                                { 
+                                    // Находим имя
+                                    // Проверяем время
+                                    // Если время меньше EndTime, то присваиваем новое значение в массив
+                                    // Если больше, то выходим из цикла
+                                    #region Обработка данных
+
+                                    example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                                    DateArr = example[1].Trim().Replace(",", ".").Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                                    DateDayArr = example[0].Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                                    Date = double.Parse(DateArr[0], formatter) * 3600 + double.Parse(DateArr[1], formatter) * 60 + double.Parse(DateArr[2], formatter) + (double.Parse(DateDayArr[0], formatter) - 6) * 24 * 3600;
+                                    DateStr = Date.ToString();
+                                    #endregion
+
+                                    ListData.Add(new string[] { DateStr, example[3] });
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+
+
         }
 
         ///<summary> Записываем информацию в файл !List_IC.txt </summary>
@@ -260,6 +311,7 @@ namespace DBSelectionForm.Services
             bool IsReliable = true;
             string ReadPathFromDB = _InfoData.PathToDataFile;
             string WorkPath = _InfoData.PathToListFile;
+            string RelatePathToFolder = _InfoData.PathToFolder;
 
             List<string> DBName = new List<string>();
             List<string> StringArrayFromDB = new List<string>();
