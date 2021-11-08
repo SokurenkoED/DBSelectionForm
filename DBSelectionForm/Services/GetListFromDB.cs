@@ -43,15 +43,15 @@ namespace DBSelectionForm.Services
             {
                 return "0";
             }
-            else if (str.IndexOf("AA2") != -1 && CheckForNums(str, "AA2")) // Категория 2
+            else if (str.IndexOf("AA2") != -1 && CheckForNums(str, "AA")) // Категория 2
             {
                 return "2";
             }
-            else if (str.IndexOf("AA1") != -1 && CheckForNums(str, "AA1")) // Категория 3
+            else if (str.IndexOf("AA1") != -1 && CheckForNums(str, "AA")) // Категория 3
             {
                 return "3";
             }
-            else if ((str.IndexOf("AA6") != -1 && CheckForNums(str, "AA6")) || (str.IndexOf("AA4") != -1 && CheckForNums(str, "AA4"))) // Категория 4
+            else if ((str.IndexOf("AA6") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("AA4") != -1 && CheckForNums(str, "AA"))) // Категория 4
             {
                 return "4";
             }
@@ -136,6 +136,7 @@ namespace DBSelectionForm.Services
                 IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 Encoding ANSI = Encoding.GetEncoding(1251);
+
                 using (StreamReader sr = new StreamReader(Path, ANSI))
                 {
                     List<string> VarArr = new List<string>();
