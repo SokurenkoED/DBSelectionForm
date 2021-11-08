@@ -12,6 +12,23 @@ namespace DBSelectionForm.Services
 {
     class GetListFromDB
     {
+        /// <summary> Проверяем левую и правую букву, если это цифра, то возвращает - 1, это нужно для метода IsFoundName</summary>
+        private static bool CheckForNums(string CheckStr, string KeyStr)
+        {
+            var asf = CheckStr[CheckStr.IndexOf(KeyStr) - 1];
+            bool IsLeftNum = int.TryParse(CheckStr[CheckStr.IndexOf(KeyStr) - 1].ToString(), out _);
+            bool IsRightNum = int.TryParse(CheckStr[CheckStr.IndexOf(KeyStr) + KeyStr.Length + 1].ToString(), out _);
+
+            if (IsLeftNum == true && IsRightNum == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            
+        }
         private static void IsFoundName(ref List<string> DBArray, ref List<string> ICArray)
         {
             var result = ICArray.Except(DBArray);
@@ -22,31 +39,31 @@ namespace DBSelectionForm.Services
         }
         private static string GetCategory(string str)
         {
-            if (str.IndexOf("CP") != -1 || str.IndexOf("CT") != -1 || str.IndexOf("CL") != -1 || str.IndexOf("CF") != -1 || str.IndexOf("FX") != -1) // категория 0
+            if ((str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX"))) // категория 0
             {
                 return "0";
             }
-            else if (str.IndexOf("AA2") != -1) // Категория 2
+            else if (str.IndexOf("AA2") != -1 && CheckForNums(str, "AA2")) // Категория 2
             {
                 return "2";
             }
-            else if (str.IndexOf("AA1") != -1) // Категория 3
+            else if (str.IndexOf("AA1") != -1 && CheckForNums(str, "AA1")) // Категория 3
             {
                 return "3";
             }
-            else if (str.IndexOf("AA6") != -1 || str.IndexOf("AA4") != -1) // Категория 4
+            else if ((str.IndexOf("AA6") != -1 && CheckForNums(str, "AA6")) || (str.IndexOf("AA4") != -1 && CheckForNums(str, "AA4"))) // Категория 4
             {
                 return "4";
             }
-            else if (str.IndexOf("AP") != -1) // Категория 5
+            else if (str.IndexOf("AP") != -1 && CheckForNums(str, "AP")) // Категория 5
             {
                 return "5";
             }
-            else if (str.IndexOf("DL") != -1 || str.IndexOf("EE") != -1 || str.IndexOf("EZ") != -1 || str.IndexOf("ED") != -1 || str.IndexOf("ER") != -1) // категория 6
+            else if ((str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6
             {
                 return "6";
             }
-            else if (str.IndexOf("KIN1.OR") != -1) // Категория 7
+            else if (str.IndexOf("KIN1.OR") != -1 && CheckForNums(str, "KIN1.OR")) // Категория 7
             {
                 return "7";
             }
@@ -143,7 +160,6 @@ namespace DBSelectionForm.Services
                             else if (ICArray.IndexOf($"{StrArr[0].Replace("#0", "")}") != -1)
                             {
                                 VarArr.Add($"{StrArr[2]}");
-
                             }
                             else if (ICArray.IndexOf($"{StrArr[0].Replace("#1", "")}") != -1)
                             {
