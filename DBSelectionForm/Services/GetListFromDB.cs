@@ -17,7 +17,7 @@ namespace DBSelectionForm.Services
             var result = ICArray.Except(DBArray);
             foreach (var item in result)
             {
-                throw new Exception($"Не был найден элемент {item}!");
+                MessageBox.Show($"Не был найден элемент {item}!");
             }
         }
         private static string GetCategory(string str)
@@ -60,6 +60,7 @@ namespace DBSelectionForm.Services
         {
             try
             {
+                int index = 0;
                 using (StreamReader sr = new StreamReader(Path))
                 {
                     string Line;
@@ -67,6 +68,12 @@ namespace DBSelectionForm.Services
                     {
                         if (string.IsNullOrEmpty(Line))
                         {
+                            continue;
+                        }
+                        if (index == 0 && Line.IndexOf("Count") == -1)
+                        {
+                            index++;
+                            MessageBox.Show($"Ошибка. В первой строчке отсутствует слово: Count");
                             continue;
                         }
                         string[] ArrOfStr = Line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
@@ -78,6 +85,7 @@ namespace DBSelectionForm.Services
                             }
                             if (ArrOfStr[1] == "Count")
                             {
+                                index++;
                                 continue;
                             }
                             StringArray.Add(ArrOfStr[1]);
@@ -91,8 +99,10 @@ namespace DBSelectionForm.Services
                             }
                             StringArray.Add(Line);
                         }
+                        index++;
                     }
                 }
+                index = 0;
             }
             catch (FileNotFoundException)
             {
@@ -137,17 +147,18 @@ namespace DBSelectionForm.Services
                             }
                             else if (ICArray.IndexOf($"{StrArr[0].Replace("#1", "")}") != -1)
                             {
+                                string str = GetCategory(StrArr[0]);
                                 if (VarArr[0] == "НЕТ" && StrArr[2] == "ДА")
                                 {
-                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}1{"\t"}{StrArr[3]}\t-10000");
+                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}1{"\t"}{StrArr[3]}\t{str}");
                                 }
                                 else if (VarArr[0] == "ДА" && StrArr[2] == "НЕТ")
                                 {
-                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}0{"\t"}{StrArr[3]}\t-10000");
+                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}0{"\t"}{StrArr[3]}\t{str}");
                                 }
                                 else
                                 {
-                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}99995{"\t"}{StrArr[3]}\t-10000");
+                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}99995{"\t"}{StrArr[3]}\t{str}");
                                 }
                                 DBName.Add(StrArr[0].Replace("#1", ""));
                                 VarArr = new List<string>();
@@ -188,6 +199,14 @@ namespace DBSelectionForm.Services
                         if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
                         {
                             sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]}");
+                        }
+                        else if (ArrOfStr[1] == "ДА")
+                        {
+                            sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]}");
+                        }
+                        else if (ArrOfStr[1] == "НЕТ")
+                        {
+                            sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]}");
                         }
                         else
                         {

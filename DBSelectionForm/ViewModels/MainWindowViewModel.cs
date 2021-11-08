@@ -359,8 +359,10 @@ namespace DBSelectionForm.ViewModels
 
             _fileIOservice = new FileIOService(Path);
 
-            _InfoData = _fileIOservice.LoadData();
-
+            if ((_InfoData = _fileIOservice.LoadData()) == null)
+            {
+                _InfoData = new InfoData();
+            }
             if (_InfoData.PathToFolder != null)
             {
                 _PathToFolder = _InfoData.PathToFolder;
