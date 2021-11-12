@@ -12,6 +12,11 @@ namespace DBSelectionForm.Services
 {
     class GetListFromDB
     {
+        private static double ConvertDataFormat(string OldFormat, string Day, IFormatProvider formatter)
+        {
+            string[] SplitStr = OldFormat.Trim().Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+            return ((double.Parse(Day, formatter) - 6) * 3600 * 24 + double.Parse(SplitStr[0], formatter) * 3600 + double.Parse(SplitStr[1], formatter) * 60 + double.Parse(SplitStr[2], formatter));
+        }
         /// <summary> Проверяем левую и правую букву, если это цифра, то возвращает - 1, это нужно для метода IsFoundName</summary>
         private static bool CheckForNums(string CheckStr, string KeyStr)
         {
@@ -39,7 +44,7 @@ namespace DBSelectionForm.Services
         }
         private static string GetCategory(string str)
         {
-            if ((str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX"))) // категория 0
+            if ((str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX")) || (str.IndexOf("FF") != -1 && CheckForNums(str, "FF")) || (str.IndexOf("FP") != -1 && CheckForNums(str, "FP")) || (str.IndexOf("FT") != -1 && CheckForNums(str, "FT")) || (str.IndexOf("FL") != -1 && CheckForNums(str, "FL"))) // категория 0
             {
                 return "0";
             }
@@ -91,7 +96,7 @@ namespace DBSelectionForm.Services
                         {
                             index++;
                             MessageBox.Show($"Ошибка. В первой строчке отсутствует слово: Count");
-                            continue;
+                            
                         }
                         string[] ArrOfStr = Line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                         if (ArrOfStr.Length > 1)
@@ -137,53 +142,68 @@ namespace DBSelectionForm.Services
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 Encoding ANSI = Encoding.GetEncoding(1251);
 
-                using (StreamReader sr = new StreamReader(Path, ANSI))
-                {
+
+
                     List<string> VarArr = new List<string>();
                     string Line;
                     int k = 0;
-                    while ((Line = sr.ReadLine()) != null)
+                    foreach (var IC in ICArray)
                     {
-                        if (k > 3)
+                    using (StreamReader sr = new StreamReader(Path, ANSI))
+                    {
+                        while ((Line = sr.ReadLine()) != null)
                         {
+                            if (k > 3)
+                            {
+                                string[] StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                
+                                //<------------------------------------------------------------------------------------------------------------>
 
-                            string[] StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                            if (ICArray.Contains(StrArr[0]))
-                            {
-                                string str = GetCategory(StrArr[0]);
-                                if (str == "-100000") // Если не нашли категорию
+                                if (IC.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
                                 {
-                                    IsReliable = false;
+                                    if ($"{IC}#1".Contains(StrArr[0]))
+                                    {
+                                        string str = GetCategory(StrArr[0]);
+                                        if (str == "-100000")
+                                        {
+                                            IsReliable = false;
+                                        }
+                                        if (StrArr[2] == "ДА")
+                                        {
+                                            DBArray.Add($"{IC}{"\t"}1{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
+                                            DBName.Add(IC);
+                                        }
+                                        else if (StrArr[2] == "НЕТ")
+                                        {
+                                            DBArray.Add($"{IC}{"\t"}0{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
+                                            DBName.Add(IC);
+                                        }
+                                        k = 0;
+                                        break;
+                                    }
                                 }
+                                //<------------------------------------------------------------------------------------------------------------>
+                                else // Если встречается обычный датчик
+                                {
+                                    if (IC.Contains(StrArr[0]))
+                                    {
+                                        string str = GetCategory(StrArr[0]);
+                                        if (str == "-100000")
+                                        {
+                                            IsReliable = false;
+                                        }
+                                        DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
+                                        DBName.Add(IC);
 
-                                DBArray.Add($"{StrArr[0]}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}");
-                                DBName.Add(StrArr[0]);
-                            }
-                            else if (ICArray.IndexOf($"{StrArr[0].Replace("#0", "")}") != -1)
-                            {
-                                VarArr.Add($"{StrArr[2]}");
-                            }
-                            else if (ICArray.IndexOf($"{StrArr[0].Replace("#1", "")}") != -1)
-                            {
-                                string str = GetCategory(StrArr[0]);
-                                if (VarArr[0] == "НЕТ" && StrArr[2] == "ДА")
-                                {
-                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}1{"\t"}{StrArr[3]}\t{str}");
+                                        k = 0;
+                                        break;
+                                    }
                                 }
-                                else if (VarArr[0] == "ДА" && StrArr[2] == "НЕТ")
-                                {
-                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}0{"\t"}{StrArr[3]}\t{str}");
-                                }
-                                else
-                                {
-                                    DBArray.Add($"{StrArr[0].Replace("#1", "")}{"\t"}99995{"\t"}{StrArr[3]}\t{str}");
-                                }
-                                DBName.Add(StrArr[0].Replace("#1", ""));
-                                VarArr = new List<string>();
                             }
+                            k++;
                         }
-                        k++;
                     }
+                    
                 }
             }
             catch (FileNotFoundException)
@@ -192,16 +212,26 @@ namespace DBSelectionForm.Services
             }
         }
 
-        private static void FindFreshDataInDB(ref List<string> DBArray, string RelatePathToFolder, string EndTime)
+        /// <summary> Нужно найти свежую информацию о датчике, если она есть в большом массиве, где данные не всегда записываются</summary>
+        private static void FindFreshDataInDB(ref List<string> DBArray, ref List<string> DBNameFresh, string RelatePathToFolder, double EndTime)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding ANSI = Encoding.GetEncoding(1251);
             string[] filePaths = Directory.GetFiles(RelatePathToFolder);
+            string LastValueOfSensor = null;
+            string LastDateOfSensor = null;
+            double ConvertedDate; // конвертируем дату
+            string[] ConvertedTimeArr; // конвертируем время
+            double ConvertedTimeDouble; // конечное время, переведенное
+            string VarStr; // присаиваем сюда значение item из цикла foreach
+            bool IsEnd = false;
+
 
             foreach (var SensorName in DBArray)
             {
+                VarStr = SensorName;
                 string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var path in filePaths)
                 {
@@ -212,34 +242,62 @@ namespace DBSelectionForm.Services
                         using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
                         {
                             string line;
+                            string[] lineSplit;
                             while ((line = sr.ReadLine()) != null)
                             {
-                                if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], SensorName) == 0)
-                                { 
-                                    // Находим имя
-                                    // Проверяем время
-                                    // Если время меньше EndTime, то присваиваем новое значение в массив
-                                    // Если больше, то выходим из цикла
+                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                                if (lineSplit[2].IndexOf(StrArr[0]) != -1) //String.Compare(lineSplit[2], StrArr[0]) == 0
+                                {
+
                                     #region Обработка данных
 
-                                    example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
-                                    DateArr = example[1].Trim().Replace(",", ".").Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-                                    DateDayArr = example[0].Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-                                    Date = double.Parse(DateArr[0], formatter) * 3600 + double.Parse(DateArr[1], formatter) * 60 + double.Parse(DateArr[2], formatter) + (double.Parse(DateDayArr[0], formatter) - 6) * 24 * 3600;
-                                    DateStr = Date.ToString();
+                                    ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
+                                    ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                                    ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter)/1000;
+
+                                    try
+                                    {
+                                        if (EndTime >= ConvertedTimeDouble && lineSplit[4] == "дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[3];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                        }
+                                        else if (EndTime < ConvertedTimeDouble && lineSplit[4] == "дост")
+                                        {
+                                            IsEnd = true;
+                                            VarStr = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            IsEnd = true;
+                                            break;
+                                        }
+                                    }
+                                    catch (NullReferenceException)
+                                    {
+                                        MessageBox.Show("Вылетел NULL в методе GetDataListBD");
+                                    }
+
                                     #endregion
 
-                                    ListData.Add(new string[] { DateStr, example[3] });
                                 }
                             }
+
+                            
                         }
 
                     }
+                    LastDateOfSensor = null;
+                    LastValueOfSensor = null;
+                    if (IsEnd)
+                    {
+                        IsEnd = false;
+                        break;
+                    }
                 }
+                DBNameFresh.Add(VarStr);
             }
-
-
-
         }
 
         ///<summary> Записываем информацию в файл !List_IC.txt </summary>
@@ -266,19 +324,19 @@ namespace DBSelectionForm.Services
                     {
                         if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
                         {
-                            sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]}");
+                            sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ","_")}");
                         }
                         else if (ArrOfStr[1] == "ДА")
                         {
-                            sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]}");
+                            sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                         else if (ArrOfStr[1] == "НЕТ")
                         {
-                            sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]}");
+                            sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                         else
                         {
-                            sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]}");
+                            sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                     }
                     else
@@ -287,16 +345,16 @@ namespace DBSelectionForm.Services
                         {
                             if (d >= 0)
                             {
-                                sw.WriteLine($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]}");
+                                sw.WriteLine($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
                             }
                             else
                             {
-                                sw.WriteLine($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]}");
+                                sw.WriteLine($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
                             }
                         }
                         else
                         {
-                            sw.WriteLine($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]}");
+                            sw.WriteLine($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                     }
                     i++;
@@ -305,16 +363,18 @@ namespace DBSelectionForm.Services
             }
         }
 
-        public static void GetListMethod(InfoData _InfoData)
+        public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay)
         {
-
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             bool IsReliable = true;
             string ReadPathFromDB = _InfoData.PathToDataFile;
             string WorkPath = _InfoData.PathToListFile;
             string RelatePathToFolder = _InfoData.PathToFolder;
+            //double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
-            List<string> DBName = new List<string>();
-            List<string> StringArrayFromDB = new List<string>();
+            List<string> DBName = new List<string>(); 
+            List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
+            List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
             List<string> StringArrayFromIC = new List<string>();
 
 
@@ -322,9 +382,13 @@ namespace DBSelectionForm.Services
 
             FindDataInDB(ReadPathFromDB, ref StringArrayFromDB, ref StringArrayFromIC, ref IsReliable, ref DBName);
 
+            //FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime);
+
             WriteDataToIC(WorkPath, ref StringArrayFromDB, IsReliable);
 
             IsFoundName(ref DBName, ref StringArrayFromIC);
+
+            
 
             MessageBox.Show($"Список создан");
         }

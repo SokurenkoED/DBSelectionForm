@@ -23,5 +23,10 @@ namespace DBSelectionForm.Models
         public string DayFrom { get; set; }
 
         public string DayTo { get; set; }
+
+        public string PathToFolderForListBD { get; set; }
+
+        public string EndDayForListBD { get; set; }
+        public string EndTimeForListBD { get; set; }
     }
 }
