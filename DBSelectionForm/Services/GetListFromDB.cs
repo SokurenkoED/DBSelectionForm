@@ -1,6 +1,7 @@
 ﻿using DBSelectionForm.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -213,7 +214,7 @@ namespace DBSelectionForm.Services
         }
 
         /// <summary> Нужно найти свежую информацию о датчике, если она есть в большом массиве, где данные не всегда записываются</summary>
-        private static void FindFreshDataInDB(ref List<string> DBArray, ref List<string> DBNameFresh, string RelatePathToFolder, double EndTime)
+        private static void FindFreshDataInDB(ref List<string> DBArray, ref List<string> DBNameFresh, string RelatePathToFolder, double EndTime, ref ObservableCollection<string> _TextInformationFromListDB)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
@@ -231,6 +232,7 @@ namespace DBSelectionForm.Services
 
             foreach (var SensorName in DBArray)
             {
+                
                 DBNameFresh.Add(SensorName);
                 VarStr = SensorName;
                 string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries); // Разделил строку с маленькой базы данных
@@ -240,6 +242,7 @@ namespace DBSelectionForm.Services
                     string RuteName = StrArr[0].Substring(2, 3); // Получил 3 буквы
                     if (filename.IndexOf(RuteName) != -1) // Находим файлы, в которых содержатся 3 буквы
                     {
+                        _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск значений для датчика {StrArr[0]} в файле {filename}!");
                         using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
                         {
                             string line;
@@ -256,7 +259,6 @@ namespace DBSelectionForm.Services
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                                 ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
-
                                 if (EndTime < ConvertedTimeDouble) // Логика выхода из цикла, когда заданное время привышает время у датчика в БД
                                 {
                                     IsEnd = true;
@@ -266,6 +268,18 @@ namespace DBSelectionForm.Services
                                 if (StrArr[0].IndexOf("_Z0") != -1)// Если попадается элемент с _Z0 
                                 {
                                     if (lineSplit[2].IndexOf($"{StrArr[0]}#1") != -1) 
+                                    {
+                                        if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[5];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                        }
+                                    }
+                                }
+                                else if (StrArr[0].IndexOf("_XA") != -1)
+                                {
+                                    if (lineSplit[2].IndexOf(StrArr[0]) == 0)
                                     {
                                         if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
                                         {
@@ -364,8 +378,13 @@ namespace DBSelectionForm.Services
             }
         }
 
-        public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay)
+        public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
         {
+            Stopwatch SW = new Stopwatch();
+            SW.Start();
+            _TextInformationFromListDB.Clear();
+            _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск начался!");
+
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             bool IsReliable = true;
             string ReadPathFromDB = _InfoData.PathToDataFile;
@@ -383,14 +402,17 @@ namespace DBSelectionForm.Services
 
             FindDataInDB(ReadPathFromDB, ref StringArrayFromDB, ref StringArrayFromIC, ref IsReliable, ref DBName);
 
-            FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime);
+            FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
 
             WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable);
 
             IsFoundName(ref DBName, ref StringArrayFromIC);
-
-            
-
+            SW.Stop();
+            TimeSpan ts = SW.Elapsed;
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+            _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск закончился! Время выполнения - {elapsedTime}");
             MessageBox.Show($"Список создан");
         }
     }

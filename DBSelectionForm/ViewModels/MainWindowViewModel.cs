@@ -155,7 +155,7 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
-        #region Сообщения о процессе выполнения
+        #region Сообщения о процессе выполнения для выборки с БД
 
         private ObservableCollection<string> _TextInformation = new AsyncObservableCollection<string>();
 
@@ -166,6 +166,22 @@ namespace DBSelectionForm.ViewModels
             set
             {
                 Set(ref _TextInformation, value);
+            }
+        }
+
+        #endregion
+
+        #region Сообщения о процессе выполнения для ListFromDB
+
+        private ObservableCollection<string> _TextInformationFromListDB = new AsyncObservableCollection<string>();
+
+        /// <summary>Сообщения о процессе выполнения для ListFromDB</summary>
+        public ObservableCollection<string> TextInformationFromListDB
+        {
+            get => _TextInformationFromListDB;
+            set
+            {
+                Set(ref _TextInformationFromListDB, value);
             }
         }
 
@@ -384,11 +400,12 @@ namespace DBSelectionForm.ViewModels
             {
                 _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
                 _fileIOservice.SaveData(_InfoData);
-                GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD);
-                using (StreamReader sr = new StreamReader(PathToListFile, Encoding.Default))
-                {
-                    DataToTextBox = sr.ReadToEnd();
-                }
+                Task task = Task.Factory.StartNew(() => GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
+                //GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD);
+                //using (StreamReader sr = new StreamReader(PathToListFile, Encoding.Default))
+                //{
+                //    DataToTextBox = sr.ReadToEnd();
+                //}
             }
             catch (ArgumentException)
             {
