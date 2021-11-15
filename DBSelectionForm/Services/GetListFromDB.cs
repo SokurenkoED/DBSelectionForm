@@ -219,7 +219,7 @@ namespace DBSelectionForm.Services
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding ANSI = Encoding.GetEncoding(1251);
-            string[] filePaths = Directory.GetFiles(RelatePathToFolder);
+            string[] filePaths = Directory.GetFiles(RelatePathToFolder); // Массив путей со всеми элементами
             string LastValueOfSensor = null;
             string LastDateOfSensor = null;
             double ConvertedDate; // конвертируем дату
@@ -231,62 +231,64 @@ namespace DBSelectionForm.Services
 
             foreach (var SensorName in DBArray)
             {
+                DBNameFresh.Add(SensorName);
                 VarStr = SensorName;
-                string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries); // Разделил строку с маленькой базы данных
                 foreach (var path in filePaths)
                 {
-                    string filename = Path.GetFileName(path);
-                    string RuteName = StrArr[0].Substring(2, 3);
-                    if (filename.IndexOf(RuteName) != -1)
+                    string filename = Path.GetFileName(path); // Получаем имя файла
+                    string RuteName = StrArr[0].Substring(2, 3); // Получил 3 буквы
+                    if (filename.IndexOf(RuteName) != -1) // Находим файлы, в которых содержатся 3 буквы
                     {
                         using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
                         {
                             string line;
                             string[] lineSplit;
+                            int k = 0;
                             while ((line = sr.ReadLine()) != null)
                             {
-                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
-                                if (lineSplit[2].IndexOf(StrArr[0]) != -1) //String.Compare(lineSplit[2], StrArr[0]) == 0
+                                if (k < 4)
                                 {
+                                    k++;
+                                    continue;
+                                }
+                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
+                                ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
+                                ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                                ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
 
-                                    #region Обработка данных
+                                if (EndTime < ConvertedTimeDouble) // Логика выхода из цикла, когда заданное время привышает время у датчика в БД
+                                {
+                                    IsEnd = true;
+                                    break;
+                                }
 
-                                    ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
-                                    ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-                                    ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter)/1000;
-
-                                    try
+                                if (StrArr[0].IndexOf("_Z0") != -1)// Если попадается элемент с _Z0 
+                                {
+                                    if (lineSplit[2].IndexOf($"{StrArr[0]}#1") != -1) 
+                                    {
+                                        if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[5];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (lineSplit[2].IndexOf(StrArr[0]) == 0)
                                     {
                                         if (EndTime >= ConvertedTimeDouble && lineSplit[4] == "дост")
                                         {
                                             LastValueOfSensor = lineSplit[3];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                        }
-                                        else if (EndTime < ConvertedTimeDouble && lineSplit[4] == "дост")
-                                        {
-                                            IsEnd = true;
-                                            VarStr = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            IsEnd = true;
-                                            break;
+                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
                                         }
                                     }
-                                    catch (NullReferenceException)
-                                    {
-                                        MessageBox.Show("Вылетел NULL в методе GetDataListBD");
-                                    }
-
-                                    #endregion
-
                                 }
                             }
-
-                            
                         }
-
                     }
                     LastDateOfSensor = null;
                     LastValueOfSensor = null;
@@ -296,7 +298,6 @@ namespace DBSelectionForm.Services
                         break;
                     }
                 }
-                DBNameFresh.Add(VarStr);
             }
         }
 
@@ -370,9 +371,9 @@ namespace DBSelectionForm.Services
             string ReadPathFromDB = _InfoData.PathToDataFile;
             string WorkPath = _InfoData.PathToListFile;
             string RelatePathToFolder = _InfoData.PathToFolder;
-            //double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
+            double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
-            List<string> DBName = new List<string>(); 
+            List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
             List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
             List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
             List<string> StringArrayFromIC = new List<string>();
@@ -382,9 +383,9 @@ namespace DBSelectionForm.Services
 
             FindDataInDB(ReadPathFromDB, ref StringArrayFromDB, ref StringArrayFromIC, ref IsReliable, ref DBName);
 
-            //FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime);
+            FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime);
 
-            WriteDataToIC(WorkPath, ref StringArrayFromDB, IsReliable);
+            WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable);
 
             IsFoundName(ref DBName, ref StringArrayFromIC);
 
