@@ -27,6 +27,54 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+        #region PathToFolderForListBD
+
+        private string _PathToFolderForListBD;
+
+        /// <summary></summary>
+        public string PathToFolderForListBD
+        {
+            get => _PathToFolderForListBD;
+            set
+            {
+                Set(ref _PathToFolderForListBD, value);
+            }
+        }
+
+        #endregion
+
+        #region EndTimeForListBD
+
+        private string _EndTimeForListBD;
+
+        /// <summary></summary>
+        public string EndTimeForListBD
+        {
+            get => _EndTimeForListBD;
+            set
+            {
+                Set(ref _EndTimeForListBD, value);
+            }
+        }
+
+        #endregion
+
+        #region EndDayForListBD
+
+        private string _EndDayForListBD;
+
+        /// <summary></summary>
+        public string EndDayForListBD
+        {
+            get => _EndDayForListBD;
+            set
+            {
+                Set(ref _EndDayForListBD, value);
+            }
+        }
+
+        #endregion
+
         #region День "С"
 
         private string _DayFrom;
@@ -107,7 +155,7 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
-        #region Сообщения о процессе выполнения
+        #region Сообщения о процессе выполнения для выборки с БД
 
         private ObservableCollection<string> _TextInformation = new AsyncObservableCollection<string>();
 
@@ -118,6 +166,22 @@ namespace DBSelectionForm.ViewModels
             set
             {
                 Set(ref _TextInformation, value);
+            }
+        }
+
+        #endregion
+
+        #region Сообщения о процессе выполнения для ListFromDB
+
+        private ObservableCollection<string> _TextInformationFromListDB = new AsyncObservableCollection<string>();
+
+        /// <summary>Сообщения о процессе выполнения для ListFromDB</summary>
+        public ObservableCollection<string> TextInformationFromListDB
+        {
+            get => _TextInformationFromListDB;
+            set
+            {
+                Set(ref _TextInformationFromListDB, value);
             }
         }
 
@@ -334,17 +398,35 @@ namespace DBSelectionForm.ViewModels
         {
             try
             {
-                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo };
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
                 _fileIOservice.SaveData(_InfoData);
-                GetListFromDB.GetListMethod(_InfoData);
-                using (StreamReader sr = new StreamReader(PathToListFile, Encoding.Default))
-                {
-                    DataToTextBox = sr.ReadToEnd();
-                }
+                Task task = Task.Factory.StartNew(() => GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
+                //GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD);
+                //using (StreamReader sr = new StreamReader(PathToListFile, Encoding.Default))
+                //{
+                //    DataToTextBox = sr.ReadToEnd();
+                //}
             }
             catch (ArgumentException)
             {
                 MessageBox.Show($"Ошибка! Файл не был найден!");
+            }
+        }
+
+        #endregion
+
+        #region OpenFolderDialogForListBD (находим путь до папки с базой данных)
+
+        public ICommand OpenFolderDialogForListBD { get; }
+        private bool CanOpenFolderDialogForListBDExecute(object p) => true;
+        private void OnOpenFolderDialogForListBDExecuted(object p)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            //dialog.InitialDirectory = "C:\\Users";
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                PathToFolderForListBD = dialog.FileName;
             }
         }
 
@@ -359,8 +441,10 @@ namespace DBSelectionForm.ViewModels
 
             _fileIOservice = new FileIOService(Path);
 
-            _InfoData = _fileIOservice.LoadData();
-
+            if ((_InfoData = _fileIOservice.LoadData()) == null)
+            {
+                _InfoData = new InfoData();
+            }
             if (_InfoData.PathToFolder != null)
             {
                 _PathToFolder = _InfoData.PathToFolder;
@@ -385,7 +469,6 @@ namespace DBSelectionForm.ViewModels
             {
                 _PathToListFile = _InfoData.PathToListFile;
             }
-
             if (_InfoData.DayFrom != null)
             {
                 _DayFrom = _InfoData.DayFrom;
@@ -394,6 +477,20 @@ namespace DBSelectionForm.ViewModels
             {
                 _DayTo = _InfoData.DayTo;
             }
+            if (_InfoData.PathToFolderForListBD != null)
+            {
+                _PathToFolderForListBD = _InfoData.PathToFolderForListBD;
+            }
+            if (_InfoData.EndDayForListBD != null)
+            {
+                _EndDayForListBD = _InfoData.EndDayForListBD;
+            }
+            if (_InfoData.EndTimeForListBD != null)
+            {
+                _EndTimeForListBD = _InfoData.EndTimeForListBD;
+            }
+
+
 
 
             #endregion
@@ -415,6 +512,8 @@ namespace DBSelectionForm.ViewModels
             OpenFileDialogForExitFileCommand = new LambdaCommand(OnOpenFileDialogForExitFileCommandExecuted, CanOpenFileDialogForExitFileCommandExecute);
 
             GetListFromDBCommand = new LambdaCommand(OnGetListFromDBCommandExecuted, CanGetListFromDBCommandExecute);
+
+            OpenFolderDialogForListBD = new LambdaCommand(OnOpenFolderDialogForListBDExecuted, CanOpenFolderDialogForListBDExecute);
 
             #endregion
 
