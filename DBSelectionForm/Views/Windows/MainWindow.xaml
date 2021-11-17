@@ -11,7 +11,7 @@
         <vs:MainWindowViewModel/>
     </Window.DataContext>
     <DockPanel>
-        <TabControl>
+        <TabControl> 
 
             <TabItem Header="Выборка с БД" FontSize="16">
                 <Grid>
