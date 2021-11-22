@@ -289,6 +289,18 @@ namespace DBSelectionForm.Services
                                         }
                                     }
                                 }
+                                else if (StrArr[0].IndexOf("_XV01") != -1)
+                                {
+                                    if (lineSplit[2].IndexOf(StrArr[0]) == 0)
+                                    {
+                                        if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[5];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                        }
+                                    }
+                                }
                                 else
                                 {
                                     if (lineSplit[2].IndexOf(StrArr[0]) == 0)
@@ -407,6 +419,7 @@ namespace DBSelectionForm.Services
             WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable);
 
             IsFoundName(ref DBName, ref StringArrayFromIC);
+
             SW.Stop();
             TimeSpan ts = SW.Elapsed;
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
