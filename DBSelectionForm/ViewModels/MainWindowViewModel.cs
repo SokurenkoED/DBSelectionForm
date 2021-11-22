@@ -400,12 +400,14 @@ namespace DBSelectionForm.ViewModels
             {
                 _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
                 _fileIOservice.SaveData(_InfoData);
-                Task task = Task.Factory.StartNew(() => GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
-                //GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD);
-                //using (StreamReader sr = new StreamReader(PathToListFile, Encoding.Default))
-                //{
-                //    DataToTextBox = sr.ReadToEnd();
-                //}
+                try
+                {
+                    Task task = Task.Factory.StartNew(() => GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка в GetListFromDB" + ex.Message);
+                }
             }
             catch (ArgumentException)
             {
