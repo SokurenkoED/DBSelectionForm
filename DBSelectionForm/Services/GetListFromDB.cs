@@ -157,6 +157,7 @@ namespace DBSelectionForm.Services
                     string TimeSansWithTag = null;
                     Dictionary<int, string> DictForGridSens = new Dictionary<int, string>();
                     bool IsNameWithTag = false;
+                    string IsDost = null;
                     using (StreamReader sr = new StreamReader(Path, ANSI))
                     {
                         while ((Line = sr.ReadLine()) != null)
@@ -179,7 +180,7 @@ namespace DBSelectionForm.Services
                                     {
                                         IsReliable = false;
                                     }
-                                    DBArray.Add($"{IC}\t{result}\tдост\t{str}\t{TimeSansWithTag}");
+                                    DBArray.Add($"{IC}\t{result}\t{IsDost}\t{str}\t{TimeSansWithTag}");
                                     DBName.Add(IC);
                                     break;
                                 }
@@ -189,11 +190,12 @@ namespace DBSelectionForm.Services
 
                                 if (IC.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
                                 {
-                                    if (StrArr[0].IndexOf(IC) != -1 && StrArr[3] == "дост")
+                                    if (StrArr[0].IndexOf(IC) != -1)
                                     {
 
                                         IsNameWithTag = true;
                                         TimeSansWithTag = StrArr[1];
+                                        IsDost = StrArr[3];
                                         if (StrArr[2] == "ДА")
                                         {
                                             DictForGridSens.Add(int.Parse(StrArr[0].Replace($"{IC}#", "")), StrArr[2]);
