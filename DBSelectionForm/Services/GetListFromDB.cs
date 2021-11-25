@@ -149,10 +149,14 @@ namespace DBSelectionForm.Services
                     List<string> VarArr = new List<string>();
                 string[] StrArr;
                     string Line;
-                bool IsNameWithTag = false;
-                    int k = 0;
+
+                
                     foreach (var IC in ICArray)
                     {
+                    int k = 0;
+                    string TimeSansWithTag = null;
+                    Dictionary<int, string> DictForGridSens = new Dictionary<int, string>();
+                    bool IsNameWithTag = false;
                     using (StreamReader sr = new StreamReader(Path, ANSI))
                     {
                         while ((Line = sr.ReadLine()) != null)
@@ -161,32 +165,62 @@ namespace DBSelectionForm.Services
                             {
                                 StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
+                                //<------------------------------------------------------------------------------------------------------------>
+
+                                if (IsNameWithTag && StrArr[0].IndexOf(IC) == -1) // Если пошел следубщий датчик, нам нужно доабвить предыдущий с #
+                                {
+                                    int result = 0;
+                                    foreach (var item in DictForGridSens)
+                                    {
+                                        result += (int)Math.Pow(2, item.Key);
+                                    }
+                                    string str = GetCategory(IC);
+                                    if (str == "-100000")
+                                    {
+                                        IsReliable = false;
+                                    }
+                                    DBArray.Add($"{IC}\t{result}\tдост\t{str}\t{TimeSansWithTag}");
+                                    DBName.Add(IC);
+                                    break;
+                                }
 
 
                                 //<------------------------------------------------------------------------------------------------------------>
 
                                 if (IC.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
                                 {
-                                    if ($"{IC}#1".Contains(StrArr[0]))
+                                    if (StrArr[0].IndexOf(IC) != -1 && StrArr[3] == "дост")
                                     {
-                                        string str = GetCategory(StrArr[0]);
-                                        if (str == "-100000")
-                                        {
-                                            IsReliable = false;
-                                        }
+
+                                        IsNameWithTag = true;
+                                        TimeSansWithTag = StrArr[1];
                                         if (StrArr[2] == "ДА")
                                         {
-                                            DBArray.Add($"{IC}{"\t"}1{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
-                                            DBName.Add(IC);
+                                            DictForGridSens.Add(int.Parse(StrArr[0].Replace($"{IC}#", "")), StrArr[2]);
                                         }
-                                        else if (StrArr[2] == "НЕТ")
-                                        {
-                                            DBArray.Add($"{IC}{"\t"}0{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
-                                            DBName.Add(IC);
-                                        }
-                                        k = 0;
-                                        break;
+                                        //SensWithGrid.Add($"{IC}{"\t"}1{"\t"}{StrArr[3]}\t{"ffff"}\t{StrArr[1]}");
                                     }
+
+
+                                    //if ($"{IC}#1".Contains(StrArr[0]))
+                                    //{
+                                    //    string str = GetCategory(StrArr[0]);
+                                    //    if (str == "-100000")
+                                    //    {
+                                    //        IsReliable = false;
+                                    //    }
+                                    //    if (StrArr[2] == "ДА")
+                                    //    {
+                                    //        DBArray.Add($"{IC}{"\t"}1{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
+                                    //        DBName.Add(IC);
+                                    //    }
+                                    //    else if (StrArr[2] == "НЕТ")
+                                    //    {
+                                    //        DBArray.Add($"{IC}{"\t"}0{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
+                                    //        DBName.Add(IC);
+                                    //    }
+                                    //    break;
+                                    //}
                                 }
                                 //<------------------------------------------------------------------------------------------------------------>
                                 else // Если встречается обычный датчик
@@ -204,7 +238,6 @@ namespace DBSelectionForm.Services
                                         DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
                                         DBName.Add(IC);
 
-                                        k = 0;
                                         break;
                                     }
                                 }
