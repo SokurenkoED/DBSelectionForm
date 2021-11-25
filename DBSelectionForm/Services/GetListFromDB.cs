@@ -89,6 +89,7 @@ namespace DBSelectionForm.Services
                     string Line;
                     while ((Line = sr.ReadLine()) != null)
                     {
+                        Line = Line.Trim();
                         if (string.IsNullOrEmpty(Line))
                         {
                             continue;
@@ -146,7 +147,9 @@ namespace DBSelectionForm.Services
 
 
                     List<string> VarArr = new List<string>();
+                string[] StrArr;
                     string Line;
+                bool IsNameWithTag = false;
                     int k = 0;
                     foreach (var IC in ICArray)
                     {
@@ -156,8 +159,10 @@ namespace DBSelectionForm.Services
                         {
                             if (k > 3)
                             {
-                                string[] StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                                
+                                StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+
+
                                 //<------------------------------------------------------------------------------------------------------------>
 
                                 if (IC.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
@@ -186,6 +191,9 @@ namespace DBSelectionForm.Services
                                 //<------------------------------------------------------------------------------------------------------------>
                                 else // Если встречается обычный датчик
                                 {
+
+                                    //Запишем 
+
                                     if (IC.Contains(StrArr[0]))
                                     {
                                         string str = GetCategory(StrArr[0]);
