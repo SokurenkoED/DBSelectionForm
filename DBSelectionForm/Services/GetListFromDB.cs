@@ -13,6 +13,18 @@ namespace DBSelectionForm.Services
 {
     class GetListFromDB
     {
+        private static int ConvertBoolStringToInt(string BoolStr)
+        {
+            switch (BoolStr)
+            {
+                case "ДА":
+                    return 1;
+                case "НЕТ":
+                    return 0;
+                default:
+                    return -10000;
+            }
+        }
         private static double ConvertDataFormat(string OldFormat, string Day, IFormatProvider formatter)
         {
             string[] SplitStr = OldFormat.Trim().Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
@@ -155,7 +167,7 @@ namespace DBSelectionForm.Services
                     {
                     int k = 0;
                     string TimeSansWithTag = null;
-                    Dictionary<int, string> DictForGridSens = new Dictionary<int, string>();
+                    List<string> GridList = new List<string>();
                     bool IsNameWithTag = false;
                     string IsDost = null;
                     using (StreamReader sr = new StreamReader(Path, ANSI))
@@ -168,19 +180,27 @@ namespace DBSelectionForm.Services
 
                                 //<------------------------------------------------------------------------------------------------------------>
 
-                                if (IsNameWithTag && StrArr[0].IndexOf(IC) == -1) // Если пошел следубщий датчик, нам нужно доабвить предыдущий с #
+                                if (IsNameWithTag && StrArr[0].IndexOf(IC) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
                                 {
                                     int result = 0;
-                                    foreach (var item in DictForGridSens)
+                                    foreach (var item in GridList)
                                     {
-                                        result += (int)Math.Pow(2, item.Key);
+                                        string[] varstr = item.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                        switch (varstr[2])
+                                        {
+                                            case "дост":
+                                                result += (int)Math.Pow(2, int.Parse(varstr[0])) * ConvertBoolStringToInt(varstr[1]);
+                                                break;   
+                                            default:
+                                                break;
+                                        }
                                     }
                                     string str = GetCategory(IC);
                                     if (str == "-100000")
                                     {
                                         IsReliable = false;
                                     }
-                                    DBArray.Add($"{IC}\t{result}\t{IsDost}\t{str}\t{TimeSansWithTag}");
+                                    DBArray.Add($"{IC}\t{result}\tдост\t{str}\t{TimeSansWithTag}");
                                     DBName.Add(IC);
                                     break;
                                 }
@@ -192,37 +212,11 @@ namespace DBSelectionForm.Services
                                 {
                                     if (StrArr[0].IndexOf(IC) != -1)
                                     {
-
                                         IsNameWithTag = true;
-                                        TimeSansWithTag = StrArr[1];
+                                        TimeSansWithTag = StrArr[1].Replace("<","");
                                         IsDost = StrArr[3];
-                                        if (StrArr[2] == "ДА")
-                                        {
-                                            DictForGridSens.Add(int.Parse(StrArr[0].Replace($"{IC}#", "")), StrArr[2]);
-                                        }
-                                        //SensWithGrid.Add($"{IC}{"\t"}1{"\t"}{StrArr[3]}\t{"ffff"}\t{StrArr[1]}");
+                                        GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
                                     }
-
-
-                                    //if ($"{IC}#1".Contains(StrArr[0]))
-                                    //{
-                                    //    string str = GetCategory(StrArr[0]);
-                                    //    if (str == "-100000")
-                                    //    {
-                                    //        IsReliable = false;
-                                    //    }
-                                    //    if (StrArr[2] == "ДА")
-                                    //    {
-                                    //        DBArray.Add($"{IC}{"\t"}1{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
-                                    //        DBName.Add(IC);
-                                    //    }
-                                    //    else if (StrArr[2] == "НЕТ")
-                                    //    {
-                                    //        DBArray.Add($"{IC}{"\t"}0{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
-                                    //        DBName.Add(IC);
-                                    //    }
-                                    //    break;
-                                    //}
                                 }
                                 //<------------------------------------------------------------------------------------------------------------>
                                 else // Если встречается обычный датчик
@@ -237,7 +231,7 @@ namespace DBSelectionForm.Services
                                         {
                                             IsReliable = false;
                                         }
-                                        DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1]}");
+                                        DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
                                         DBName.Add(IC);
 
                                         break;
