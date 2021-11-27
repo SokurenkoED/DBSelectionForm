@@ -269,7 +269,11 @@ namespace DBSelectionForm.Services
 
             foreach (var SensorName in DBArray)
             {
-                
+                string GridCategory = null;
+                string TimeSansWithTag = null;
+                List<string> GridList = new List<string>();
+                bool IsNameWithTag = false;
+                string IsDost = null;
                 DBNameFresh.Add(SensorName);
                 VarStr = SensorName;
                 string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries); // Разделил строку с маленькой базы данных
@@ -296,22 +300,59 @@ namespace DBSelectionForm.Services
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                                 ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
+
+
+                                if (IsNameWithTag && lineSplit[2].IndexOf(StrArr[0]) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
+                                {
+                                    int result = 0;
+                                    foreach (var item in GridList)
+                                    {
+                                        string[] varstr = item.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                        switch (varstr[2])
+                                        {
+                                            case "дост":
+                                                result += (int)Math.Pow(2, int.Parse(varstr[0])) * ConvertBoolStringToInt(varstr[1]);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+
+                                    DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{result}\tдост\t{GridCategory}\t{TimeSansWithTag}";
+                                    IsEnd = true;
+                                    break;
+                                }
+
                                 if (EndTime < ConvertedTimeDouble) // Логика выхода из цикла, когда заданное время привышает время у датчика в БД
                                 {
                                     IsEnd = true;
                                     break;
                                 }
 
-                                if (StrArr[0].IndexOf("_Z0") != -1)// Если попадается элемент с _Z0 
+                                //if (StrArr[0].IndexOf("_Z0") != -1)// Если попадается элемент с _Z0 
+                                //{
+                                //    if (lineSplit[2].IndexOf($"{StrArr[0]}#1") != -1) 
+                                //    {
+                                //        if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
+                                //        {
+                                //            LastValueOfSensor = lineSplit[5];
+                                //            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                //            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                //        }
+                                //    }
+                                //}
+                                if (StrArr[0].IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
                                 {
-                                    if (lineSplit[2].IndexOf($"{StrArr[0]}#1") != -1) 
+                                    if (lineSplit[2].IndexOf(StrArr[0]) != -1)
                                     {
-                                        if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
-                                        {
-                                            LastValueOfSensor = lineSplit[5];
-                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
-                                        }
+                                        GridCategory = StrArr[3];
+                                        IsNameWithTag = true;
+                                        LastValueOfSensor = lineSplit[5];
+                                        LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                        TimeSansWithTag = LastDateOfSensor;
+                                        IsDost = StrArr[2];
+
+                                        GridList.Add($"{lineSplit[2].Replace($"{StrArr[0]}#", "")}\t{lineSplit[5]}\t{StrArr[2]}");
                                     }
                                 }
                                 else if (StrArr[0].IndexOf("_XA") != -1)
