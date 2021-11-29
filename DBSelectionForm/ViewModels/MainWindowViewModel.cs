@@ -229,7 +229,7 @@ namespace DBSelectionForm.ViewModels
 
         #region Путь до папки с БД
 
-        private string _PathToFolder = @"C:\Users\Evgeniy-boss\source\repos\SokurenkoED\DBSelection\bin\Debug\net5.0\06-09_07_2018";
+        private string _PathToFolder;
 
         /// <summary>Путь до папки с БД</summary>
         public string PathToFolder
@@ -348,7 +348,7 @@ namespace DBSelectionForm.ViewModels
                 {
                     DataToTextBox = sr.ReadToEnd();
                 }
-                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile };
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
                 _fileIOservice.SaveData(_InfoData);
             }
             catch (ArgumentException)
@@ -372,7 +372,7 @@ namespace DBSelectionForm.ViewModels
                     sw.WriteLine(DataToTextBox);
                     MessageBox.Show("Файл сохранен!");
                 }
-                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile };
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
                 _fileIOservice.SaveData(_InfoData);
             }
             catch (ArgumentException)
