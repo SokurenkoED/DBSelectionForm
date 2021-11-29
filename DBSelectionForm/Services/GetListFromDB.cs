@@ -470,41 +470,48 @@ namespace DBSelectionForm.Services
 
         public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
         {
-            Stopwatch SW = new Stopwatch();
-            SW.Start();
-            _TextInformationFromListDB.Clear();
-            _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск начался!");
+            try
+            {
+                Stopwatch SW = new Stopwatch();
+                SW.Start();
+                _TextInformationFromListDB.Clear();
+                _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск начался!");
 
-            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-            bool IsReliable = true;
-            string ReadPathFromDB = _InfoData.PathToDataFile;
-            string WorkPath = _InfoData.PathToListFile;
-            string RelatePathToFolder = _InfoData.PathToFolder;
-            double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
+                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                bool IsReliable = true;
+                string ReadPathFromDB = _InfoData.PathToDataFile;
+                string WorkPath = _InfoData.PathToListFile;
+                string RelatePathToFolder = _InfoData.PathToFolderForListBD;
+                double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
-            List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
-            List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
-            List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
-            List<string> StringArrayFromIC = new List<string>();
+                List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
+                List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
+                List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
+                List<string> StringArrayFromIC = new List<string>();
 
 
-            ReadDataFromIC(WorkPath, ref StringArrayFromIC);
+                ReadDataFromIC(WorkPath, ref StringArrayFromIC);
 
-            FindDataInDB(ReadPathFromDB, ref StringArrayFromDB, ref StringArrayFromIC, ref IsReliable, ref DBName);
+                FindDataInDB(ReadPathFromDB, ref StringArrayFromDB, ref StringArrayFromIC, ref IsReliable, ref DBName);
 
-            FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
+                FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
 
-            WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable);
+                WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable);
 
-            IsFoundName(ref DBName, ref StringArrayFromIC);
+                IsFoundName(ref DBName, ref StringArrayFromIC);
 
-            SW.Stop();
-            TimeSpan ts = SW.Elapsed;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-            _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск закончился! Время выполнения - {elapsedTime}");
-            MessageBox.Show($"Список создан");
+                SW.Stop();
+                TimeSpan ts = SW.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+                _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск закончился! Время выполнения - {elapsedTime}");
+                MessageBox.Show($"Список создан");
+            }
+            catch (Exception ex)
+            {
+                _TextInformationFromListDB.Add(ex.Message);
+            }
         }
     }
 }
