@@ -13,6 +13,19 @@ namespace DBSelectionForm.Services
 {
     class GetListFromDB
     {
+        /// <summary>
+        /// Тест на проверку формы записи: если у элемента не указывается сигнал, содержащий "_", то вылетает ошибка.
+        /// </summary>
+        /// <param name="ArrOfStr"></param>
+        /// <param name="index">Если записано только имя элемента, то ставится "0", если перед элементом записано число, то ставится "1"</param>
+        private static void TestIsContainsSimbol(string[] ArrOfStr, int index)
+        {
+            // Проверка на наличие "_" у элементов
+            if (!ArrOfStr[index].Contains("_"))
+            {
+                MessageBox.Show($"Ошибка. Неверный формат записи для элемента {ArrOfStr[1]}");
+            }
+        }
         private static int ConvertBoolStringToInt(string BoolStr)
         {
             switch (BoolStr)
@@ -61,11 +74,11 @@ namespace DBSelectionForm.Services
             {
                 return "0";
             }
-            else if (str.IndexOf("AA2") != -1 && CheckForNums(str, "AA")) // Категория 2
+            else if ((str.IndexOf("AA2") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("CG2") != -1 && CheckForNums(str, "CG"))) // Категория 2
             {
                 return "2";
             }
-            else if (str.IndexOf("AA1") != -1 && CheckForNums(str, "AA")) // Категория 3
+            else if ((str.IndexOf("AA1") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("AA8") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("CG1") != -1 && CheckForNums(str, "CG"))) // Категория 3
             {
                 return "3";
             }
@@ -112,7 +125,9 @@ namespace DBSelectionForm.Services
                             MessageBox.Show($"Ошибка. В первой строчке отсутствует слово: Count");
                             
                         }
+
                         string[] ArrOfStr = Line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+
                         if (ArrOfStr.Length > 1)
                         {
                             if (StringArray.Any(w => w == ArrOfStr[1])) // Проверяю на повтор элемента
@@ -124,6 +139,7 @@ namespace DBSelectionForm.Services
                                 index++;
                                 continue;
                             }
+                            TestIsContainsSimbol(ArrOfStr, 1);
                             StringArray.Add(ArrOfStr[1]);
                         }
                         else
@@ -133,6 +149,8 @@ namespace DBSelectionForm.Services
                                 MessageBox.Show($"{"Элемент"} {Line} {"повторяется"}");
                                 //throw new Exception($"{"Элемент"} {Line} {"повторяется"}");
                             }
+                            TestIsContainsSimbol(ArrOfStr, 0);
+
                             StringArray.Add(Line);
                         }
                         index++;
@@ -510,7 +528,7 @@ namespace DBSelectionForm.Services
             }
             catch (Exception ex)
             {
-                _TextInformationFromListDB.Add(ex.Message);
+                _TextInformationFromListDB.Add("Критическая ошибка! " + ex.Message);
             }
         }
     }

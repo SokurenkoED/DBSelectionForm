@@ -20,6 +20,21 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+        #region SelectedIndex - для скрола к последнему элемнету ListBox
+
+        private string _SelectedIndex;
+
+        public string SelectedIndex
+        {
+            get => _SelectedIndex;
+            set
+            {
+                Set(ref _SelectedIndex, value);
+            }
+        }
+
+        #endregion
+
         #region PathToFolderForListBD
 
         private string _PathToFolderForListBD;
