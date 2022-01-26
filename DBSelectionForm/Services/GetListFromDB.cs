@@ -46,7 +46,7 @@ namespace DBSelectionForm.Services
         /// <summary> Проверяем левую и правую букву, если это цифра, то возвращает - 1, это нужно для метода IsFoundName</summary>
         private static bool CheckForNums(string CheckStr, string KeyStr)
         {
-            var asf = CheckStr[CheckStr.IndexOf(KeyStr) - 1];
+            CheckStr = CheckStr.Substring(5);
             bool IsLeftNum = int.TryParse(CheckStr[CheckStr.IndexOf(KeyStr) - 1].ToString(), out _);
             bool IsRightNum = int.TryParse(CheckStr[CheckStr.IndexOf(KeyStr) + KeyStr.Length + 1].ToString(), out _);
 
