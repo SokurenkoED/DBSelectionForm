@@ -205,9 +205,10 @@ namespace DBSelectionForm.Services
                                 if (IsNameWithTag && StrArr[0].IndexOf(IC) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
                                 {
                                     int result = 0;
+                                    string[] varstr = null;
                                     foreach (var item in GridList)
                                     {
-                                        string[] varstr = item.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                        varstr = item.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                                         switch (varstr[2])
                                         {
                                             case "дост":
@@ -222,7 +223,7 @@ namespace DBSelectionForm.Services
                                     {
                                         IsReliable = false;
                                     }
-                                    DBArray.Add($"{IC}\t{result}\tдост\t{str}\t{TimeSansWithTag}");
+                                    DBArray.Add($"{IC}\t{result}\t{varstr[2]}\t{str}\t{TimeSansWithTag}");
                                     DBName.Add(IC);
                                     break;
                                 }
@@ -451,19 +452,19 @@ namespace DBSelectionForm.Services
                     {
                         if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
                         {
-                            sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ","_")}");
+                            sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ","_")}");
                         }
                         else if (ArrOfStr[1] == "ДА")
                         {
-                            sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                         else if (ArrOfStr[1] == "НЕТ")
                         {
-                            sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                         else
                         {
-                            sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                     }
                     else
@@ -472,16 +473,16 @@ namespace DBSelectionForm.Services
                         {
                             if (d >= 0)
                             {
-                                sw.WriteLine($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
+                                sw.WriteLine($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                             }
                             else
                             {
-                                sw.WriteLine($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
+                                sw.WriteLine($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                             }
                         }
                         else
                         {
-                            sw.WriteLine($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            sw.WriteLine($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                     }
                     i++;
