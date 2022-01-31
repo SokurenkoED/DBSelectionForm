@@ -414,6 +414,7 @@ namespace DBSelectionForm.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    _TextInformationFromListDB.Add($"Критическая ошибка {ex.Message}");
                     MessageBox.Show("Ошибка в GetListFromDB" + ex.Message);
                 }
             }
