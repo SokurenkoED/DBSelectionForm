@@ -21,7 +21,7 @@ namespace DBSelectionForm.Services
         private static void TestIsContainsSimbol(string[] ArrOfStr, int index)
         {
             // Проверка на наличие "_" у элементов
-            if (!ArrOfStr[index].Contains("_"))
+            if (!ArrOfStr[index].Contains("_") && !ArrOfStr[index].Contains("Обнаружено "))
             {
                 MessageBox.Show($"Ошибка. Неверный формат записи для элемента {ArrOfStr[1]}");
             }
@@ -64,13 +64,9 @@ namespace DBSelectionForm.Services
             }
             
         }
-        private static void IsFoundName(ref List<string> DBArray, ref List<string> ICArray)
+        private static void IsFoundName(ref List<string> DBArray, ref List<string> ICArray, ref List<string> NotFoundSignals)
         {
-            var result = ICArray.Except(DBArray);
-            foreach (var item in result)
-            {
-                MessageBox.Show($"Не был найден элемент {item}!");
-            }
+            NotFoundSignals = ICArray.Except(DBArray).ToList();
         }
         private static string GetCategory(string str)
         {
@@ -119,6 +115,12 @@ namespace DBSelectionForm.Services
                     while ((Line = sr.ReadLine()) != null)
                     {
                         Line = Line.Trim();
+
+                        if (Line.Contains("Обнаружено ")) // Если доходим до крайней надписи, выходим из цикла
+                        {
+                            return;
+                        }
+
                         if (string.IsNullOrEmpty(Line))
                         {
                             continue;
@@ -430,66 +432,100 @@ namespace DBSelectionForm.Services
         }
 
         ///<summary> Записываем информацию в файл !List_IC.txt </summary>
-        private static void WriteDataToIC(string WorkPath, ref List<string> StringArrayFromDB, bool IsReliable)
+        private static void WriteDataToIC(string WorkPath, ref List<string> StringArrayFromDB, bool IsReliable, StreamWriter sw, List<string> NotFoundSignals, List<string> InvalidSignals)
         {
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             int i = 0;
-            using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
-            {
-                if (IsReliable == true)
-                {
-                    sw.WriteLine($"{StringArrayFromDB.Count};Count;0");
-                }
-                else
-                {
-                    sw.WriteLine($"{StringArrayFromDB.Count};Count;-1");
-                }
+            List<string> StringArrayAfterSort = new List<string>(); // Конечный массив
+            List<string> StringArrayAfterCategorySort = new List<string>(); // Массив после сортировки по категориям
 
+            if (IsReliable == true)
+            {
+                sw.WriteLine($"{StringArrayFromDB.Count};Count;0");
+            }
+            else
+            {
+                sw.WriteLine($"{StringArrayFromDB.Count};Count;-1");
+            }
+
+            for (int j = 0; j < 8; j++) // СОРТИРОВКА МАССИВА С ЭЛЕМЕНТАМИ
+            {
+                StringArrayAfterCategorySort = new List<string>();
                 foreach (var item in StringArrayFromDB)
                 {
                     string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
-                    double d;
-                    if (ArrOfStr[2] == "дост")
+                    if (ArrOfStr[3] == j.ToString())
                     {
-                        if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
+                        StringArrayAfterCategorySort.Add(item);
+                    }
+                }
+
+                IEnumerable<string> query = from Str in StringArrayAfterCategorySort
+                                            orderby Str.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[0].Substring(2, 3)
+                                            select Str;
+                foreach (var item in query)
+                {
+                    StringArrayAfterSort.Add(item);
+                }
+            }
+
+
+            foreach (var item in StringArrayAfterSort) // Записываем в выходной файл достоверные сигналы
+            {
+                string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                double d;
+                if (ArrOfStr[2] == "дост")
+                {
+                    if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
+                    {
+                        sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ","_")}");
+                    }
+                    else if (ArrOfStr[1] == "ДА")
+                    {
+                        sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                    }
+                    else if (ArrOfStr[1] == "НЕТ")
+                    {
+                        sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                    }
+                    else
+                    {
+                        sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                    }
+                }
+                else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
+                {
+                    if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
+                    {
+                        if (d >= 0)
                         {
-                            sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ","_")}");
-                        }
-                        else if (ArrOfStr[1] == "ДА")
-                        {
-                            sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
-                        }
-                        else if (ArrOfStr[1] == "НЕТ")
-                        {
-                            sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            InvalidSignals.Add($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                         else
                         {
-                            sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            InvalidSignals.Add($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                         }
                     }
                     else
                     {
-                        if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
-                        {
-                            if (d >= 0)
-                            {
-                                sw.WriteLine($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
-                            }
-                            else
-                            {
-                                sw.WriteLine($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
-                            }
-                        }
-                        else
-                        {
-                            sw.WriteLine($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
-                        }
+                        InvalidSignals.Add($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                     }
-                    i++;
                 }
-
+                i++;
             }
+
+            foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
+            {
+                sw.WriteLine(Invalid);
+            }
+
+            sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
+            foreach (var NotFound in NotFoundSignals)
+            {
+                sw.WriteLine(NotFound);
+            }
+
+
         }
 
         public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
@@ -506,6 +542,8 @@ namespace DBSelectionForm.Services
             string RelatePathToFolder = _InfoData.PathToFolderForListBD;
             double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
+            List<string> InvalidSignals = new List<string>(); // Массив с недостоверными сигналами
+            List<string> NotFoundSignals = new List<string>(); // Массив с ненайденными сигналами
             List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
             List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
             List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
@@ -518,9 +556,13 @@ namespace DBSelectionForm.Services
 
             FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
 
-            WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable);
+            IsFoundName(ref DBName, ref StringArrayFromIC, ref NotFoundSignals);
 
-            IsFoundName(ref DBName, ref StringArrayFromIC);
+            using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
+            {
+                WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals);
+            }
+
 
             SW.Stop();
             TimeSpan ts = SW.Elapsed;
