@@ -134,9 +134,10 @@ namespace DBSelectionForm.Services
 
                         if (ArrOfStr.Length > 1)
                         {
-                            if (StringArray.Any(w => w == ArrOfStr[1])) // Проверяю на повтор элемента
+                            if (StringArray.Any(w => w == ArrOfStr[1])) // Проверяю на повтор элемента (Если сигнал повторяется)
                             {
-                                MessageBox.Show($"{"Элемент"} {ArrOfStr[1]} {"повторяется"}");
+                                //MessageBox.Show($"{"Элемент"} {ArrOfStr[1]} {"повторяется"}");
+                                continue;
                             }
                             if (ArrOfStr[1] == "Count")
                             {
