@@ -150,14 +150,14 @@ namespace DBSelectionForm.Services
                         }
                         else
                         {
-                            if (ReadSignals.Any(w => w.Name == ArrOfStr[1])) // Проверяю на повтор элемента
+                            if (ReadSignals.Any(w => w.Name == Line)) // Проверяю на повтор элемента
                             {
                                 MessageBox.Show($"{"Элемент"} {Line} {"повторяется"}");
                                 //throw new Exception($"{"Элемент"} {Line} {"повторяется"}");
                             }
                             TestIsContainsSimbol(ArrOfStr, 0);
 
-                            ReadSignals.Add(new SignalModel { Name = ArrOfStr[1] });
+                            ReadSignals.Add(new SignalModel { Name = Line });
                         }
                         index++;
                     }
