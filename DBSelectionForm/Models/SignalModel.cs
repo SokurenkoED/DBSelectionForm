@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DBSelectionForm.Models
 {
-    class SignalModel
+    class SignalModel : ICloneable
     {
         public int OldValue { get; set; }
         public int NewValue { get; set; }
@@ -19,6 +19,10 @@ namespace DBSelectionForm.Models
             this.Status = Status;
             this.Category = Category;
             this.Date = Date;
+        }
+        public object Clone()
+        {
+            return new SignalModel { Name = this.Name, Category = this.Category, Date = this.Date, NewValue = this.NewValue, OldValue = this.OldValue, Status = this.Status };
         }
     }
 }
