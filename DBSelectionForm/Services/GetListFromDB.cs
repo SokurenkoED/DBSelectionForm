@@ -104,7 +104,7 @@ namespace DBSelectionForm.Services
             }
         }
         /// <summary> Считываем все данные с файла !List_IC.txt </summary>
-        private static void ReadDataFromIC(string Path, ref List<string> StringArray)
+        private static void ReadDataFromIC(string Path, ref List<SignalModel> ReadSignals)
         {
             try
             {
@@ -136,9 +136,8 @@ namespace DBSelectionForm.Services
 
                         if (ArrOfStr.Length > 1)
                         {
-                            if (StringArray.Any(w => w == ArrOfStr[1])) // Проверяю на повтор элемента (Если сигнал повторяется)
+                            if (ReadSignals.Any(w => w.Name == ArrOfStr[1])) // Проверяю на повтор элемента (Если сигнал повторяется)
                             {
-                                //MessageBox.Show($"{"Элемент"} {ArrOfStr[1]} {"повторяется"}");
                                 continue;
                             }
                             if (ArrOfStr[1] == "Count")
@@ -147,18 +146,18 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
                             TestIsContainsSimbol(ArrOfStr, 1);
-                            StringArray.Add(ArrOfStr[1]);
+                            ReadSignals.Add( new SignalModel { Name = ArrOfStr[1] } );
                         }
                         else
                         {
-                            if (StringArray.Any(w => w == Line)) // Проверяю на повтор элемента
+                            if (ReadSignals.Any(w => w.Name == ArrOfStr[1])) // Проверяю на повтор элемента
                             {
                                 MessageBox.Show($"{"Элемент"} {Line} {"повторяется"}");
                                 //throw new Exception($"{"Элемент"} {Line} {"повторяется"}");
                             }
                             TestIsContainsSimbol(ArrOfStr, 0);
 
-                            StringArray.Add(Line);
+                            ReadSignals.Add(new SignalModel { Name = ArrOfStr[1] });
                         }
                         index++;
                     }
@@ -172,7 +171,7 @@ namespace DBSelectionForm.Services
         }
 
         /// <summary> Находим все данные в БД, которые нас интересуют </summary>
-        private static void FindDataInDB(string Path, ref List<string> DBArray, ref List<string> ICArray, ref bool IsReliable, ref List<string> DBName)
+        private static void FindDataInDB(string Path, ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> ReadSignals, ref bool IsReliable, ref List<SignalModel> CheckFoundSignals)
         {
             try
             {
@@ -183,13 +182,13 @@ namespace DBSelectionForm.Services
 
 
 
-                    List<string> VarArr = new List<string>();
+                List<string> VarArr = new List<string>();
                 string[] StrArr;
-                    string Line;
+                string Line;
 
-                
-                    foreach (var IC in ICArray)
-                    {
+
+                foreach (var IC in ReadSignals)
+                {
                     int k = 0;
                     string TimeSansWithTag = null;
                     List<string> GridList = new List<string>();
@@ -205,7 +204,7 @@ namespace DBSelectionForm.Services
 
                                 //<------------------------------------------------------------------------------------------------------------>
 
-                                if (IsNameWithTag && StrArr[0].IndexOf(IC) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
+                                if (IsNameWithTag && StrArr[0].IndexOf(IC.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
                                 {
                                     int result = 0;
                                     string[] varstr = null;
@@ -216,30 +215,31 @@ namespace DBSelectionForm.Services
                                         {
                                             case "дост":
                                                 result += (int)Math.Pow(2, int.Parse(varstr[0])) * ConvertBoolStringToInt(varstr[1]);
-                                                break;   
+                                                break;
                                             default:
                                                 break;
                                         }
                                     }
-                                    string str = GetCategory(IC);
+                                    string str = GetCategory(IC.Name);
                                     if (str == "-100000")
                                     {
                                         IsReliable = false;
                                     }
-                                    DBArray.Add($"{IC}\t{result}\t{varstr[2]}\t{str}\t{TimeSansWithTag}");
-                                    DBName.Add(IC);
+                                    IC.SetPropOnFindDataInDB(result, varstr[2], str, TimeSansWithTag);
+                                    FoundSignalsInDB.Add(IC);
+                                    CheckFoundSignals.Add(IC);
                                     break;
                                 }
 
 
                                 //<------------------------------------------------------------------------------------------------------------>
 
-                                if (IC.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
+                                if (IC.Name.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
                                 {
-                                    if (StrArr[0].IndexOf(IC) != -1)
+                                    if (StrArr[0].IndexOf(IC.Name) != -1)
                                     {
                                         IsNameWithTag = true;
-                                        TimeSansWithTag = StrArr[1].Replace("<","");
+                                        TimeSansWithTag = StrArr[1].Replace("<", "");
                                         IsDost = StrArr[3];
                                         GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
                                     }
@@ -250,7 +250,7 @@ namespace DBSelectionForm.Services
 
                                     //Запишем 
 
-                                    if (IC.Contains(StrArr[0]))
+                                    if (IC.Name.Contains(StrArr[0]))
                                     {
                                         string str = GetCategory(StrArr[0]);
                                         if (str == "-100000")
@@ -258,7 +258,7 @@ namespace DBSelectionForm.Services
                                             IsReliable = false;
                                         }
                                         DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
-                                        DBName.Add(IC);
+                                        CheckFoundSignals.Add(IC);
 
                                         break;
                                     }
@@ -267,7 +267,7 @@ namespace DBSelectionForm.Services
                             k++;
                         }
                     }
-                    
+
                 }
             }
             catch (FileNotFoundException)
@@ -524,8 +524,6 @@ namespace DBSelectionForm.Services
             {
                 sw.WriteLine(NotFound);
             }
-
-
         }
 
         public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
@@ -547,12 +545,16 @@ namespace DBSelectionForm.Services
             List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
             List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
             List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
-            List<string> StringArrayFromIC = new List<string>();
+            List<string> StringArrayFromIC = new List<string>(); // массив сигналов, прочитанных из файла
+
+            List<SignalModel> ReadSignals = new List<SignalModel>(); // Сигналы, которые считали с файла
+            List<SignalModel> FoundSignalsInDB = new List<SignalModel>(); // Сигналы, которые нашлись в срезе
+            List<SignalModel> CheckFoundSignals = new List<SignalModel>(); // Массив с сигналами, которые нашлись в срезе
 
 
-            ReadDataFromIC(WorkPath, ref StringArrayFromIC);
+            ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
 
-            FindDataInDB(ReadPathFromDB, ref StringArrayFromDB, ref StringArrayFromIC, ref IsReliable, ref DBName);
+            FindDataInDB(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
 
             FindFreshDataInDB(ref StringArrayFromDB,ref StringArrayFromDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
 

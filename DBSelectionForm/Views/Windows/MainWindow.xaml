@@ -109,6 +109,23 @@
 
                 </Grid>
             </TabItem>
+            <TabItem Header="Табличное окно">
+                <DockPanel>
+                    <Grid DockPanel.Dock="Top">
+                        
+                    </Grid>
+                    
+                    <Grid>
+                        <DataGrid ItemsSource="">
+                            
+                        </DataGrid>
+                    </Grid>
+                    
+                    <Grid DockPanel.Dock="Bottom">
+                        
+                    </Grid>
+                </DockPanel>
+            </TabItem>
 
         </TabControl>
     </DockPanel>
