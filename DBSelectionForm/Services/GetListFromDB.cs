@@ -90,7 +90,7 @@ namespace DBSelectionForm.Services
             {
                 return "5";
             }
-            else if ((str.IndexOf("ER") != -1 && CheckForNums(str, "ER")) || (str.IndexOf("EG") != -1 && CheckForNums(str, "EG")) || (str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6
+            else if ((str.IndexOf("CG9") != -1 && CheckForNums(str, "CG")) || (str.IndexOf("EU") != -1 && CheckForNums(str, "EU")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER")) || (str.IndexOf("EG") != -1 && CheckForNums(str, "EG")) || (str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6
             {
                 return "6";
             }
@@ -100,7 +100,7 @@ namespace DBSelectionForm.Services
             }
             else
             {
-                return "-100000";
+                return "-1";
             }
         }
         /// <summary> Считываем все данные с файла !List_IC.txt </summary>
@@ -116,9 +116,9 @@ namespace DBSelectionForm.Services
                     {
                         Line = Line.Trim();
 
-                        if (Line.Contains("Обнаружено ")) // Если доходим до крайней надписи, выходим из цикла
+                        if (Line.Contains("Обнаружено "))
                         {
-                            return;
+                            continue;
                         }
 
                         if (string.IsNullOrEmpty(Line))
@@ -220,8 +220,8 @@ namespace DBSelectionForm.Services
                                                 break;
                                         }
                                     }
-                                    string str = GetCategory(IC.Name);
-                                    if (str == "-100000")
+                                    string str = GetCategory(IC);
+                                    if (str == "-1")
                                     {
                                         IsReliable = false;
                                     }
@@ -253,7 +253,7 @@ namespace DBSelectionForm.Services
                                     if (IC.Name.Contains(StrArr[0]))
                                     {
                                         string str = GetCategory(StrArr[0]);
-                                        if (str == "-100000")
+                                        if (str == "-1")
                                         {
                                             IsReliable = false;
                                         }
@@ -438,17 +438,9 @@ namespace DBSelectionForm.Services
             int i = 0;
             List<string> StringArrayAfterSort = new List<string>(); // Конечный массив
             List<string> StringArrayAfterCategorySort = new List<string>(); // Массив после сортировки по категориям
+            List<string> CorrectSignals = new List<string>(); // Корректные сигналы 
 
-            if (IsReliable == true)
-            {
-                sw.WriteLine($"{StringArrayFromDB.Count};Count;0");
-            }
-            else
-            {
-                sw.WriteLine($"{StringArrayFromDB.Count};Count;-1");
-            }
-
-            for (int j = 0; j < 8; j++) // СОРТИРОВКА МАССИВА С ЭЛЕМЕНТАМИ
+            for (int j = -1; j < 8; j++) // СОРТИРОВКА МАССИВА С ЭЛЕМЕНТАМИ
             {
                 StringArrayAfterCategorySort = new List<string>();
                 foreach (var item in StringArrayFromDB)
@@ -478,19 +470,19 @@ namespace DBSelectionForm.Services
                 {
                     if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
                     {
-                        sw.WriteLine($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ","_")}");
+                        CorrectSignals.Add($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ","_")}");
                     }
                     else if (ArrOfStr[1] == "ДА")
                     {
-                        sw.WriteLine($"{1};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        CorrectSignals.Add($"{1};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                     }
                     else if (ArrOfStr[1] == "НЕТ")
                     {
-                        sw.WriteLine($"{0};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        CorrectSignals.Add($"{0};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                     }
                     else
                     {
-                        sw.WriteLine($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        CorrectSignals.Add($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
                     }
                 }
                 else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
@@ -513,7 +505,19 @@ namespace DBSelectionForm.Services
                 }
                 i++;
             }
-
+            if (IsReliable == true)
+            {
+                sw.WriteLine($"{CorrectSignals.Count};Count;0");
+            }
+            else
+            {
+                sw.WriteLine($"{CorrectSignals.Count};Count;-1");
+            }
+            foreach (var Correct in CorrectSignals)
+            {
+                sw.WriteLine(Correct);
+            }
+            sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
             foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
             {
                 sw.WriteLine(Invalid);
