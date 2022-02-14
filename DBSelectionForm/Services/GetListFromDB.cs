@@ -311,7 +311,7 @@ namespace DBSelectionForm.Services
                 bool IsNameWithTag = false;
                 string IsDost = null;
                 FoundSignalsInDBFresh.Add((SignalModel)SensorName.Clone());
-                VarStr = SensorName;
+                //VarStr = SensorName;
                 //string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries); // Разделил строку с маленькой базы данных
                 foreach (var path in filePaths)
                 {
@@ -355,8 +355,8 @@ namespace DBSelectionForm.Services
                                     }
 
                                     //DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{result}\tдост\t{GridCategory}\t{TimeSansWithTag}";
-                                    FoundSignalsInDB[FoundSignalsInDB.Count - 1].NewValue = result;
-                                    FoundSignalsInDB[FoundSignalsInDB.Count - 1].Date = TimeSansWithTag;
+                                    FoundSignalsInDBFresh[^1].NewValue = result;
+                                    FoundSignalsInDBFresh[^1].Date = TimeSansWithTag;
                                     IsEnd = true;
                                     break;
                                 }
@@ -381,43 +381,48 @@ namespace DBSelectionForm.Services
 
                                         var CloneIC = (SignalModel)SensorName.Clone();
                                         CloneIC.Name = lineSplit[2];
-                                        CloneIC.SetPropOnFindDataInDB(lineSplit[5], lineSplit[2], null, null);
+                                        CloneIC.SetPropOnFindDataInDB(lineSplit[5], lineSplit[6], null, null);
                                         BoleanSignals.Add(CloneIC);
                                     }
                                 }
                                 else if (SensorName.Name.IndexOf("_XA") != -1)
                                 {
-                                    if (lineSplit[2].IndexOf(StrArr[0]) == 0)
+                                    if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
                                         if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                            //DBNameFresh[DBNameFresh.Count - 1] = $"{SensorName.Name}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                            FoundSignalsInDB[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDB[^1].Date = LastDateOfSensor;
+
                                         }
                                     }
                                 }
                                 else if (SensorName.Name.IndexOf("_XV01") != -1)
                                 {
-                                    if (lineSplit[2].IndexOf(StrArr[0]) == 0)
+                                    if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
                                         if (EndTime >= ConvertedTimeDouble && lineSplit[6] == "дост")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                            FoundSignalsInDB[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDB[^1].Date = LastDateOfSensor;
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    if (lineSplit[2].IndexOf(StrArr[0]) == 0)
+                                    if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
                                         if (EndTime >= ConvertedTimeDouble && lineSplit[4] == "дост")
                                         {
                                             LastValueOfSensor = lineSplit[3];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                            DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
+                                            FoundSignalsInDB[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDB[^1].Date = LastDateOfSensor;
                                         }
                                     }
                                 }
