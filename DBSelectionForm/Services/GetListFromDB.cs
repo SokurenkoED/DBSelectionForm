@@ -225,7 +225,7 @@ namespace DBSelectionForm.Services
                                     {
                                         IsReliable = false;
                                     }
-                                    IC.SetPropOnFindDataInDB(result, varstr[2], str, TimeSansWithTag);
+                                    IC.SetPropOnFindDataInDB(result, IC.Status, str, TimeSansWithTag);
                                     FoundSignalsInDB.Add(IC);
                                     CheckFoundSignals.Add(IC);
                                     break;
