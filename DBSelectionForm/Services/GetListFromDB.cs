@@ -211,10 +211,10 @@ namespace DBSelectionForm.Services
                                     string status = null;
                                     foreach (var item in BoleanSignals)
                                     {
-                                        switch (item.Status)
+                                        switch (status = item.Status)
                                         {
                                             case "дост":
-                                                result += (int)Math.Pow(2, int.Parse(varstr[0])) * ConvertBoolStringToInt(varstr[1]);
+                                                result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                                 break;
                                             default:
                                                 break;
@@ -225,7 +225,7 @@ namespace DBSelectionForm.Services
                                     {
                                         IsReliable = false;
                                     }
-                                    IC.SetPropOnFindDataInDB(result, IC.Status, str, TimeSansWithTag);
+                                    IC.SetPropOnFindDataInDB(result, status, str, TimeSansWithTag);
                                     FoundSignalsInDB.Add(IC);
                                     CheckFoundSignals.Add(IC);
                                     break;
@@ -243,6 +243,7 @@ namespace DBSelectionForm.Services
                                         IsDost = StrArr[3];
                                         //GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
                                         var CloneIC = (SignalModel)IC.Clone();
+                                        CloneIC.Name = StrArr[0];
                                         CloneIC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], null, null);
                                         BoleanSignals.Add(CloneIC);
                                     }
