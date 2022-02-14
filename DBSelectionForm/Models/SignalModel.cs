@@ -12,7 +12,10 @@ namespace DBSelectionForm.Models
         public string Status { get; set; }
         public string Date { get; set; }
         public string Category { get; set; }
-
+        public string WriteDataToFile()
+        {
+            return $"{NewValue};{Name};{Category};{Status};{Date}";
+        }
         public void SetPropOnFindDataInDB( object NewValue, string Status, string Category, string Date)
         {
             this.NewValue = NewValue;

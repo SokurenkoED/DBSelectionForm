@@ -537,18 +537,18 @@ namespace DBSelectionForm.Services
             }
             foreach (var Correct in CorrectSignals)
             {
-                sw.WriteLine(Correct);
+                sw.WriteLine(Correct.WriteDataToFile());
             }
             sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
             foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
             {
-                sw.WriteLine(Invalid);
+                sw.WriteLine(Invalid.WriteDataToFile());
             }
 
             sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
             foreach (var NotFound in NotFoundSignals)
             {
-                sw.WriteLine(NotFound);
+                sw.WriteLine(NotFound.WriteDataToFile());
             }
         }
 
