@@ -191,7 +191,8 @@ namespace DBSelectionForm.Services
                 {
                     int k = 0;
                     string TimeSansWithTag = null;
-                    List<string> GridList = new List<string>();
+                    //List<string> GridList = new List<string>();
+                    List<SignalModel> BoleanSignals = new List<SignalModel>();
                     bool IsNameWithTag = false;
                     string IsDost = null;
                     using (StreamReader sr = new StreamReader(Path, ANSI))
@@ -208,10 +209,9 @@ namespace DBSelectionForm.Services
                                 {
                                     int result = 0;
                                     string[] varstr = null;
-                                    foreach (var item in GridList)
+                                    foreach (var item in BoleanSignals)
                                     {
-                                        varstr = item.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                                        switch (varstr[2])
+                                        switch (item.Status)
                                         {
                                             case "дост":
                                                 result += (int)Math.Pow(2, int.Parse(varstr[0])) * ConvertBoolStringToInt(varstr[1]);
@@ -220,7 +220,7 @@ namespace DBSelectionForm.Services
                                                 break;
                                         }
                                     }
-                                    string str = GetCategory(IC);
+                                    string str = GetCategory(IC.Name);
                                     if (str == "-1")
                                     {
                                         IsReliable = false;
@@ -241,7 +241,8 @@ namespace DBSelectionForm.Services
                                         IsNameWithTag = true;
                                         TimeSansWithTag = StrArr[1].Replace("<", "");
                                         IsDost = StrArr[3];
-                                        GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
+                                        //GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
+                                        BoleanSignals.Add((SignalModel)IC.Clone());
                                     }
                                 }
                                 //<------------------------------------------------------------------------------------------------------------>
@@ -257,8 +258,13 @@ namespace DBSelectionForm.Services
                                         {
                                             IsReliable = false;
                                         }
-                                        DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
+                                        //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
+                                        //CheckFoundSignals.Add(IC);
+                                        IC.SetPropOnFindDataInDB(int.Parse(StrArr[2]), StrArr[3], str, StrArr[1].Replace("<", ""));
+                                        FoundSignalsInDB.Add(IC);
                                         CheckFoundSignals.Add(IC);
+
+
 
                                         break;
                                     }
