@@ -208,7 +208,7 @@ namespace DBSelectionForm.Services
                                 if (IsNameWithTag && StrArr[0].IndexOf(IC.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
                                 {
                                     int result = 0;
-                                    string[] varstr = null;
+                                    string status = null;
                                     foreach (var item in BoleanSignals)
                                     {
                                         switch (item.Status)
@@ -242,7 +242,9 @@ namespace DBSelectionForm.Services
                                         TimeSansWithTag = StrArr[1].Replace("<", "");
                                         IsDost = StrArr[3];
                                         //GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
-                                        BoleanSignals.Add((SignalModel)IC.Clone());
+                                        var CloneIC = (SignalModel)IC.Clone();
+                                        CloneIC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], null, null);
+                                        BoleanSignals.Add(CloneIC);
                                     }
                                 }
                                 //<------------------------------------------------------------------------------------------------------------>
