@@ -270,7 +270,7 @@ namespace DBSelectionForm.Services
                                         }
                                         //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
                                         //CheckFoundSignals.Add(IC);
-                                        IC.SetPropOnFindDataInDB(int.Parse(StrArr[2]), StrArr[3], str, StrArr[1].Replace("<", ""));
+                                        IC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], str, StrArr[1].Replace("<", ""));
                                         FoundSignalsInDB.Add(IC);
                                         CheckFoundSignals.Add(IC);
 
@@ -448,28 +448,28 @@ namespace DBSelectionForm.Services
         }
 
         ///<summary> Записываем информацию в файл !List_IC.txt </summary>
-        private static void WriteDataToIC(string WorkPath, ref List<string> StringArrayFromDB, bool IsReliable, StreamWriter sw, List<string> NotFoundSignals, List<string> InvalidSignals)
+        private static void WriteDataToIC(string WorkPath, ref List<SignalModel> StringArrayFromDB, bool IsReliable, StreamWriter sw, List<SignalModel> NotFoundSignals, List<SignalModel> InvalidSignals)
         {
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             int i = 0;
-            List<string> StringArrayAfterSort = new List<string>(); // Конечный массив
-            List<string> StringArrayAfterCategorySort = new List<string>(); // Массив после сортировки по категориям
-            List<string> CorrectSignals = new List<string>(); // Корректные сигналы 
+            List<SignalModel> StringArrayAfterSort = new List<SignalModel>(); // Конечный массив
+            List<SignalModel> StringArrayAfterCategorySort = new List<SignalModel>(); // Массив после сортировки по категориям
+            List<SignalModel> CorrectSignals = new List<SignalModel>(); // Корректные сигналы 
 
             for (int j = -1; j < 8; j++) // СОРТИРОВКА МАССИВА С ЭЛЕМЕНТАМИ
             {
-                StringArrayAfterCategorySort = new List<string>();
+                StringArrayAfterCategorySort = new List<SignalModel>();
                 foreach (var item in StringArrayFromDB)
                 {
-                    string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
-                    if (ArrOfStr[3] == j.ToString())
+                    //string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (item.Category == j.ToString())
                     {
                         StringArrayAfterCategorySort.Add(item);
                     }
                 }
 
-                IEnumerable<string> query = from Str in StringArrayAfterCategorySort
-                                            orderby Str.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[0].Substring(2, 3)
+                var query = from Str in StringArrayAfterCategorySort
+                                            orderby Str.Name.Substring(2, 3)
                                             select Str;
                 foreach (var item in query)
                 {
@@ -480,43 +480,49 @@ namespace DBSelectionForm.Services
 
             foreach (var item in StringArrayAfterSort) // Записываем в выходной файл достоверные сигналы
             {
-                string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                //string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 double d;
-                if (ArrOfStr[2] == "дост")
+                if (item.Status == "дост")
                 {
-                    if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
+                    if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
                     {
-                        CorrectSignals.Add($"{ArrOfStr[1]};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ","_")}");
+                        CorrectSignals.Add(item);
                     }
-                    else if (ArrOfStr[1] == "ДА")
+                    else if (item.Status == "ДА")
                     {
-                        CorrectSignals.Add($"{1};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        item.NewValue = 1;
+                        CorrectSignals.Add(item);
                     }
-                    else if (ArrOfStr[1] == "НЕТ")
+                    else if (item.Status == "НЕТ")
                     {
-                        CorrectSignals.Add($"{0};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        item.NewValue = 0;
+                        CorrectSignals.Add(item);
                     }
                     else
                     {
-                        CorrectSignals.Add($"{9999997};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        item.NewValue = 9999997;
+                        CorrectSignals.Add(item);
                     }
                 }
                 else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
                 {
-                    if (double.TryParse(ArrOfStr[1], NumberStyles.Number, formatter, out d))
+                    if (double.TryParse((string)item.NewValue, NumberStyles.Number, formatter, out d))
                     {
                         if (d >= 0)
                         {
-                            InvalidSignals.Add($"{9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            item.NewValue = 9999999;
+                            InvalidSignals.Add(item);
                         }
                         else
                         {
-                            InvalidSignals.Add($"{-9999999};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                            item.NewValue = 9999999;
+                            InvalidSignals.Add(item);
                         }
                     }
                     else
                     {
-                        InvalidSignals.Add($"{9999998};{ArrOfStr[0]};{ArrOfStr[3]};{ArrOfStr[2]};_{ArrOfStr[4].Replace(" ", "_")}");
+                        item.NewValue = 9999998;
+                        InvalidSignals.Add(item);
                     }
                 }
                 i++;
@@ -560,7 +566,7 @@ namespace DBSelectionForm.Services
             string RelatePathToFolder = _InfoData.PathToFolderForListBD;
             double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
-            List<string> InvalidSignals = new List<string>(); // Массив с недостоверными сигналами
+            //List<string> InvalidSignals = new List<string>(); // Массив с недостоверными сигналами
             //List<string> NotFoundSignals = new List<string>(); // Массив с ненайденными сигналами
             List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
             List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
@@ -573,6 +579,7 @@ namespace DBSelectionForm.Services
 
             List<SignalModel> CheckFoundSignals = new List<SignalModel>(); // Массив с сигналами, которые нашлись в срезе
             List<SignalModel> NotFoundSignals = new List<SignalModel>(); // Не найденные в БД сигналы
+            List<SignalModel> InvalidSignals = new List<SignalModel>(); // Недостоверные сигналы
 
 
             ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
@@ -585,7 +592,7 @@ namespace DBSelectionForm.Services
 
             using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
             {
-                //WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals);
+                WriteDataToIC(WorkPath, ref FoundSignalsInDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals);
             }
 
 
