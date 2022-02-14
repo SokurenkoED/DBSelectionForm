@@ -376,9 +376,9 @@ namespace DBSelectionForm.Services
                                         LastValueOfSensor = lineSplit[5];
                                         LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
                                         TimeSansWithTag = LastDateOfSensor;
-                                        IsDost = StrArr[2];
+                                        IsDost = lineSplit[6];
 
-                                        GridList.Add($"{lineSplit[2].Replace($"{StrArr[0]}#", "")}\t{lineSplit[5]}\t{StrArr[2]}");
+                                        GridList.Add($"{lineSplit[2].Replace($"{StrArr[0]}#", "")}\t{lineSplit[5]}\t{lineSplit[6]}");
                                     }
                                 }
                                 else if (StrArr[0].IndexOf("_XA") != -1)
