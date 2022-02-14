@@ -64,9 +64,16 @@ namespace DBSelectionForm.Services
             }
             
         }
-        private static void IsFoundName(ref List<string> DBArray, ref List<string> ICArray, ref List<string> NotFoundSignals)
+        private static void IsFoundName(ref List<SignalModel> ICArray, ref List<SignalModel> NotFoundSignals)
         {
-            NotFoundSignals = ICArray.Except(DBArray).ToList();
+            //NotFoundSignals = ICArray.Where(x => !DBArray.Any(y => y.Name == x.Name)).ToList();
+            foreach (var item in ICArray)
+            {
+                if (item.NewValue == null)
+                {
+                    NotFoundSignals.Add(item);
+                }
+            }
         }
         private static string GetCategory(string str)
         {
@@ -394,8 +401,8 @@ namespace DBSelectionForm.Services
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
                                             //DBNameFresh[DBNameFresh.Count - 1] = $"{SensorName.Name}\t{LastValueOfSensor}\t{StrArr[2]}\t{StrArr[3]}\t{LastDateOfSensor}";
-                                            FoundSignalsInDB[^1].NewValue = LastValueOfSensor;
-                                            FoundSignalsInDB[^1].Date = LastDateOfSensor;
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
 
                                         }
                                     }
@@ -408,8 +415,8 @@ namespace DBSelectionForm.Services
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                            FoundSignalsInDB[^1].NewValue = LastValueOfSensor;
-                                            FoundSignalsInDB[^1].Date = LastDateOfSensor;
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
                                         }
                                     }
                                 }
@@ -421,8 +428,8 @@ namespace DBSelectionForm.Services
                                         {
                                             LastValueOfSensor = lineSplit[3];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
-                                            FoundSignalsInDB[^1].NewValue = LastValueOfSensor;
-                                            FoundSignalsInDB[^1].Date = LastDateOfSensor;
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
                                         }
                                     }
                                 }
@@ -554,7 +561,7 @@ namespace DBSelectionForm.Services
             double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
             List<string> InvalidSignals = new List<string>(); // Массив с недостоверными сигналами
-            List<string> NotFoundSignals = new List<string>(); // Массив с ненайденными сигналами
+            //List<string> NotFoundSignals = new List<string>(); // Массив с ненайденными сигналами
             List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
             List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
             List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
@@ -563,7 +570,9 @@ namespace DBSelectionForm.Services
             List<SignalModel> ReadSignals = new List<SignalModel>(); // Сигналы, которые считали с файла
             List<SignalModel> FoundSignalsInDB = new List<SignalModel>(); // Сигналы, которые нашлись в срезе
             List<SignalModel> FoundSignalsInDBFresh = new List<SignalModel>(); // Сигналы, которые нашлись в изменяющейся базе данных
+
             List<SignalModel> CheckFoundSignals = new List<SignalModel>(); // Массив с сигналами, которые нашлись в срезе
+            List<SignalModel> NotFoundSignals = new List<SignalModel>(); // Не найденные в БД сигналы
 
 
             ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
@@ -572,11 +581,11 @@ namespace DBSelectionForm.Services
 
             FindFreshDataInDB(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
 
-            IsFoundName(ref DBName, ref StringArrayFromIC, ref NotFoundSignals);
+            IsFoundName(ref ReadSignals, ref NotFoundSignals);
 
             using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
             {
-                WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals);
+                //WriteDataToIC(WorkPath, ref StringArrayFromDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals);
             }
 
 
