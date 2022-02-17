@@ -6,6 +6,7 @@ namespace DBSelectionForm.Models
 {
     class SignalModel : ICloneable
     {
+        public int Number { get; set; }
         public object OldValue { get; set; }
         public object NewValue { get; set; }
         public string Name { get; set; }

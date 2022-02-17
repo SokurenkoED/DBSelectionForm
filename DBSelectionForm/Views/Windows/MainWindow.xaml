@@ -114,16 +114,32 @@
                     <Grid DockPanel.Dock="Top">
                         
                     </Grid>
-                    
+
                     <Grid>
-                        <DataGrid ItemsSource="">
-                            
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <DataGrid ItemsSource="{Binding Signals}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  HorizontalGridLinesBrush="DarkGray"
+                                  VerticalGridLinesBrush="DarkGray"
+                                  >
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="№ сигнала" Binding="{Binding Number}"/>
+                                <DataGridTextColumn Header="Имя сигнала" Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="Категория" Binding="{Binding Category}"/>
+                                <DataGridTextColumn Header="Старое значение" Binding="{Binding OldValue}"/>
+                                <DataGridTextColumn Header="Новое значение" Binding="{Binding NewValue}"/>
+                                <DataGridTextColumn Header="Доставерность" Binding="{Binding Status}"/>
+                                <DataGridTextColumn Header="Время" Binding="{Binding Date}" Width="*"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
                     
-                    <Grid DockPanel.Dock="Bottom">
+                    <!--<Grid DockPanel.Dock="Bottom">
                         
-                    </Grid>
+                    </Grid>-->
                 </DockPanel>
             </TabItem>
 

@@ -4,6 +4,7 @@ using DBSelectionForm.Services;
 using DBSelectionForm.ViewModels.Base;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
@@ -19,6 +20,17 @@ namespace DBSelectionForm.ViewModels
         private readonly string Path = $"{Environment.CurrentDirectory}\\IndoData.json";
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
+
+        #region Signals
+
+        private List<SignalModel> _Signals = new List<SignalModel>();
+        public List<SignalModel> Signals
+        {
+            get => _Signals;
+            set => Set(ref _Signals, value);
+        }
+
+        #endregion
 
         #region SelectedIndex - для скрола к последнему элемнету ListBox
 
@@ -410,7 +422,7 @@ namespace DBSelectionForm.ViewModels
                 _fileIOservice.SaveData(_InfoData);
                 try
                 {
-                    Task task = Task.Factory.StartNew(() => GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
+                    Task task = Task.Factory.StartNew(() => Signals = GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
                 }
                 catch (Exception ex)
                 {

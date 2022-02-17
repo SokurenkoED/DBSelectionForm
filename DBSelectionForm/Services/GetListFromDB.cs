@@ -448,7 +448,7 @@ namespace DBSelectionForm.Services
         }
 
         ///<summary> Записываем информацию в файл !List_IC.txt </summary>
-        private static void WriteDataToIC(string WorkPath, ref List<SignalModel> StringArrayFromDB, bool IsReliable, StreamWriter sw, List<SignalModel> NotFoundSignals, List<SignalModel> InvalidSignals)
+        private static void WriteDataToIC(string WorkPath, ref List<SignalModel> StringArrayFromDB, bool IsReliable, StreamWriter sw, List<SignalModel> NotFoundSignals, List<SignalModel> InvalidSignals, ref List<SignalModel> FinalSignalsList)
         {
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             int i = 0;
@@ -506,7 +506,7 @@ namespace DBSelectionForm.Services
                 }
                 else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
                 {
-                    if (double.TryParse((string)item.NewValue, NumberStyles.Number, formatter, out d))
+                    if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
                     {
                         if (d >= 0)
                         {
@@ -527,32 +527,47 @@ namespace DBSelectionForm.Services
                 }
                 i++;
             }
-            if (IsReliable == true)
+            foreach (var item in CorrectSignals)
             {
-                sw.WriteLine($"{CorrectSignals.Count};Count;0");
+                item.Number = FinalSignalsList.Count + 1;
+                FinalSignalsList.Add(item);
             }
-            else
+            foreach (var item in InvalidSignals)
             {
-                sw.WriteLine($"{CorrectSignals.Count};Count;-1");
+                item.Number = FinalSignalsList.Count + 1;
+                FinalSignalsList.Add(item);
             }
-            foreach (var Correct in CorrectSignals)
+            foreach (var item in NotFoundSignals)
             {
-                sw.WriteLine(Correct.WriteDataToFile());
+                item.Number = FinalSignalsList.Count + 1;
+                FinalSignalsList.Add(item);
             }
-            sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
-            foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
-            {
-                sw.WriteLine(Invalid.WriteDataToFile());
-            }
+            //if (IsReliable == true)
+            //{
+            //    sw.WriteLine($"{CorrectSignals.Count};Count;0");
+            //}
+            //else
+            //{
+            //    sw.WriteLine($"{CorrectSignals.Count};Count;-1");
+            //}
+            //foreach (var Correct in CorrectSignals)
+            //{
+            //    sw.WriteLine(Correct.WriteDataToFile());
+            //}
+            //sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
+            //foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
+            //{
+            //    sw.WriteLine(Invalid.WriteDataToFile());
+            //}
 
-            sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
-            foreach (var NotFound in NotFoundSignals)
-            {
-                sw.WriteLine(NotFound.WriteDataToFile());
-            }
+            //sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
+            //foreach (var NotFound in NotFoundSignals)
+            //{
+            //    sw.WriteLine(NotFound.WriteDataToFile());
+            //}
         }
 
-        public static void GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
+        public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
         {
             Stopwatch SW = new Stopwatch();
             SW.Start();
@@ -580,6 +595,7 @@ namespace DBSelectionForm.Services
             List<SignalModel> CheckFoundSignals = new List<SignalModel>(); // Массив с сигналами, которые нашлись в срезе
             List<SignalModel> NotFoundSignals = new List<SignalModel>(); // Не найденные в БД сигналы
             List<SignalModel> InvalidSignals = new List<SignalModel>(); // Недостоверные сигналы
+            List<SignalModel> FinalSignalsList = new List<SignalModel>(); // Конечный список сигналов
 
 
             ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
@@ -592,9 +608,8 @@ namespace DBSelectionForm.Services
 
             using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
             {
-                WriteDataToIC(WorkPath, ref FoundSignalsInDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals);
+                WriteDataToIC(WorkPath, ref FoundSignalsInDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals, ref FinalSignalsList);
             }
-
 
             SW.Stop();
             TimeSpan ts = SW.Elapsed;
@@ -603,6 +618,7 @@ namespace DBSelectionForm.Services
             ts.Milliseconds / 10);
             _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск закончился! Время выполнения - {elapsedTime}");
             MessageBox.Show($"Список создан");
+            return FinalSignalsList;
         }
     }
 }
