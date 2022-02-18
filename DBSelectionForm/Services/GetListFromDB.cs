@@ -135,7 +135,7 @@ namespace DBSelectionForm.Services
                         if (index == 0 && Line.IndexOf("Count") == -1)
                         {
                             index++;
-                            MessageBox.Show($"Ошибка. В первой строчке отсутствует слово: Count");
+                            //MessageBox.Show($"Ошибка. В первой строчке отсутствует слово: Count");
                             
                         }
 
@@ -153,7 +153,7 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
                             TestIsContainsSimbol(ArrOfStr, 1);
-                            ReadSignals.Add( new SignalModel { Name = ArrOfStr[1] } );
+                            ReadSignals.Add( new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0] } );
                         }
                         else
                         {
@@ -164,7 +164,7 @@ namespace DBSelectionForm.Services
                             }
                             TestIsContainsSimbol(ArrOfStr, 0);
 
-                            ReadSignals.Add(new SignalModel { Name = Line });
+                            ReadSignals.Add(new SignalModel { Name = Line, OldValue = "-" });
                         }
                         index++;
                     }
@@ -542,29 +542,29 @@ namespace DBSelectionForm.Services
                 item.Number = FinalSignalsList.Count + 1;
                 FinalSignalsList.Add(item);
             }
-            //if (IsReliable == true)
-            //{
-            //    sw.WriteLine($"{CorrectSignals.Count};Count;0");
-            //}
-            //else
-            //{
-            //    sw.WriteLine($"{CorrectSignals.Count};Count;-1");
-            //}
-            //foreach (var Correct in CorrectSignals)
-            //{
-            //    sw.WriteLine(Correct.WriteDataToFile());
-            //}
-            //sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
-            //foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
-            //{
-            //    sw.WriteLine(Invalid.WriteDataToFile());
-            //}
+            if (IsReliable == true)
+            {
+                sw.WriteLine($"{CorrectSignals.Count};Count;0");
+            }
+            else
+            {
+                sw.WriteLine($"{CorrectSignals.Count};Count;-1");
+            }
+            foreach (var Correct in CorrectSignals)
+            {
+                sw.WriteLine(Correct.WriteDataToFile());
+            }
+            sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
+            foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
+            {
+                sw.WriteLine(Invalid.WriteDataToFile());
+            }
 
-            //sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
-            //foreach (var NotFound in NotFoundSignals)
-            //{
-            //    sw.WriteLine(NotFound.WriteDataToFile());
-            //}
+            sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
+            foreach (var NotFound in NotFoundSignals)
+            {
+                sw.WriteLine(NotFound.WriteDataToFile());
+            }
         }
 
         public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)

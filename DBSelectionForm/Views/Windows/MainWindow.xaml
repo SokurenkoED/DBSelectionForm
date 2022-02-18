@@ -121,7 +121,6 @@
                         </Grid.ColumnDefinitions>
                         <DataGrid ItemsSource="{Binding Signals}"
                                   AutoGenerateColumns="False"
-                                  IsReadOnly="True"
                                   HorizontalGridLinesBrush="DarkGray"
                                   VerticalGridLinesBrush="DarkGray"
                                   >
