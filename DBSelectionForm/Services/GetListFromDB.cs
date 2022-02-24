@@ -345,8 +345,10 @@ namespace DBSelectionForm.Services
                                     }
 
                                     DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{result}\tдост\t{GridCategory}\t{TimeSansWithTag}";
-                                    IsEnd = true;
-                                    break;
+                                    GridList = new List<string>();
+                                    IsNameWithTag = false;
+                                    //IsEnd = true;
+                                    //break;
                                 }
 
                                 if (EndTime < ConvertedTimeDouble) // Логика выхода из цикла, когда заданное время привышает время у датчика в БД
