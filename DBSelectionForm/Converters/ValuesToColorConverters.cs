@@ -19,6 +19,10 @@ namespace DBSelectionForm.Converters
             {
                 return new SolidColorBrush(Colors.White);
             }
+            if (SM.NewValue == null)
+            {
+                return new SolidColorBrush(Colors.White);
+            }
             if (SM.NewValue.ToString() != SM.OldValue.ToString())
             {
                 return new SolidColorBrush(Colors.Pink);

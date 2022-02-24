@@ -364,8 +364,10 @@ namespace DBSelectionForm.Services
                                     //DBNameFresh[DBNameFresh.Count - 1] = $"{StrArr[0]}\t{result}\tдост\t{GridCategory}\t{TimeSansWithTag}";
                                     FoundSignalsInDBFresh[^1].NewValue = result;
                                     FoundSignalsInDBFresh[^1].Date = TimeSansWithTag;
-                                    IsEnd = true;
-                                    break;
+                                    IsNameWithTag = false;
+                                    BoleanSignals = new List<SignalModel>();
+                                    //IsEnd = true;
+                                    //break;
                                 }
 
                                 if (EndTime < ConvertedTimeDouble) // Логика выхода из цикла, когда заданное время привышает время у датчика в БД
