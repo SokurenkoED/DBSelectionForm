@@ -15,20 +15,28 @@ namespace DBSelectionForm.Converters
         public object Convert(object values, Type targetType, object parameter, CultureInfo culture)
         {
             var SM = values as SignalModel;
+            double TryParseNewValue;
+            double TryParseOldValue;
+            var PinkBrush = new SolidColorBrush(Colors.Pink);
+            var WhiteBrush = new SolidColorBrush(Colors.White);
             if (SM == null)
             {
-                return new SolidColorBrush(Colors.White);
+                return WhiteBrush;
             }
-            if (SM.NewValue == null)
+            if (!double.TryParse(SM.NewValue.ToString(), out TryParseNewValue))
             {
-                return new SolidColorBrush(Colors.White);
+                return PinkBrush;
             }
-            if (double.Parse(SM.NewValue.ToString(), culture) != double.Parse(SM.OldValue.ToString(), culture))
+            if (!double.TryParse(SM.OldValue.ToString(), out TryParseOldValue))
             {
-                return new SolidColorBrush(Colors.Pink);
+                return PinkBrush;
+            }
+            if (TryParseNewValue != TryParseOldValue)
+            {
+                return PinkBrush;
             }
 
-            return new SolidColorBrush(Colors.White);
+            return WhiteBrush;
         }
 
 

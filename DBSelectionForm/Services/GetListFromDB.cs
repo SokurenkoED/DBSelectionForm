@@ -490,12 +490,12 @@ namespace DBSelectionForm.Services
                     {
                         CorrectSignals.Add(item);
                     }
-                    else if (item.Status == "ДА")
+                    else if (item.NewValue.ToString() == "ДА")
                     {
                         item.NewValue = 1;
                         CorrectSignals.Add(item);
                     }
-                    else if (item.Status == "НЕТ")
+                    else if (item.NewValue.ToString() == "НЕТ")
                     {
                         item.NewValue = 0;
                         CorrectSignals.Add(item);
