@@ -23,7 +23,7 @@ namespace DBSelectionForm.Converters
             {
                 return new SolidColorBrush(Colors.White);
             }
-            if (SM.NewValue.ToString() != SM.OldValue.ToString())
+            if (double.Parse(SM.NewValue.ToString(), culture) != double.Parse(SM.OldValue.ToString(), culture))
             {
                 return new SolidColorBrush(Colors.Pink);
             }
