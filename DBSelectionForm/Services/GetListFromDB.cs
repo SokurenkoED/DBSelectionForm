@@ -500,32 +500,10 @@ namespace DBSelectionForm.Services
                         item.NewValue = 0;
                         CorrectSignals.Add(item);
                     }
-                    else
-                    {
-                        item.NewValue = 9999997;
-                        CorrectSignals.Add(item);
-                    }
                 }
                 else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
                 {
-                    if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
-                    {
-                        if (d >= 0)
-                        {
-                            item.NewValue = 9999999;
-                            InvalidSignals.Add(item);
-                        }
-                        else
-                        {
-                            item.NewValue = 9999999;
-                            InvalidSignals.Add(item);
-                        }
-                    }
-                    else
-                    {
-                        item.NewValue = 9999998;
-                        InvalidSignals.Add(item);
-                    }
+                    InvalidSignals.Add(item);
                 }
                 i++;
             }

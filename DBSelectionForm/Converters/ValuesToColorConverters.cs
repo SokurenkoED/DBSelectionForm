@@ -17,23 +17,28 @@ namespace DBSelectionForm.Converters
             var SM = values as SignalModel;
             double TryParseNewValue;
             double TryParseOldValue;
-            var PinkBrush = new SolidColorBrush(Colors.Pink);
+            var BlueBrush = new SolidColorBrush(Colors.Blue);
             var WhiteBrush = new SolidColorBrush(Colors.White);
+            var RedBrush = new SolidColorBrush(Colors.Red);
+            if (SM.Status != "дост")
+            {
+                return RedBrush;
+            }
             if (SM == null)
             {
                 return WhiteBrush;
             }
             if (!double.TryParse(SM.NewValue.ToString(), out TryParseNewValue))
             {
-                return PinkBrush;
+                return BlueBrush;
             }
             if (!double.TryParse(SM.OldValue.ToString(), out TryParseOldValue))
             {
-                return PinkBrush;
+                return BlueBrush;
             }
             if (TryParseNewValue != TryParseOldValue)
             {
-                return PinkBrush;
+                return BlueBrush;
             }
 
             return WhiteBrush;
