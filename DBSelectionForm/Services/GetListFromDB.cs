@@ -13,6 +13,19 @@ namespace DBSelectionForm.Services
 {
     class GetListFromDB
     {
+
+        private static void IsRegulator_xq08(SignalModel Signal)
+        {
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+            if (Signal.Name.Contains("_xq08"))
+            {
+                double IsParse;
+                if (Signal.Status == "дост" && double.TryParse(Signal.NewValue.ToString(), NumberStyles.Any, formatter, out IsParse) && IsParse <= 0)
+                {
+                    Signal.NewValue = 0;
+                }
+            }
+        }
         /// <summary>
         /// Тест на проверку формы записи: если у элемента не указывается сигнал, содержащий "_", то вылетает ошибка.
         /// </summary>
@@ -153,6 +166,9 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
                             TestIsContainsSimbol(ArrOfStr, 1);
+
+                            
+
                             ReadSignals.Add( new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0] } );
                         }
                         else
@@ -522,6 +538,12 @@ namespace DBSelectionForm.Services
                 item.Number = FinalSignalsList.Count + 1;
                 FinalSignalsList.Add(item);
             }
+
+            foreach (var item in FinalSignalsList)
+            {
+                IsRegulator_xq08(item);
+            }
+
             if (IsReliable == true)
             {
                 sw.WriteLine($"{CorrectSignals.Count};Count;0");
