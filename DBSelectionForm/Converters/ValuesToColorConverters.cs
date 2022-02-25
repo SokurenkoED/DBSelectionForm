@@ -19,9 +19,9 @@ namespace DBSelectionForm.Converters
             var SM = values as SignalModel;
             double TryParseNewValue;
             double TryParseOldValue;
-            var BlueBrush = new SolidColorBrush(Colors.Blue);
+            var BlueBrush = new SolidColorBrush(Colors.Aqua);
             var WhiteBrush = new SolidColorBrush(Colors.White);
-            var RedBrush = new SolidColorBrush(Colors.Red);
+            var RedBrush = new SolidColorBrush(Colors.Pink);
             if (SM == null)
             {
                 return WhiteBrush;
