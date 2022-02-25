@@ -14,25 +14,27 @@ namespace DBSelectionForm.Converters
 
         public object Convert(object values, Type targetType, object parameter, CultureInfo culture)
         {
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+
             var SM = values as SignalModel;
             double TryParseNewValue;
             double TryParseOldValue;
             var BlueBrush = new SolidColorBrush(Colors.Blue);
             var WhiteBrush = new SolidColorBrush(Colors.White);
             var RedBrush = new SolidColorBrush(Colors.Red);
-            if (SM.Status != "дост")
-            {
-                return RedBrush;
-            }
             if (SM == null)
             {
                 return WhiteBrush;
             }
-            if (!double.TryParse(SM.NewValue.ToString(), out TryParseNewValue))
+            if (SM.Status != "дост")
+            {
+                return RedBrush;
+            }
+            if (!double.TryParse(SM.NewValue.ToString(), NumberStyles.Any, formatter, out TryParseNewValue))
             {
                 return BlueBrush;
             }
-            if (!double.TryParse(SM.OldValue.ToString(), out TryParseOldValue))
+            if (!double.TryParse(SM.OldValue.ToString(), NumberStyles.Any, formatter, out TryParseOldValue))
             {
                 return BlueBrush;
             }
@@ -48,7 +50,7 @@ namespace DBSelectionForm.Converters
         public object ConvertBack(object value, Type targetTypes, object parameter, CultureInfo culture)
         {
             throw new Exception("The method or operation is not implemented.");
-        }
+        }  
 
     }
 }
