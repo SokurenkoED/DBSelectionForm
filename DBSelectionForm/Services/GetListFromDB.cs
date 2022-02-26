@@ -148,7 +148,6 @@ namespace DBSelectionForm.Services
                         if (index == 0 && Line.IndexOf("Count") == -1)
                         {
                             index++;
-                            //MessageBox.Show($"Ошибка. В первой строчке отсутствует слово: Count");
                             
                         }
 
@@ -193,7 +192,7 @@ namespace DBSelectionForm.Services
             }
         }
 
-        /// <summary> Находим все данные в БД, которые нас интересуют </summary>
+        /// <summary> Находим все данные в срезе, которые нас интересуют </summary>
         private static void FindDataInDB(string Path, ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> ReadSignals, ref bool IsReliable, ref List<SignalModel> CheckFoundSignals)
         {
             try
@@ -222,85 +221,121 @@ namespace DBSelectionForm.Services
                     {
                         while ((Line = sr.ReadLine()) != null)
                         {
-                            if (k > 3)
+                            if (k < 4)
                             {
-                                StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                k++;
+                                continue;
+                            }
 
-                                //<------------------------------------------------------------------------------------------------------------>
+                            StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-                                if (IsNameWithTag && StrArr[0].IndexOf(IC.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
+                            //<------------------------------------------------------------------------------------------------------------>
+
+                            if (IsNameWithTag && StrArr[0].IndexOf(IC.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
+                            {
+                                int result = 0;
+                                string status = null;
+                                foreach (var item in BoleanSignals)
                                 {
-                                    int result = 0;
-                                    string status = null;
-                                    foreach (var item in BoleanSignals)
+                                    switch (status = item.Status)
                                     {
-                                        switch (status = item.Status)
-                                        {
-                                            case "дост":
-                                                result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
-                                                break;
-                                            default:
-                                                break;
-                                        }
+                                        case "дост":
+                                            result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                            break;
+                                        default:
+                                            break;
                                     }
-                                    string str = GetCategory(IC.Name);
+                                }
+                                string str = GetCategory(IC.Name);
+                                if (str == "-1")
+                                {
+                                    IsReliable = false;
+                                }
+                                IC.SetPropOnFindDataInDB(result, status, str, TimeSansWithTag);
+                                FoundSignalsInDB.Add(IC);
+                                CheckFoundSignals.Add(IC);
+                                break;
+                            }
+
+                            //<------------------------------------------------------------------------------------------------------------>
+
+                            if (IC.Name.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
+                            {
+                                if (StrArr[0].IndexOf(IC.Name) != -1)
+                                {
+                                    IsNameWithTag = true;
+                                    TimeSansWithTag = StrArr[1].Replace("<", "");
+                                    IsDost = StrArr[3];
+                                    //GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
+                                    var CloneIC = (SignalModel)IC.Clone();
+                                    CloneIC.Name = StrArr[0];
+                                    CloneIC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], null, null);
+                                    BoleanSignals.Add(CloneIC);
+                                }
+                            }
+
+                            //<------------------------------------------------------------------------------------------------------------>
+
+                            else // Если встречается обычный датчик
+                            {
+
+                                //Запишем 
+
+                                if (IC.Name.Contains(StrArr[0]))
+                                {
+                                    string str = GetCategory(StrArr[0]);
                                     if (str == "-1")
                                     {
                                         IsReliable = false;
                                     }
-                                    IC.SetPropOnFindDataInDB(result, status, str, TimeSansWithTag);
+                                    //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
+                                    //CheckFoundSignals.Add(IC);
+                                    IC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], str, StrArr[1].Replace("<", ""));
                                     FoundSignalsInDB.Add(IC);
                                     CheckFoundSignals.Add(IC);
+
                                     break;
-                                }
-
-
-                                //<------------------------------------------------------------------------------------------------------------>
-
-                                if (IC.Name.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
-                                {
-                                    if (StrArr[0].IndexOf(IC.Name) != -1)
-                                    {
-                                        IsNameWithTag = true;
-                                        TimeSansWithTag = StrArr[1].Replace("<", "");
-                                        IsDost = StrArr[3];
-                                        //GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
-                                        var CloneIC = (SignalModel)IC.Clone();
-                                        CloneIC.Name = StrArr[0];
-                                        CloneIC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], null, null);
-                                        BoleanSignals.Add(CloneIC);
-                                    }
-                                }
-                                //<------------------------------------------------------------------------------------------------------------>
-                                else // Если встречается обычный датчик
-                                {
-
-                                    //Запишем 
-
-                                    if (IC.Name.Contains(StrArr[0]))
-                                    {
-                                        string str = GetCategory(StrArr[0]);
-                                        if (str == "-1")
-                                        {
-                                            IsReliable = false;
-                                        }
-                                        //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
-                                        //CheckFoundSignals.Add(IC);
-                                        IC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], str, StrArr[1].Replace("<", ""));
-                                        FoundSignalsInDB.Add(IC);
-                                        CheckFoundSignals.Add(IC);
-
-
-
-                                        break;
-                                    }
                                 }
                             }
                             k++;
                         }
                     }
-
                 }
+
+                // Нужно проверить массив всех элементов на сигналы _xq08, найти для регулятора сигналы xc01 и xc02 в срезе
+                foreach (var item in FoundSignalsInDB)
+                {
+                    if (item.Name.Contains("_XQ08"))
+                    {
+                        using (StreamReader sr = new StreamReader(Path, ANSI))
+                        {
+                            string ReplacedName = null;
+                            int k = 0;
+                            while ((Line = sr.ReadLine()) != null)
+                            {
+                                if (k < 4)
+                                {
+                                    k++;
+                                    continue;
+                                }
+
+                                StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                ReplacedName = item.Name.Replace("_XQ08", "");
+
+                                if (StrArr[0].Contains(ReplacedName + "_XC01") && StrArr[2] == "ДА")
+                                {
+                                    item.NewValue = 100;
+                                }
+                                if (StrArr[0].Contains(ReplacedName + "_XC02") && StrArr[2] == "ДА")
+                                {
+                                    item.NewValue = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
             }
             catch (FileNotFoundException)
             {
