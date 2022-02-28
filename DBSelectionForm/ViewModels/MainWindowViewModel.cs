@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace DBSelectionForm.ViewModels
 {
@@ -21,6 +22,17 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+        #region SelectedSignal выбор строки в datagrid
+
+        private SignalModel _SelectedSignal;
+        public SignalModel SelectedSignal
+        {
+            get => _SelectedSignal;
+            set => Set(ref _SelectedSignal, value);
+        }
+
+        #endregion
+
         #region Signals
 
         private List<SignalModel> _Signals = new List<SignalModel>();
@@ -28,21 +40,6 @@ namespace DBSelectionForm.ViewModels
         {
             get => _Signals;
             set => Set(ref _Signals, value);
-        }
-
-        #endregion
-
-        #region SelectedIndex - для скрола к последнему элемнету ListBox
-
-        private string _SelectedIndex;
-
-        public string SelectedIndex
-        {
-            get => _SelectedIndex;
-            set
-            {
-                Set(ref _SelectedIndex, value);
-            }
         }
 
         #endregion
@@ -284,6 +281,23 @@ namespace DBSelectionForm.ViewModels
 
         #region Команды
 
+        #region SaveSignalsToList_ICCommand
+
+        public ICommand SaveSignalsToList_IC { get; }
+        private bool CanSaveSignalsToList_ICExecute(object p) => true;
+        private void OnSaveSignalsToList_ICExecuted(object p)
+        {
+
+            Task task = Task.Factory.StartNew(() => GetListFromDB.WriteDataToIC(_InfoData, ref _Signals));
+
+            //XElement SignalsXML = SerializeDesignerItems(Signals);
+            //XElement root = new XElement("Root");
+            //root.Add(SignalsXML);
+            //root.Save("Signals.xml");
+        }
+
+        #endregion
+
         #region ColseApplicationCommand
 
         public ICommand ColseApplicationCommand { get;}
@@ -457,6 +471,25 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region Методы
+
+        #region SerializeSignals
+
+        private XElement SerializeDesignerItems(List<SignalModel> Signals)
+        {
+            XElement serializedSignals = new XElement("Signals");
+            foreach (var Signal in Signals)
+            {
+                serializedSignals.Add(new XElement("Signal", new XElement("IsInvariable", Signal.IsInvariable)));
+            }
+            return serializedSignals;
+        }
+
+
+        #endregion
+
+        #endregion
+
         public MainWindowViewModel()
         {
 
@@ -537,6 +570,8 @@ namespace DBSelectionForm.ViewModels
             GetListFromDBCommand = new LambdaCommand(OnGetListFromDBCommandExecuted, CanGetListFromDBCommandExecute);
 
             OpenFolderDialogForListBD = new LambdaCommand(OnOpenFolderDialogForListBDExecuted, CanOpenFolderDialogForListBDExecute);
+
+            SaveSignalsToList_IC = new LambdaCommand(OnSaveSignalsToList_ICExecuted, CanSaveSignalsToList_ICExecute);
 
             #endregion
 

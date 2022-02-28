@@ -13,9 +13,10 @@ namespace DBSelectionForm.Models
         public string Status { get; set; }
         public string Date { get; set; }
         public string Category { get; set; }
+        public bool IsInvariable { get; set; }
         public string WriteDataToFile()
         {
-            return $"{NewValue};{Name};{Category};{Status};{Date}";
+            return $"{NewValue};{Name};{Category};{Status};{Date};{IsInvariable}";
         }
         public void SetPropOnFindDataInDB( object NewValue, string Status, string Category, string Date)
         {
@@ -26,7 +27,7 @@ namespace DBSelectionForm.Models
         }
         public object Clone()
         {
-            return new SignalModel { Name = this.Name, Category = this.Category, Date = this.Date, NewValue = this.NewValue, OldValue = this.OldValue, Status = this.Status };
+            return new SignalModel { Name = this.Name, Category = this.Category, Date = this.Date, NewValue = this.NewValue, OldValue = this.OldValue, Status = this.Status, IsInvariable = this.IsInvariable };
         }
     }
 }

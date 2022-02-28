@@ -166,9 +166,17 @@ namespace DBSelectionForm.Services
                             }
                             TestIsContainsSimbol(ArrOfStr, 1);
 
-                            
+                            if (ArrOfStr.Length == 6)
+                            {
+                                var IsInvariableFromStr = Convert.ToBoolean(ArrOfStr[5]);
+                                ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0], IsInvariable = IsInvariableFromStr});
+                            }
+                            else
+                            {
+                                ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0] });
+                            }
 
-                            ReadSignals.Add( new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0] } );
+                            
                         }
                         else
                         {
@@ -532,7 +540,7 @@ namespace DBSelectionForm.Services
         }
 
         ///<summary> Записываем информацию в файл !List_IC.txt </summary>
-        private static void WriteDataToIC(string WorkPath, ref List<SignalModel> StringArrayFromDB, bool IsReliable, StreamWriter sw, List<SignalModel> NotFoundSignals, List<SignalModel> InvalidSignals, ref List<SignalModel> FinalSignalsList)
+        private static void CreateFinalSignalsList(string WorkPath, ref List<SignalModel> StringArrayFromDB, bool IsReliable, List<SignalModel> NotFoundSignals, List<SignalModel> InvalidSignals, ref List<SignalModel> FinalSignalsList)
         {
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             int i = 0;
@@ -610,29 +618,11 @@ namespace DBSelectionForm.Services
                 IsRegulator_xq08(item);
             }
 
-            if (IsReliable == true)
-            {
-                sw.WriteLine($"{CorrectSignals.Count};Count;0");
-            }
-            else
-            {
-                sw.WriteLine($"{CorrectSignals.Count};Count;-1");
-            }
-            foreach (var Correct in CorrectSignals)
-            {
-                sw.WriteLine(Correct.WriteDataToFile());
-            }
-            sw.WriteLine($"Обнаружено {InvalidSignals.Count} недостоверных сигналов:"); // записал недостоверные сигналы
-            foreach (var Invalid in InvalidSignals) // записал недостоверные сигналы
-            {
-                sw.WriteLine(Invalid.WriteDataToFile());
-            }
 
-            sw.WriteLine($"Обнаружено {NotFoundSignals.Count} ненайденых сигналов:"); // записал ненайденные сигналы
-            foreach (var NotFound in NotFoundSignals)
-            {
-                sw.WriteLine(NotFound.WriteDataToFile());
-            }
+        }
+        private static void SortSignalsList()
+        {
+
         }
 
         public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
@@ -674,10 +664,10 @@ namespace DBSelectionForm.Services
 
             IsFoundName(ref ReadSignals, ref NotFoundSignals);
 
-            using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
-            {
-                WriteDataToIC(WorkPath, ref FoundSignalsInDBFresh, IsReliable, sw , NotFoundSignals, InvalidSignals, ref FinalSignalsList);
-            }
+            //using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
+            //{
+            CreateFinalSignalsList(WorkPath, ref FoundSignalsInDBFresh, IsReliable, NotFoundSignals, InvalidSignals, ref FinalSignalsList);
+            //}
 
             SW.Stop();
             TimeSpan ts = SW.Elapsed;
@@ -687,6 +677,23 @@ namespace DBSelectionForm.Services
             _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск закончился! Время выполнения - {elapsedTime}");
             MessageBox.Show($"Список создан");
             return FinalSignalsList;
+        }
+
+        public static void WriteDataToIC(InfoData _InfoData, ref List<SignalModel> Signals)
+        {
+            using (StreamWriter sw = new StreamWriter(_InfoData.PathToListFile, false, Encoding.Default))
+            {
+                sw.WriteLine($"{Signals.Count};Count");
+
+                foreach (var Signal in Signals)
+                {
+                    if (Signal.IsInvariable == true)
+                    {
+                        Signal.NewValue = Signal.OldValue;
+                    }
+                    sw.WriteLine(Signal.WriteDataToFile());
+                }
+            }
         }
     }
 }

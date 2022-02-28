@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vs="clr-namespace:DBSelectionForm.ViewModels"
         xmlns:conv="clr-namespace:DBSelectionForm.Converters"
-        xmlns:cmd="clr-namespace:DBSelectionForm.Infastructure.Commands"
+        xmlns:model="clr-namespace:DBSelectionForm.Models"
         xmlns:l="clr-namespace:DBSelectionForm"
-        Title="{Binding Path=Title}" Height="800" Width="650" WindowStartupLocation="CenterScreen">
+        Title="{Binding Path=Title}" Height="800" Width="800" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vs:MainWindowViewModel/>
     </Window.DataContext>
@@ -128,10 +128,16 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="100"/>
+                        </Grid.RowDefinitions>
                         <DataGrid ItemsSource="{Binding Signals}"
                                   AutoGenerateColumns="False"
                                   HorizontalGridLinesBrush="DarkGray"
                                   VerticalGridLinesBrush="DarkGray"
+                                  CanUserAddRows="False"
+                                  Grid.Row="0"
                                   >
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="№ сигнала" Binding="{Binding Number}"/>
@@ -140,9 +146,11 @@
                                 <DataGridTextColumn Header="Старое значение" Binding="{Binding OldValue}"/>
                                 <DataGridTextColumn Header="Новое значение" Binding="{Binding NewValue}"/>
                                 <DataGridTextColumn Header="Доставерность" Binding="{Binding Status}"/>
-                                <DataGridTextColumn Header="Время" Binding="{Binding Date}" Width="*"/>
+                                <DataGridTextColumn Header="Время" Binding="{Binding Date}"/>
+                                <DataGridCheckBoxColumn Header="Не изменять" Binding="{Binding IsInvariable}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <Button Grid.Row="1" FontSize="20" Content="Сохранить сигналы в файл" Command="{Binding SaveSignalsToList_IC}" />
                     </Grid>
                     
                     <!--<Grid DockPanel.Dock="Bottom">
