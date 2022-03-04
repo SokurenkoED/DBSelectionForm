@@ -22,6 +22,7 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+
         #region SelectedSignal выбор строки в datagrid
 
         private SignalModel _SelectedSignal;
@@ -190,7 +191,7 @@ namespace DBSelectionForm.ViewModels
 
         #region Сообщения о процессе выполнения для ListFromDB
 
-        private ObservableCollection<string> _TextInformationFromListDB = new AsyncObservableCollection<string>();
+        private ObservableCollection<string> _TextInformationFromListDB = new AsyncObservableCollection<string>() { "Строка состояния" };
 
         /// <summary>Сообщения о процессе выполнения для ListFromDB</summary>
         public ObservableCollection<string> TextInformationFromListDB

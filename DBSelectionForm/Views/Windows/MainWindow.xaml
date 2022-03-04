@@ -7,10 +7,12 @@
         xmlns:conv="clr-namespace:DBSelectionForm.Converters"
         xmlns:model="clr-namespace:DBSelectionForm.Models"
         xmlns:l="clr-namespace:DBSelectionForm"
-        Title="{Binding Path=Title}" Height="800" Width="800" WindowStartupLocation="CenterScreen">
+        Title="{Binding Path=Title}" Height="800" Width="1200" WindowStartupLocation="CenterScreen">
+    
     <Window.DataContext>
         <vs:MainWindowViewModel/>
     </Window.DataContext>
+    
     <Window.Resources>
         <ResourceDictionary>
             <conv:ValuesToColorConverters x:Key="ValuesToColorConverters"/>
@@ -19,8 +21,150 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
+    
     <DockPanel>
+        
         <TabControl>
+
+            <TabItem Header="Создание списка элементов" FontSize="16">
+                <Grid>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5*"/>
+                        <RowDefinition Height="10*"/>
+                        <RowDefinition Height="1.5*"/>
+                        <RowDefinition Height="2*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border BorderThickness="1" BorderBrush="Black" Margin="5">
+                        <!--Входные данные-->
+                        <Grid Grid.Row="0" Grid.Column="0" Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240"/>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="50"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" Content="Путь среза данных" HorizontalAlignment="Left"  VerticalAlignment="Center" FontSize="16"  />
+                            <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding PathToDataFile}" VerticalAlignment="Center" />
+
+
+                            <Label Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Content="Путь до List_IC" HorizontalAlignment="Left"  VerticalAlignment="Center" FontSize="16"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding PathToListFile}" VerticalAlignment="Center"/>
+
+
+                            <Label Grid.Row="2" Grid.Column="0" HorizontalContentAlignment="Center" Content="Путь до папки с данными" HorizontalAlignment="Left"  VerticalAlignment="Center" FontSize="16" />
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding PathToFolderForListBD}" VerticalAlignment="Center"/>
+
+                            <Label Grid.Row="3"  Grid.Column="0" HorizontalContentAlignment="Center" Content="Дата" HorizontalAlignment="Left"  VerticalAlignment="Center" FontSize="16" />
+                            <Grid Grid.Row="3" Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Content="ДД" FontSize="9" />
+                                <Label Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Content="ЧЧ:ММ:СС" FontSize="9"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EndTimeForListBD}" VerticalAlignment="Center" Margin="5, 0, 0, 0 "/>
+                                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding EndDayForListBD}" VerticalAlignment="Center" Margin="0, 0, 5, 0 "/>
+
+                            </Grid>
+
+                            <Button Grid.Row="0" Grid.Column="2" Command="{Binding OpenFileDialogForDataFileCommand}" Height="24" Width="30" Margin="5"/>
+                            <Button Grid.Row="1" Grid.Column="2" Command="{Binding OpenFileDialogForExitFileCommand}" Height="24" Width="30" Margin="5"/>
+                            <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenFolderDialogForListBD}" Height="24" Width="30" Margin="5"/>
+
+                        </Grid>
+                    </Border>
+
+                    <Border BorderThickness="1" BorderBrush="Black" Grid.Row="0" Grid.Column="1" Margin="5">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" Grid.Column="0" Command="{Binding OpenExitFile}" Content="Открыть ListIC" Margin="0, 2, 10, 4" />
+                            <Button Grid.Row="0" Grid.Column="1" Command="{Binding SaveExitFile}" Content="Сохранить ListIC" Margin="10, 2, 0, 4"/>
+                            <TextBox Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding DataToTextBox}"  AcceptsReturn="True" TextWrapping="Wrap" BorderBrush="Black" Background="#FFF0F0F0"/>
+                        </Grid>
+                    </Border>
+
+                    <Border BorderThickness="1" BorderBrush="Black" Grid.ColumnSpan="2" Grid.Row="1" Margin="5">
+                        <!--DataGrid-->
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <DataGrid ItemsSource="{Binding Signals}"
+                                      AutoGenerateColumns="False"
+                                      HorizontalGridLinesBrush="DarkGray"
+                                      VerticalGridLinesBrush="DarkGray"
+                                      CanUserAddRows="False"
+                                      Grid.Row="0"
+                                      >
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="№ сигнала" Binding="{Binding Number}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Имя сигнала" Binding="{Binding Name}" IsReadOnly="True" />
+                                    <DataGridTextColumn Header="Категория" Binding="{Binding Category}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Старое значение" Binding="{Binding OldValue}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Новое значение" Binding="{Binding NewValue}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Доставерность" Binding="{Binding Status}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Время" Binding="{Binding Date}" IsReadOnly="True"/>
+                                    <DataGridCheckBoxColumn Header="Не изменять" Binding="{Binding IsInvariable}" Width="*" IsReadOnly="False"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid >
+                    </Border>
+
+                    <Border BorderThickness="1" BorderBrush="Black" Grid.Row="2" Margin="5" Grid.ColumnSpan="2">
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <!--<ListBox Grid.Row="1" ItemsSource="{Binding TextInformationFromListDB}" Margin="5,0,5,5" BorderBrush="Black" FontFamily="Times New Roman" FontSize="16" Background="#FFF0F0F0"/>-->
+                            <Label Content="{Binding TextInformationFromListDB[0]}" HorizontalAlignment="Left"   VerticalAlignment="Top" FontSize="20" FontFamily="Times New Roman" />
+                        </Grid>
+                    </Border>
+
+                    <Border BorderThickness="1" BorderBrush="Black" Grid.Row="3" Grid.ColumnSpan="2" Margin="5">
+                        <Grid Margin="0 ,0, 5, 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="130"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Command="{Binding GetListFromDBCommand}" HorizontalAlignment="Right"  Content="Создать"  Height="37" Width="142"  />
+
+                            <Button Grid.Column="1" Command="{Binding SaveSignalsToList_IC}" HorizontalAlignment="Right" Content="Сохранить"  Height="37" Width="119"  />
+
+                            <Button Grid.Column="2" Command="{Binding ColseApplicationCommand}" HorizontalAlignment="Right" Content="Отменить"  Height="37" Width="119"  />
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </TabItem>
 
             <TabItem Header="Выборка с БД" FontSize="16">
                 <Grid>
@@ -67,98 +211,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Создание списка элементов" FontSize="16">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition />
-                        <RowDefinition Height="150"/>
-                        <RowDefinition Height="50"/>
-                    </Grid.RowDefinitions>
-
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до файла - базы данных" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="246" FontSize="16" Grid.ColumnSpan="2" Margin="33,0,0,0" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToDataFile}" VerticalAlignment="Top" Width="238" Height="22" Margin="336,18,0,0" />
-                    <Button Command="{Binding OpenFileDialogForDataFileCommand}" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="22" Width="26" Margin="588,18,0,0"/>
-
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до выходного файла" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="246" FontSize="16" Grid.Row="1" Margin="33,0,0,0"/>
-                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToListFile}" VerticalAlignment="Center" Width="238" Height="22" Margin="336,0,0,0" Grid.Row="1"/>
-                    <Button Command="{Binding OpenFileDialogForExitFileCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="588,0,0,0" Grid.Row="1"/>
-
-                    <Label Grid.Row="2" HorizontalContentAlignment="Center" Content="Путь до папки с данными" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" Margin="49,0,0,0" />
-                    <TextBox Grid.Row="2" HorizontalAlignment="Left" Text="{Binding PathToFolderForListBD}" VerticalAlignment="Center" Width="238" Height="21" Margin="336,0,0,0"  />
-                    <Button Grid.Row="2" Command="{Binding OpenFolderDialogForListBD}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="588,0,0,0"/>
-
-                    <Label Grid.Row="3" HorizontalContentAlignment="Center" Content="Дата" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" Margin="49,0,0,0" />
-                    <TextBox HorizontalAlignment="Left" Margin="380,0,0,0" Text="{Binding EndTimeForListBD}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="3"  />
-                    <Label Grid.Row="2" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Content="ДД" FontSize="9" Margin="340,45,0,34" Grid.RowSpan="2" />
-                    <Label Grid.Row="2" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Content="ЧЧ:ММ:СС" FontSize="9" Margin="396,45,0,34" Grid.RowSpan="2" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding EndDayForListBD}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="3" Margin="336,0,0,0"  />
-
-                    <Button Command="{Binding OpenExitFile}" Content="Открыть выходной файл" HorizontalAlignment="Left" VerticalAlignment="Center" Height="38" Width="200" Grid.Row="4" Margin="56,0,0,0"/>
-                    <Button Command="{Binding SaveExitFile}" Content="Сохранить выходной файл" HorizontalAlignment="Left" VerticalAlignment="Center" Height="38" Width="200" Grid.Row="4" Margin="355,0,0,0"/>
-
-                    <Button Command="{Binding GetListFromDBCommand}" Content="Создать список" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="7" Margin="0,0,230,0"/>
-
-                    <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Row="7" Margin="0,0,5,0" />
-
-                    <Grid Grid.Row="6">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <ListBox Grid.Row="1" ItemsSource="{Binding TextInformationFromListDB}" Margin="5,0,5,5" BorderBrush="Black" FontFamily="Times New Roman" FontSize="16" Background="#FFF0F0F0"/>
-                        <Label Content="Информативное окно:" HorizontalAlignment="Left"   VerticalAlignment="Top" FontSize="16" FontFamily="Times New Roman" />
-                    </Grid>
-
-                    <TextBox Text="{Binding DataToTextBox}" Margin="5,5,5,5" AcceptsReturn="True" TextWrapping="Wrap" Grid.Row="5" Grid.ColumnSpan="3" BorderBrush="Black" Background="#FFF0F0F0"/>
-
-                </Grid>
-            </TabItem>
-            <TabItem Header="Табличное окно">
-                <DockPanel>
-                    <Grid DockPanel.Dock="Top">
-                        
-                    </Grid>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition Height="100"/>
-                        </Grid.RowDefinitions>
-                        <DataGrid ItemsSource="{Binding Signals}"
-                                  AutoGenerateColumns="False"
-                                  HorizontalGridLinesBrush="DarkGray"
-                                  VerticalGridLinesBrush="DarkGray"
-                                  CanUserAddRows="False"
-                                  Grid.Row="0"
-                                  >
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="№ сигнала" Binding="{Binding Number}"/>
-                                <DataGridTextColumn Header="Имя сигнала" Binding="{Binding Name}" />
-                                <DataGridTextColumn Header="Категория" Binding="{Binding Category}"/>
-                                <DataGridTextColumn Header="Старое значение" Binding="{Binding OldValue}"/>
-                                <DataGridTextColumn Header="Новое значение" Binding="{Binding NewValue}"/>
-                                <DataGridTextColumn Header="Доставерность" Binding="{Binding Status}"/>
-                                <DataGridTextColumn Header="Время" Binding="{Binding Date}"/>
-                                <DataGridCheckBoxColumn Header="Не изменять" Binding="{Binding IsInvariable}" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <Button Grid.Row="1" FontSize="20" Content="Сохранить сигналы в файл" Command="{Binding SaveSignalsToList_IC}" />
-                    </Grid>
-                    
-                    <!--<Grid DockPanel.Dock="Bottom">
-                        
-                    </Grid>-->
-                </DockPanel>
-            </TabItem>
-
         </TabControl>
+        
     </DockPanel>
 </Window>

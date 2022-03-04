@@ -36,7 +36,7 @@ namespace DBSelectionForm.Services
             // Проверка на наличие "_" у элементов
             if (!ArrOfStr[index].Contains("_") && !ArrOfStr[index].Contains("Обнаружено "))
             {
-                MessageBox.Show($"Ошибка. Неверный формат записи для элемента {ArrOfStr[1]}");
+                MessageBox.Show($"Ошибка. Неверный формат записи для элемента {ArrOfStr[index]}");
             }
         }
         private static int ConvertBoolStringToInt(string BoolStr)
@@ -90,31 +90,31 @@ namespace DBSelectionForm.Services
         }
         private static string GetCategory(string str)
         {
-            if ((str.IndexOf("CQ") != -1 && CheckForNums(str, "CQ")) || (str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX")) || (str.IndexOf("FF") != -1 && CheckForNums(str, "FF")) || (str.IndexOf("FP") != -1 && CheckForNums(str, "FP")) || (str.IndexOf("FT") != -1 && CheckForNums(str, "FT")) || (str.IndexOf("FL") != -1 && CheckForNums(str, "FL"))) // категория 0
+            if ((str.IndexOf("CQ") != -1 && CheckForNums(str, "CQ")) || (str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX")) || (str.IndexOf("FF") != -1 && CheckForNums(str, "FF")) || (str.IndexOf("FP") != -1 && CheckForNums(str, "FP")) || (str.IndexOf("FT") != -1 && CheckForNums(str, "FT")) || (str.IndexOf("FL") != -1 && CheckForNums(str, "FL"))) // категория 0 (Каналы измерения)
             {
                 return "0";
             }
-            else if ((str.IndexOf("AA2") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("CG2") != -1 && CheckForNums(str, "CG"))) // Категория 2
+            else if ((str.IndexOf("AA2") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("CG2") != -1 && CheckForNums(str, "CG"))) // Категория 2 (Регуляторы)
             {
                 return "2";
             }
-            else if ((str.IndexOf("AA1") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("AA8") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("CG1") != -1 && CheckForNums(str, "CG"))) // Категория 3
+            else if ((str.IndexOf("AA1") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("AA8") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("CG1") != -1 && CheckForNums(str, "CG"))) // Категория 3 (Задвижки)
             {
                 return "3";
             }
-            else if ((str.IndexOf("AA6") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("AA4") != -1 && CheckForNums(str, "AA"))) // Категория 4
+            else if ((str.IndexOf("AA6") != -1 && CheckForNums(str, "AA")) || (str.IndexOf("AA4") != -1 && CheckForNums(str, "AA"))) // Категория 4 (Клапона)
             {
                 return "4";
             }
-            else if (str.IndexOf("AP") != -1 && CheckForNums(str, "AP")) // Категория 5
+            else if (str.IndexOf("AP") != -1 && CheckForNums(str, "AP")) // Категория 5 (Насосы)
             {
                 return "5";
             }
-            else if ((str.IndexOf("CG9") != -1 && CheckForNums(str, "CG")) || (str.IndexOf("EU") != -1 && CheckForNums(str, "EU")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER")) || (str.IndexOf("EG") != -1 && CheckForNums(str, "EG")) || (str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6
+            else if ((str.IndexOf("DU") != -1 && CheckForNums(str, "DU")) || (str.IndexOf("CG9") != -1 && CheckForNums(str, "CG")) || (str.IndexOf("EU") != -1 && CheckForNums(str, "EU")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER")) || (str.IndexOf("EG") != -1 && CheckForNums(str, "EG")) || (str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6 (Алгоритмы)
             {
                 return "6";
             }
-            else if (str.IndexOf("KIN1.OR") != -1) // Категория 7
+            else if (str.IndexOf("KIN1.OR") != -1) // Категория 7 (Группы ОР СУЗ)
             {
                 return "7";
             }
@@ -165,17 +165,20 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
                             TestIsContainsSimbol(ArrOfStr, 1);
-
-                            if (ArrOfStr.Length == 6)
+                            if (ArrOfStr.Length > 2)
                             {
-                                var IsInvariableFromStr = Convert.ToBoolean(ArrOfStr[5]);
-                                ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0], IsInvariable = IsInvariableFromStr});
+                                ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0], Category = ArrOfStr[2] });
+                                if (ArrOfStr.Length == 6)
+                                {
+                                    var IsInvariableFromStr = Convert.ToBoolean(ArrOfStr[5]);
+                                    ReadSignals[^1].IsInvariable = IsInvariableFromStr;
+                                    //ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0], IsInvariable = IsInvariableFromStr, Category = ArrOfStr[2] });
+                                }
                             }
                             else
                             {
-                                ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0] });
+                                ReadSignals.Add(new SignalModel { Name = ArrOfStr[1], OldValue = ArrOfStr[0], Category = "-1" });
                             }
-
                             
                         }
                         else
@@ -187,7 +190,7 @@ namespace DBSelectionForm.Services
                             }
                             TestIsContainsSimbol(ArrOfStr, 0);
 
-                            ReadSignals.Add(new SignalModel { Name = Line, OldValue = "-" });
+                            ReadSignals.Add(new SignalModel { Name = Line, OldValue = "-", Category = "-1" });
                         }
                         index++;
                     }
@@ -366,10 +369,12 @@ namespace DBSelectionForm.Services
             double ConvertedTimeDouble; // конечное время, переведенное
             //string VarStr; // присаиваем сюда значение item из цикла foreach
             bool IsEnd = false;
+            int Count = 0;
 
 
             foreach (var SensorName in FoundSignalsInDB)
             {
+                Count++;
                 bool IsFound_XC = false; // Нужно для того, чтобы заменить _XQ08, в зависимости от сигналов _XC01 и _XC02
                 string GridCategory = null;
                 string TimeSansWithTag = null;
@@ -386,7 +391,8 @@ namespace DBSelectionForm.Services
                     string RuteName = SensorName.Name.Substring(2, 3); // Получил 3 буквы
                     if (filename.IndexOf(RuteName) != -1) // Находим файлы, в которых содержатся 3 буквы
                     {
-                        _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск значений для датчика {SensorName.Name} в файле {filename}!");
+                        _TextInformationFromListDB.Clear();
+                        _TextInformationFromListDB.Add($"Расчет {Count} сигнала из {FoundSignalsInDB.Count}!");
                         using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
                         {
                             string line;
@@ -618,11 +624,6 @@ namespace DBSelectionForm.Services
                 IsRegulator_xq08(item);
             }
 
-
-        }
-        private static void SortSignalsList()
-        {
-
         }
 
         public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
@@ -674,7 +675,8 @@ namespace DBSelectionForm.Services
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-            _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск закончился! Время выполнения - {elapsedTime}");
+            _TextInformationFromListDB.Clear();
+            _TextInformationFromListDB.Add($"Поиск закончился! Время выполнения - {elapsedTime}");
             MessageBox.Show($"Список создан");
             return FinalSignalsList;
         }
@@ -694,6 +696,7 @@ namespace DBSelectionForm.Services
                     sw.WriteLine(Signal.WriteDataToFile());
                 }
             }
+            MessageBox.Show($"Список сохранен!");
         }
     }
 }

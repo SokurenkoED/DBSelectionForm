@@ -21,14 +21,19 @@ namespace DBSelectionForm.Converters
             double TryParseOldValue;
             var BlueBrush = new SolidColorBrush(Colors.Aqua);
             var WhiteBrush = new SolidColorBrush(Colors.White);
-            var RedBrush = new SolidColorBrush(Colors.Pink);
+            var PinkBrush = new SolidColorBrush(Colors.Pink);
+            var RedBrush = new SolidColorBrush(Colors.Red);
             if (SM == null)
             {
                 return WhiteBrush;
             }
-            if (SM.Status != "дост")
+            if (SM.Status == null)
             {
                 return RedBrush;
+            }
+            if (SM.Status != "дост")
+            {
+                return PinkBrush;
             }
             if (!double.TryParse(SM.NewValue.ToString(), NumberStyles.Any, formatter, out TryParseNewValue))
             {
