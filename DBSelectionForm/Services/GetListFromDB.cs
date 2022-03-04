@@ -129,7 +129,7 @@ namespace DBSelectionForm.Services
             try
             {
                 int index = 0;
-                using (StreamReader sr = new StreamReader(Path))
+                using (StreamReader sr = new StreamReader(Path, Encoding.Default))
                 {
                     string Line;
                     while ((Line = sr.ReadLine()) != null)
@@ -228,7 +228,7 @@ namespace DBSelectionForm.Services
                     List<SignalModel> BoleanSignals = new List<SignalModel>();
                     bool IsNameWithTag = false;
                     string IsDost = null;
-                    using (StreamReader sr = new StreamReader(Path, ANSI))
+                    using (StreamReader sr = new StreamReader(Path, Encoding.Default))
                     {
                         while ((Line = sr.ReadLine()) != null)
                         {
@@ -321,7 +321,7 @@ namespace DBSelectionForm.Services
                 {
                     if (item.Name.Contains("_XQ08"))
                     {
-                        using (StreamReader sr = new StreamReader(Path, ANSI))
+                        using (StreamReader sr = new StreamReader(Path, Encoding.Default))
                         {
                             string ReplacedName = null;
                             int k = 0;
@@ -396,7 +396,7 @@ namespace DBSelectionForm.Services
                     {
                         _TextInformationFromListDB.Clear();
                         _TextInformationFromListDB.Add($"Расчет {Count} сигнала из {FoundSignalsInDB.Count}!");
-                        using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
+                        using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", Encoding.Default))
                         {
                             string line;
                             string[] lineSplit;
