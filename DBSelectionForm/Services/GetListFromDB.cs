@@ -20,7 +20,7 @@ namespace DBSelectionForm.Services
             if (Signal.Name.Contains("_xq08"))
             {
                 double IsParse;
-                if (Signal.Status == "дост" && double.TryParse(Signal.NewValue.ToString(), NumberStyles.Any, formatter, out IsParse) && IsParse <= 0)
+                if ((Signal.Status == "дост" || Signal.Status == "повт.дост") && double.TryParse(Signal.NewValue.ToString(), NumberStyles.Any, formatter, out IsParse) && IsParse <= 0)
                 {
                     Signal.NewValue = 0;
                 }
@@ -253,6 +253,9 @@ namespace DBSelectionForm.Services
                                         case "дост":
                                             result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                             break;
+                                        case "повт.дост":
+                                            result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                            break;
                                         default:
                                             break;
                                     }
@@ -422,6 +425,9 @@ namespace DBSelectionForm.Services
                                             case "дост":
                                                 result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                                 break;
+                                            case "повт.дост":
+                                                result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                                break;
                                             default:
                                                 break;
                                         }
@@ -462,7 +468,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[6] == "дост")
+                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -476,7 +482,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[6] == "дост")
+                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -488,19 +494,19 @@ namespace DBSelectionForm.Services
                                 else if (SensorName.Name.IndexOf("_XQ08") != -1)
                                 {
                                     var ReplacedName = SensorName.Name.Replace("_XQ08", "");
-                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && lineSplit[6] == "дост")
+                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
                                     {
                                         IsFound_XC = true;
                                         FoundSignalsInDBFresh[^1].NewValue = 100;
                                     }
-                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && lineSplit[6] == "дост")
+                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
                                     {
                                         IsFound_XC = true;
                                         FoundSignalsInDBFresh[^1].NewValue = 0;
                                     }
                                     else if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "дост")
+                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
                                         {
                                             if (IsFound_XC)
                                             {
@@ -521,7 +527,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "дост")
+                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
                                         {
                                             LastValueOfSensor = lineSplit[3];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -580,7 +586,7 @@ namespace DBSelectionForm.Services
             {
                 //string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 double d;
-                if (item.Status == "дост")
+                if (item.Status == "дост" || item.Status == "повт.дост")
                 {
                     if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
                     {
