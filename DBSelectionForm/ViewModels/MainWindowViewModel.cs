@@ -22,6 +22,49 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+        #region SelectedDataBaseFormat
+
+        private string _SelectedDataBaseFormat;
+        public string SelectedDataBaseFormat
+        {
+            get => _SelectedDataBaseFormat;
+            set => Set(ref _SelectedDataBaseFormat, value);
+        }
+
+        #endregion
+
+        #region SelectedSliceFormat
+
+        private string _SelectedSliceFormat;
+        public string SelectedSliceFormat
+        {
+            get => _SelectedSliceFormat;
+            set => Set(ref _SelectedSliceFormat, value);
+        }
+
+        #endregion
+
+        #region SliceFormat
+
+        private List<string> _SliceFormat = new List<string>() { "06.07.2018", "22.02.2022" };
+        public List<string> SliceFormat
+        {
+            get => _SliceFormat;
+            set => Set(ref _SliceFormat, value);
+        }
+
+        #endregion
+
+        #region DataBaseFormat
+
+        private List<string> _DataBaseFormat = new List<string>() { "06.07.2018", "22.02.2022" };
+        public List<string> DataBaseFormat
+        {
+            get => _DataBaseFormat;
+            set => Set(ref _DataBaseFormat, value);
+        }
+
+        #endregion
 
         #region SelectedSignal выбор строки в datagrid
 
@@ -440,7 +483,7 @@ namespace DBSelectionForm.ViewModels
                 _fileIOservice.SaveData(_InfoData);
                 try
                 {
-                    Task task = Task.Factory.StartNew(() => Signals = GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB));
+                    Task task = Task.Factory.StartNew(() => Signals = GetListFromDB.GetListMethod(_InfoData, EndTimeForListBD, EndDayForListBD, ref _TextInformationFromListDB, SelectedSliceFormat, SelectedDataBaseFormat));
                 }
                 catch (Exception ex)
                 {

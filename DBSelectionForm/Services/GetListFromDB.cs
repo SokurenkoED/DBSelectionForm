@@ -203,8 +203,8 @@ namespace DBSelectionForm.Services
             }
         }
 
-        /// <summary> Находим все данные в срезе, которые нас интересуют </summary>
-        private static void FindDataInDB(string Path, ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> ReadSignals, ref bool IsReliable, ref List<SignalModel> CheckFoundSignals)
+        /// <summary> Находим все данные в срезе, которые нас интересуют (06.07.18 slice format)</summary>
+        private static void FindDataInDB_06_07_18(string Path, ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> ReadSignals, ref bool IsReliable, ref List<SignalModel> CheckFoundSignals)
         {
             try
             {
@@ -228,7 +228,7 @@ namespace DBSelectionForm.Services
                     List<SignalModel> BoleanSignals = new List<SignalModel>();
                     bool IsNameWithTag = false;
                     string IsDost = null;
-                    using (StreamReader sr = new StreamReader(Path, Encoding.Default))
+                    using (StreamReader sr = new StreamReader(Path, ANSI))
                     {
                         while ((Line = sr.ReadLine()) != null)
                         {
@@ -321,7 +321,7 @@ namespace DBSelectionForm.Services
                 {
                     if (item.Name.Contains("_XQ08"))
                     {
-                        using (StreamReader sr = new StreamReader(Path, Encoding.Default))
+                        using (StreamReader sr = new StreamReader(Path, ANSI))
                         {
                             string ReplacedName = null;
                             int k = 0;
@@ -357,8 +357,357 @@ namespace DBSelectionForm.Services
             }
         }
 
+        /// <summary> Находим все данные в срезе, которые нас интересуют (28.04.22 slice format)</summary>
+        private static void FindDataInDB_28_04_22(string Path, ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> ReadSignals, ref bool IsReliable, ref List<SignalModel> CheckFoundSignals)
+        {
+            try
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                Encoding ANSI = Encoding.GetEncoding(1251);
+
+
+
+                List<string> VarArr = new List<string>();
+                string[] StrArr;
+                string Line;
+
+
+                foreach (var IC in ReadSignals)
+                {
+                    int k = 0;
+                    string TimeSansWithTag = null;
+                    //List<string> GridList = new List<string>();
+                    List<SignalModel> BoleanSignals = new List<SignalModel>();
+                    bool IsNameWithTag = false;
+                    string IsDost = null;
+                    using (StreamReader sr = new StreamReader(Path, Encoding.Default))
+                    {
+                        while ((Line = sr.ReadLine()) != null)
+                        {
+                            if (k < 4)
+                            {
+                                k++;
+                                continue;
+                            }
+
+                            StrArr = Line.Split(new char[] { '\t' });
+
+                            //<------------------------------------------------------------------------------------------------------------>
+
+                            if (IsNameWithTag && StrArr[0].IndexOf(IC.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
+                            {
+                                int result = 0;
+                                string status = null;
+                                foreach (var item in BoleanSignals)
+                                {
+                                    switch (status = item.Status)
+                                    {
+                                        case "дост":
+                                            result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                            break;
+                                        case "повт.дост":
+                                            result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                string str = GetCategory(IC.Name);
+                                if (str == "-1")
+                                {
+                                    IsReliable = false;
+                                }
+                                IC.SetPropOnFindDataInDB(result, status, str, TimeSansWithTag);
+                                FoundSignalsInDB.Add(IC);
+                                CheckFoundSignals.Add(IC);
+                                break;
+                            }
+
+                            //<------------------------------------------------------------------------------------------------------------>
+
+                            if (IC.Name.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
+                            {
+                                if (StrArr[0].IndexOf(IC.Name) != -1)
+                                {
+                                    IsNameWithTag = true;
+                                    TimeSansWithTag = StrArr[4].Replace("<", "");
+                                    IsDost = StrArr[3];
+                                    //GridList.Add($"{StrArr[0].Replace($"{IC}#", "")}\t{StrArr[2]}\t{StrArr[3]}");
+                                    var CloneIC = (SignalModel)IC.Clone();
+                                    CloneIC.Name = StrArr[0];
+                                    CloneIC.SetPropOnFindDataInDB(StrArr[1], StrArr[3], null, null);
+                                    BoleanSignals.Add(CloneIC);
+                                }
+                            }
+
+                            //<------------------------------------------------------------------------------------------------------------>
+
+                            else // Если встречается обычный датчик
+                            {
+
+                                //Запишем 
+
+                                if (IC.Name.Contains(StrArr[0]))
+                                {
+                                    string str = GetCategory(StrArr[0]);
+                                    if (str == "-1")
+                                    {
+                                        IsReliable = false;
+                                    }
+                                    //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
+                                    //CheckFoundSignals.Add(IC);
+
+                                    IC.SetPropOnFindDataInDB(StrArr[1], StrArr[3], str, StrArr[4].Replace("<", ""));
+                                    FoundSignalsInDB.Add(IC);
+                                    CheckFoundSignals.Add(IC);
+
+                                    break;
+                                }
+                            }
+                            k++;
+                        }
+                    }
+                }
+
+                // Нужно проверить массив всех элементов на сигналы _xq08, найти для регулятора сигналы xc01 и xc02 в срезе
+                foreach (var item in FoundSignalsInDB)
+                {
+                    if (item.Name.Contains("_XQ08"))
+                    {
+                        using (StreamReader sr = new StreamReader(Path, Encoding.Default))
+                        {
+                            string ReplacedName = null;
+                            int k = 0;
+                            while ((Line = sr.ReadLine()) != null)
+                            {
+                                if (k < 4)
+                                {
+                                    k++;
+                                    continue;
+                                }
+
+                                StrArr = Line.Split(new char[] { '\t' });
+                                ReplacedName = item.Name.Replace("_XQ08", "");
+
+                                if (StrArr[0].Contains(ReplacedName + "_XC01") && StrArr[1] == "ДА")
+                                {
+                                    item.NewValue = 100;
+                                }
+                                if (StrArr[0].Contains(ReplacedName + "_XC02") && StrArr[1] == "ДА")
+                                {
+                                    item.NewValue = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Файл " + Path + " не был найден");
+            }
+        }
+
+        /// <summary> Нужно найти свежую информацию о датчике, если она есть в большом массиве, где данные не всегда записываются (06.07.18 slice format)</summary>
+        private static void FindFreshDataInDB_06_07_18(ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> FoundSignalsInDBFresh, string RelatePathToFolder, double EndTime, ref ObservableCollection<string> _TextInformationFromListDB)
+        {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding ANSI = Encoding.GetEncoding(1251);
+            string[] filePaths = Directory.GetFiles(RelatePathToFolder); // Массив путей со всеми элементами
+            string LastValueOfSensor = null;
+            string LastDateOfSensor = null;
+            double ConvertedDate; // конвертируем дату
+            string[] ConvertedTimeArr; // конвертируем время
+            double ConvertedTimeDouble; // конечное время, переведенное
+            //string VarStr; // присаиваем сюда значение item из цикла foreach
+            bool IsEnd = false;
+            int Count = 0;
+
+
+            foreach (var SensorName in FoundSignalsInDB)
+            {
+                Count++;
+                bool IsFound_XC = false; // Нужно для того, чтобы заменить _XQ08, в зависимости от сигналов _XC01 и _XC02
+                string GridCategory = null;
+                string TimeSansWithTag = null;
+                //List<string> GridList = new List<string>();
+                List<SignalModel> BoleanSignals = new List<SignalModel>();
+                bool IsNameWithTag = false;
+                string IsDost = null;
+                FoundSignalsInDBFresh.Add((SignalModel)SensorName.Clone());
+                //VarStr = SensorName;
+                //string[] StrArr = SensorName.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries); // Разделил строку с маленькой базы данных
+                foreach (var path in filePaths)
+                {
+                    string filename = Path.GetFileName(path); // Получаем имя файла
+                    string RuteName = SensorName.Name.Substring(2, 3); // Получил 3 буквы
+                    if (filename.IndexOf(RuteName) != -1) // Находим файлы, в которых содержатся 3 буквы
+                    {
+                        _TextInformationFromListDB.Clear();
+                        _TextInformationFromListDB.Add($"Расчет {Count} сигнала из {FoundSignalsInDB.Count}!");
+                        using (StreamReader sr = new StreamReader($"{RelatePathToFolder}/{filename}", ANSI))
+                        {
+                            string line;
+                            string[] lineSplit;
+                            int k = 0;
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                if (k < 4)
+                                {
+                                    k++;
+                                    continue;
+                                }
+                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
+                                ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
+                                ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                                ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
+
+
+                                if (IsNameWithTag && lineSplit[2].IndexOf(SensorName.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
+                                {
+                                    int result = 0;
+                                    string status = null;
+                                    foreach (var item in BoleanSignals)
+                                    {
+                                        switch (status = item.Status)
+                                        {
+                                            case "дост":
+                                                result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                                break;
+                                            case "повт.дост":
+                                                result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+
+                                    FoundSignalsInDBFresh[^1].NewValue = result;
+                                    FoundSignalsInDBFresh[^1].Date = TimeSansWithTag;
+                                    IsNameWithTag = false;
+                                    BoleanSignals = new List<SignalModel>();
+                                }
+
+                                if (EndTime < ConvertedTimeDouble) // Логика выхода из цикла, когда заданное время привышает время у датчика в БД
+                                {
+                                    IsEnd = true;
+                                    break;
+                                }
+
+                                if (SensorName.Name.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
+                                {
+                                    if (lineSplit[2].IndexOf(SensorName.Name) != -1)
+                                    {
+                                        GridCategory = SensorName.Category;
+                                        IsNameWithTag = true;
+                                        LastValueOfSensor = lineSplit[5];
+                                        LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                        TimeSansWithTag = LastDateOfSensor;
+                                        IsDost = SensorName.Status;
+
+                                        //GridList.Add($"{lineSplit[2].Replace($"{StrArr[0]}#", "")}\t{lineSplit[5]}\t{StrArr[2]}");
+
+                                        var CloneIC = (SignalModel)SensorName.Clone();
+                                        CloneIC.Name = lineSplit[2];
+                                        CloneIC.SetPropOnFindDataInDB(lineSplit[5], lineSplit[6], null, null);
+                                        BoleanSignals.Add(CloneIC);
+                                    }
+                                }
+                                else if (SensorName.Name.IndexOf("_XA") != -1)
+                                {
+                                    if (lineSplit[2].IndexOf(SensorName.Name) == 0)
+                                    {
+                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[5];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
+
+                                        }
+                                    }
+                                }
+                                else if (SensorName.Name.IndexOf("_XV01") != -1)
+                                {
+                                    if (lineSplit[2].IndexOf(SensorName.Name) == 0)
+                                    {
+                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[5];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
+                                        }
+                                    }
+                                }
+                                else if (SensorName.Name.IndexOf("_XQ08") != -1)
+                                {
+                                    var ReplacedName = SensorName.Name.Replace("_XQ08", "");
+                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
+                                    {
+                                        IsFound_XC = true;
+                                        FoundSignalsInDBFresh[^1].NewValue = 100;
+                                    }
+                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
+                                    {
+                                        IsFound_XC = true;
+                                        FoundSignalsInDBFresh[^1].NewValue = 0;
+                                    }
+                                    else if (lineSplit[2].IndexOf(SensorName.Name) == 0)
+                                    {
+                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
+                                        {
+                                            if (IsFound_XC)
+                                            {
+                                                IsFound_XC = false;
+                                                LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                                FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
+                                                continue;
+                                            }
+
+                                            LastValueOfSensor = lineSplit[3];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (lineSplit[2].IndexOf(SensorName.Name) == 0)
+                                    {
+                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
+                                        {
+                                            LastValueOfSensor = lineSplit[3];
+                                            LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
+                                            FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
+                                            FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    LastDateOfSensor = null;
+                    LastValueOfSensor = null;
+                    if (IsEnd)
+                    {
+                        IsEnd = false;
+                        break;
+                    }
+                }
+            }
+
+        }
+
         /// <summary> Нужно найти свежую информацию о датчике, если она есть в большом массиве, где данные не всегда записываются</summary>
-        private static void FindFreshDataInDB(ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> FoundSignalsInDBFresh, string RelatePathToFolder, double EndTime, ref ObservableCollection<string> _TextInformationFromListDB)
+        private static void FindFreshDataInDB_28_04_22(ref List<SignalModel> FoundSignalsInDB, ref List<SignalModel> FoundSignalsInDBFresh, string RelatePathToFolder, double EndTime, ref ObservableCollection<string> _TextInformationFromListDB)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
@@ -605,7 +954,21 @@ namespace DBSelectionForm.Services
                 }
                 else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
                 {
-                    InvalidSignals.Add(item);
+                    if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
+                    {
+                        InvalidSignals.Add(item);
+                    }
+                    else if (item.NewValue.ToString() == "ДА")
+                    {
+                        item.NewValue = 1;
+                        InvalidSignals.Add(item);
+                    }
+                    else if (item.NewValue.ToString() == "НЕТ")
+                    {
+                        item.NewValue = 0;
+                        InvalidSignals.Add(item);
+                    }
+                    
                 }
                 i++;
             }
@@ -632,7 +995,7 @@ namespace DBSelectionForm.Services
 
         }
 
-        public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB)
+        public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB, string SelectedSliceFormat, string SelectedDataBaseFormat)
         {
             Stopwatch SW = new Stopwatch();
             SW.Start();
@@ -665,16 +1028,29 @@ namespace DBSelectionForm.Services
 
             ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
 
-            FindDataInDB(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
+            if (SelectedSliceFormat == "06.07.2018")
+            {
+                FindDataInDB_06_07_18(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
 
-            FindFreshDataInDB(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
+            }
+            else if (SelectedSliceFormat == "22.02.2022")
+            {
+                FindDataInDB_28_04_22(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
+                
+            }
+
+            if (SelectedDataBaseFormat == "06.07.2018")
+            {
+                FindFreshDataInDB_06_07_18(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
+            }
+            else if (SelectedDataBaseFormat == "22.02.2022")
+            {
+                FindFreshDataInDB_28_04_22(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
+            }
 
             IsFoundName(ref ReadSignals, ref NotFoundSignals);
 
-            //using (StreamWriter sw = new StreamWriter(WorkPath, false, Encoding.Default))
-            //{
             CreateFinalSignalsList(WorkPath, ref FoundSignalsInDBFresh, IsReliable, NotFoundSignals, InvalidSignals, ref FinalSignalsList);
-            //}
 
             SW.Stop();
             TimeSpan ts = SW.Elapsed;

@@ -31,7 +31,7 @@ namespace DBSelectionForm.Converters
             {
                 return RedBrush;
             }
-            if (SM.Status != "дост" || SM.Status != "повт.дост")
+            if (SM.Status != "дост" && SM.Status != "повт.дост")
             {
                 return PinkBrush;
             }

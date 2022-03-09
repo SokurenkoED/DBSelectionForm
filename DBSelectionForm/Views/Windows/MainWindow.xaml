@@ -23,11 +23,16 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    
-    <DockPanel>
-        
-        <TabControl>
 
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top" Padding="5">
+            <TextBlock Text="Выбор формата среза" FontSize="15" Margin="10,0,10,0"/>
+            <ComboBox SelectedIndex="0" ToolTip="Формат среза" Width="150" Margin="0,0,50,0" SelectedItem="{Binding SelectedSliceFormat}" ItemsSource="{Binding SliceFormat}">
+            </ComboBox>
+            <TextBlock Text="Выбор формата базы данных" FontSize="15" Margin="0,0,10,0"/>
+            <ComboBox SelectedIndex="0" ToolTip="Формат базы данных" Width="150" Margin="0,0,50,0" SelectedItem="{Binding SelectedDataBaseFormat}" ItemsSource="{Binding DataBaseFormat}"/>
+        </ToolBar>
+        <TabControl>
             <TabItem Header="Создание списка элементов" FontSize="16">
                 <Grid>
                     
