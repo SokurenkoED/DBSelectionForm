@@ -25,5 +25,14 @@ namespace DBSelectionForm
             InitializeComponent();
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            string msg = "Вы уверены, что перед закрытием сохранили изменения?";
+            MessageBoxResult result = MessageBox.Show(msg, "Закрытие приложения", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.No)
+            {
+                e.Cancel = true;
+            }
+        }
     }
 }

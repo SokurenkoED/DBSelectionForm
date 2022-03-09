@@ -305,7 +305,10 @@ namespace DBSelectionForm.ViewModels
         private bool CanColseApplicationCommandExecute(object p) => true;
         private void OnColseApplicationCommandExecuted(object p)
         {
-            Application.Current.Shutdown();
+            if (p is Window window)
+            {
+                window.Close();
+            }
         }
 
         #endregion
