@@ -87,9 +87,9 @@
 
                             </Grid>
 
-                            <Button Grid.Row="0" Grid.Column="2" Command="{Binding OpenFileDialogForDataFileCommand}" Height="24" Width="30" Margin="5"/>
-                            <Button Grid.Row="1" Grid.Column="2" Command="{Binding OpenFileDialogForExitFileCommand}" Height="24" Width="30" Margin="5"/>
-                            <Button Grid.Row="2" Grid.Column="2" Command="{Binding OpenFolderDialogForListBD}" Height="24" Width="30" Margin="5"/>
+                            <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Grid.Row="0" Grid.Column="2" Command="{Binding OpenFileDialogForDataFileCommand}" Height="24" Width="30" Margin="5"/>
+                            <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Grid.Row="1" Grid.Column="2" Command="{Binding OpenFileDialogForExitFileCommand}" Height="24" Width="30" Margin="5"/>
+                            <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Grid.Row="2" Grid.Column="2" Command="{Binding OpenFolderDialogForListBD}" Height="24" Width="30" Margin="5"/>
 
                         </Grid>
                     </Border>
