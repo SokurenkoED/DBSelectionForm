@@ -121,7 +121,7 @@ namespace DBSelectionForm.Services
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
-                Environment.Exit(0);
+                return;
             }
 
             #endregion
