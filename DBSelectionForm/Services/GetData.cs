@@ -169,6 +169,12 @@ namespace DBSelectionForm.Services
                     }
                     i++;
                 }
+                if (LastTime == null)
+                {
+                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
+                    MessageBox.Show($"\nЗначение датчика {SensorName} не изменялось на заданном приоде времени.");
+                    return;
+                }
                 if (double.Parse(LastTime, formatter) != double.Parse(TimeTo, formatter) && LastTime != ListData[ListData.Count - 1][0])
                 {
                     sw.WriteLine($"{double.Parse(TimeTo, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeTo)}");
