@@ -15,7 +15,25 @@ namespace DBSelectionForm.Services
     {
         private static string LineInterpol(string[] Values1, string[] Values2, string X) // Линейная интерполяция
         {
-            return (((double.Parse(Values1[1]) - double.Parse(Values2[1])) / (double.Parse(Values1[0]) - double.Parse(Values2[0]))) * (double.Parse(X) - double.Parse(Values1[0])) + double.Parse(Values1[1])).ToString();
+            double result;
+            bool IsDouble_Values1 = Double.TryParse(Values1[1], out result);
+            bool IsDouble_Values2 = Double.TryParse(Values2[1], out result);
+
+            if (IsDouble_Values1 != false && IsDouble_Values2 != false)
+            {
+                return (((double.Parse(Values1[1]) - double.Parse(Values2[1])) / (double.Parse(Values1[0]) - double.Parse(Values2[0]))) * (double.Parse(X) - double.Parse(Values1[0])) + double.Parse(Values1[1])).ToString();
+            }
+            else
+            {
+                if (IsDouble_Values1 == false)
+                {
+                    return Values1[1];
+                }
+                else
+                {
+                    return Values2[1];
+                }
+            }
         }
         private static string ConvertDataFormat(string OldFormat, string Day, IFormatProvider formatter)
         {
