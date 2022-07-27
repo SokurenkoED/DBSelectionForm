@@ -56,7 +56,7 @@ namespace DBSelectionForm.Services
 
             string DayFrom = _InfoData.DayFrom;
             string DayTo = _InfoData.DayTo;
-            string SensorName = _InfoData.SensorName;
+            string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             string TempTimeFrom = _InfoData.TimeFrom.Trim();
             string TimeFrom = ConvertDataFormat(_InfoData.TimeFrom, DayFrom, formatter);
             string TimeTo = ConvertDataFormat(_InfoData.TimeTo, DayTo, formatter);
@@ -71,140 +71,150 @@ namespace DBSelectionForm.Services
             string[] example;
             string[] DateArr;
             string[] DateDayArr;
-            string RuteName = SensorName.Substring(2, 3);
+            string RuteName;
             string RelatePath = _InfoData.PathToFolder;
             string[] filePaths = Directory.GetFiles(RelatePath);
             List<string> ColdReactor = new List<string>();
+            _TextInformation.Clear();
 
             #endregion
 
-            _TextInformation.Add($"{_TextInformation.Count + 1}) Началось составление файла для датчика {SensorName}.");
-
-            #region Запись данных в массив
-
-            foreach (string item in filePaths)
+            for (int k = 0; k < SensorName.Length; k++)
             {
-                string filename = Path.GetFileName(item);
-                if (filename.IndexOf(RuteName) != -1)
+
+                ListData.Clear();
+
+                RuteName = SensorName[k].Substring(2, 3);
+
+                _TextInformation.Add($"{_TextInformation.Count + 1}) Началось составление файла для датчика {SensorName[k]}.");
+
+                #region Запись данных в массив
+
+                foreach (string item in filePaths)
                 {
-                    using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ANSI))
+                    string filename = Path.GetFileName(item);
+                    if (filename.IndexOf(RuteName) != -1)
                     {
-
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
+                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ANSI))
                         {
-                            if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], SensorName) == 0)
+
+                            string line;
+                            while ((line = sr.ReadLine()) != null)
                             {
+                                if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], SensorName[k]) == 0)
+                                {
 
-                                #region Обработка данных
+                                    #region Обработка данных
 
-                                example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
-                                DateArr = example[1].Trim().Replace(",", ".").Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-                                DateDayArr = example[0].Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-                                Date = double.Parse(DateArr[0], formatter) * 3600 + double.Parse(DateArr[1], formatter) * 60 + double.Parse(DateArr[2], formatter) + (double.Parse(DateDayArr[0], formatter) - 6) * 24 * 3600;
-                                DateStr = Date.ToString();
-                                #endregion
+                                    example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                                    DateArr = example[1].Trim().Replace(",", ".").Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+                                    DateDayArr = example[0].Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                                    Date = double.Parse(DateArr[0], formatter) * 3600 + double.Parse(DateArr[1], formatter) * 60 + double.Parse(DateArr[2], formatter) + (double.Parse(DateDayArr[0], formatter) - 6) * 24 * 3600;
+                                    DateStr = Date.ToString();
+                                    #endregion
 
-                                ListData.Add(new string[] { DateStr, example[3] });
+                                    
+                                    ListData.Add(new string[] { DateStr, example[3] });
+                                }
                             }
                         }
-                    }
 
-                }
-            }
-            using (StreamReader sr = new StreamReader($"{RelatePath}/срез_06_07_2018.txt", ANSI)) // Поиск по срезу для холодного реактора
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (line.StartsWith(SensorName))
-                    {
-                        ColdReactor.Add(line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[2]);
-                        break;
                     }
                 }
-            }
-
-            #endregion
-
-            #region Проверка на предмет существования датчика в БД
-
-            try
-            {
-                if (ListData.Count == 0)
+                using (StreamReader sr = new StreamReader($"{RelatePath}/срез_06_07_2018.txt", ANSI)) // Поиск по срезу для холодного реактора
                 {
-                    throw new Exception($"\nОшибка! Датчик {SensorName} не был найден!");
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message);
-                return;
-            }
-
-            #endregion
-
-            #region Запись массива в файл
-
-            using (StreamWriter sw = new StreamWriter($"{SensorName}_{TempTimeFrom.Replace(":", "-")}.dat", false, System.Text.Encoding.Default))
-            {
-                //sw.WriteLine($"Time {SensorName}");
-                string LastTime = null;
-                int i = 0;
-                int CountNods = 0;
-                foreach (var item in ListData)
-                {
-                    if (double.Parse(item[0], formatter) >= double.Parse(TimeFrom, formatter) && double.Parse(item[0], formatter) <= double.Parse(TimeTo, formatter))
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        LastTime = item[0];
-
-                        if (CountNods == 0) // Логика для крайнего первого значения
+                        if (line.StartsWith(SensorName[k]))
                         {
-                            if (double.Parse(item[0], formatter) == double.Parse(TimeFrom, formatter)) // Если значение времени ОТ есть в массиве
-                            {
-                                sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
-                            }
-                            else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item != ListData[0])
-                            {
-                                sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i], TimeFrom)}");
-                                sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
-                            }
-                            else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item == ListData[0])
-                            {
-                                sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
-                                sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
-                            }
+                            ColdReactor.Add(line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[2]);
+                            break;
                         }
-                        else
-                        {
-                            sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
-                        }
-                        CountNods++;
                     }
-                    else if (double.Parse(item[0], formatter) > double.Parse(TimeTo, formatter))
-                    {
-                        break; // Так как больше совпадений не будет
-                    }
-                    i++;
                 }
-                if (LastTime == null)
+
+                #endregion
+
+                #region Проверка на предмет существования датчика в БД
+
+                try
                 {
-                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
-                    MessageBox.Show($"\nЗначение датчика {SensorName} не изменялось на заданном приоде времени.");
+                    if (ListData.Count == 0)
+                    {
+                        throw new Exception($"\nОшибка! Датчик {SensorName[k]} не был найден!");
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
                     return;
                 }
-                if (double.Parse(LastTime, formatter) != double.Parse(TimeTo, formatter) && LastTime != ListData[ListData.Count - 1][0])
+
+                #endregion
+
+                #region Запись массива в файл
+
+                using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, System.Text.Encoding.Default))
                 {
-                    sw.WriteLine($"{double.Parse(TimeTo, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeTo)}");
+                    //sw.WriteLine($"Time {SensorName}");
+                    string LastTime = null;
+                    int i = 0;
+                    int CountNods = 0;
+                    foreach (var item in ListData)
+                    {
+                        if (double.Parse(item[0], formatter) >= double.Parse(TimeFrom, formatter) && double.Parse(item[0], formatter) <= double.Parse(TimeTo, formatter))
+                        {
+                            LastTime = item[0];
+
+                            if (CountNods == 0) // Логика для крайнего первого значения
+                            {
+                                if (double.Parse(item[0], formatter) == double.Parse(TimeFrom, formatter)) // Если значение времени ОТ есть в массиве
+                                {
+                                    sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                }
+                                else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item != ListData[0])
+                                {
+                                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i], TimeFrom)}");
+                                    sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                }
+                                else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item == ListData[0])
+                                {
+                                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
+                                    sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                }
+                            }
+                            else
+                            {
+                                sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                            }
+                            CountNods++;
+                        }
+                        else if (double.Parse(item[0], formatter) > double.Parse(TimeTo, formatter))
+                        {
+                            break; // Так как больше совпадений не будет
+                        }
+                        i++;
+                    }
+                    if (LastTime == null)
+                    {
+                        sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
+                        MessageBox.Show($"\nЗначение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
+                        return;
+                    }
+                    if (double.Parse(LastTime, formatter) != double.Parse(TimeTo, formatter) && LastTime != ListData[ListData.Count - 1][0])
+                    {
+                        sw.WriteLine($"{double.Parse(TimeTo, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeTo)}");
+                    }
                 }
+
+                #endregion
+
+                _TextInformation.Add($"{_TextInformation.Count + 1}) Файл для датчика {SensorName[k]} составлен!");
+
+                //MessageBox.Show($"\nЗапись датчика {SensorName[k]} завершена.");
             }
-
-            #endregion
-
-            _TextInformation.Add($"{_TextInformation.Count + 1}) Файл для датчика {SensorName} составлен!");
-
-            MessageBox.Show($"\nЗапись датчика {SensorName} завершена.");
-
+            _TextInformation.Add($"{_TextInformation.Count + 1}) Выборка завершена!");
         }
 
     }

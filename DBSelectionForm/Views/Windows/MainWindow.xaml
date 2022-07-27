@@ -177,7 +177,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="100"/>
                         <RowDefinition Height="50"/>
                         <RowDefinition/>
                         <RowDefinition Height="50"/>
@@ -189,7 +189,7 @@
                     <Button Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="578,0,0,0"/>
 
                     <Label HorizontalContentAlignment="Center" Content="Имя датчика" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" Grid.Row="1" Margin="31,0,0,0" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding SensorName}" VerticalAlignment="Center" Width="237" Height="21" Grid.Row="1" Margin="313,0,0,0"  />
+                    <TextBox AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left" Text="{Binding SensorName}" VerticalAlignment="Center" Width="237" MinHeight="70" Grid.Row="1" Margin="313,0,0,0"  />
 
                     <Label HorizontalContentAlignment="Center" Content="Период времени" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" Margin="31,0,0,0" FontSize="16" Grid.Row="2" />
                     <TextBox HorizontalAlignment="Left" Text="{Binding TimeTo}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="2" Margin="506,0,0,0"  />
