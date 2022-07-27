@@ -148,7 +148,7 @@ namespace DBSelectionForm.Services
 
             using (StreamWriter sw = new StreamWriter($"{SensorName}_{TempTimeFrom.Replace(":", "-")}.dat", false, System.Text.Encoding.Default))
             {
-                sw.WriteLine($"Time {SensorName}");
+                //sw.WriteLine($"Time {SensorName}");
                 string LastTime = null;
                 int i = 0;
                 int CountNods = 0;
@@ -166,7 +166,7 @@ namespace DBSelectionForm.Services
                             }
                             else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item != ListData[0])
                             {
-                                sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeFrom)}");
+                                sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i], TimeFrom)}");
                                 sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                             }
                             else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item == ListData[0])
