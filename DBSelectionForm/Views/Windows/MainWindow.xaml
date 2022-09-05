@@ -64,7 +64,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Label Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" Content="Путь среза данных" HorizontalAlignment="Left"  VerticalAlignment="Center" FontSize="16"  />
-                            <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Text="{Binding PathToDataFile}" VerticalAlignment="Center" />
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PathToDataFile}" VerticalAlignment="Center" />
 
 
                             <Label Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Content="Путь до List_IC" HorizontalAlignment="Left"  VerticalAlignment="Center" FontSize="16"/>

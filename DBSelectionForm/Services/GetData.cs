@@ -42,7 +42,8 @@ namespace DBSelectionForm.Services
         }
         public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation)
         {
-            
+            _TextInformation.Clear();
+
             #region Настроечные данные
 
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -180,7 +181,7 @@ namespace DBSelectionForm.Services
                                 }
                                 else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item == ListData[0])
                                 {
-                                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
+                                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[k]}");
                                     sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
                             }
@@ -199,8 +200,9 @@ namespace DBSelectionForm.Services
                     if (LastTime == null)
                     {
                         sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
-                        MessageBox.Show($"\nЗначение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
-                        return;
+                        _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
+                        // MessageBox.Show($"\nЗначение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
+                        continue;
                     }
                     if (double.Parse(LastTime, formatter) != double.Parse(TimeTo, formatter) && LastTime != ListData[ListData.Count - 1][0])
                     {
