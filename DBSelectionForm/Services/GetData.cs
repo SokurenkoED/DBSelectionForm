@@ -40,7 +40,7 @@ namespace DBSelectionForm.Services
             string[] SplitStr = OldFormat.Trim().Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
             return ((double.Parse(Day, formatter) - 6) * 3600 * 24 + double.Parse(SplitStr[0], formatter) * 3600 + double.Parse(SplitStr[1], formatter) * 60 + double.Parse(SplitStr[2], formatter)).ToString();
         }
-        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation)
+        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath)
         {
             _TextInformation.Clear();
 
@@ -74,7 +74,17 @@ namespace DBSelectionForm.Services
             string[] DateDayArr;
             string RuteName;
             string RelatePath = _InfoData.PathToFolder;
-            string[] filePaths = Directory.GetFiles(RelatePath);
+            string[] filePaths = null;
+            try
+            {
+                filePaths = Directory.GetFiles(RelatePath);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                MessageBox.Show($"Нет файлов по адресу {RelatePath}");
+                return;
+            }
+            
             List<string> ColdReactor = new List<string>();
             _TextInformation.Clear();
 
@@ -122,16 +132,37 @@ namespace DBSelectionForm.Services
 
                     }
                 }
-                using (StreamReader sr = new StreamReader($"{RelatePath}/срез_06_07_2018.txt", ANSI)) // Поиск по срезу для холодного реактора
+                using (StreamReader sr = new StreamReader($"{SlicePath}", ANSI)) // Поиск по срезу для холодного реактора
                 {
                     string line;
+                    int KeyVar = -1; // 0 - старый формат, 1 - новый формат
+                    int m = 0;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        if (line.StartsWith(SensorName[k]))
+                        if (m == 3)
+                        {
+                            if (line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[1] == "Время")
+                            {
+                                KeyVar = 0;
+                            }
+                            else
+                            {
+                                KeyVar = 1;
+                            }
+                            
+                        }
+                        if (line.StartsWith(SensorName[k]) && KeyVar == 0)
                         {
                             ColdReactor.Add(line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[2]);
                             break;
+
+                        } else if (line.StartsWith(SensorName[k]) && KeyVar == 1)
+                        {
+                            ColdReactor.Add(line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                            break;
+
                         }
+                        m++;
                     }
                 }
 

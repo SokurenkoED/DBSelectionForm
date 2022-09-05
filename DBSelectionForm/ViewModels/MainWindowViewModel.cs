@@ -22,6 +22,22 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+        #region SlicePathDB
+
+        private string _SlicePathDB;
+
+        /// <summary>Название файла со срезом всех данных</summary>
+        public string SlicePathDB
+        {
+            get => _SlicePathDB;
+            set
+            {
+                Set(ref _SlicePathDB, value);
+            }
+        }
+
+        #endregion
+
         #region SelectedDataBaseFormat
 
         private string _SelectedDataBaseFormat;
@@ -367,7 +383,7 @@ namespace DBSelectionForm.ViewModels
                 _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo };
                 _fileIOservice.SaveData(_InfoData);
 
-                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation));
+                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB));
             }
             catch (ArgumentException)
             {
@@ -377,7 +393,7 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
-        #region OpenFileDialog (находим путь до папки с базой данных)
+        #region OpenFileDialogCommand (находим путь до папки с базой данных)
 
         public ICommand OpenFileDialogCommand { get; }
         private bool CanOpenFileDialogCommandExecute(object p) => true;
@@ -389,6 +405,21 @@ namespace DBSelectionForm.ViewModels
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 PathToFolder =  dialog.FileName;
+            }
+        }
+
+        #endregion
+
+        #region OpenFileDialogForSlicePathCommand (находим путь до папки с базой данных)
+
+        public ICommand OpenFileDialogForSlicePathCommand { get; }
+        private bool CanOpenFileDialogForSlicePathCommandExecute(object p) => true;
+        private void OnOpenFileDialogForSlicePathCommandExecuted(object p)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                SlicePathDB = dialog.FileName;
             }
         }
 
@@ -619,6 +650,8 @@ namespace DBSelectionForm.ViewModels
             OpenFolderDialogForListBD = new LambdaCommand(OnOpenFolderDialogForListBDExecuted, CanOpenFolderDialogForListBDExecute);
 
             SaveSignalsToList_IC = new LambdaCommand(OnSaveSignalsToList_ICExecuted, CanSaveSignalsToList_ICExecute);
+
+            OpenFileDialogForSlicePathCommand = new LambdaCommand(OnOpenFileDialogForSlicePathCommandExecuted, CanOpenFileDialogForSlicePathCommandExecute);
 
             #endregion
 
