@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
@@ -248,6 +249,74 @@ namespace DBSelectionForm.Services
                 //MessageBox.Show($"\nЗапись датчика {SensorName[k]} завершена.");
             }
             _TextInformation.Add($"{_TextInformation.Count + 1}) Выборка завершена!");
+        }
+
+        public static List<string> CheckAccectableTime(InfoData _InfoData)
+        {
+
+            #region Настроечные данные
+
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding ANSI = Encoding.GetEncoding(1251);
+
+            #endregion
+
+            string RelatePath = _InfoData.PathToFolder;
+            string[] filePaths = null;
+            string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string RuteName;
+            string DayFrom = null;
+            string DayTo = null;
+            string TimeFrom = null;
+            string TimeTo = null;
+
+            try
+            {
+                filePaths = Directory.GetFiles(RelatePath);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                MessageBox.Show($"Нет файлов по адресу {RelatePath}");
+                return new List<string>();
+            }
+
+            RuteName = SensorName[0].Substring(2, 3);
+
+
+            foreach (string item in filePaths)
+            {
+                string filename = Path.GetFileName(item);
+                if (filename.IndexOf(RuteName) != -1)
+                {
+                    using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ANSI))
+                    {
+
+                        string line = null;
+                        for (int i = 0; i < 3; i++)
+                        {
+                            line = sr.ReadLine();
+                        }
+                        string[] MainStr = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                        DayFrom = MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
+                        TimeFrom = MainStr[5];
+                        DayTo = MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
+                        TimeTo = MainStr[8];
+                    }
+                }
+            }
+
+            string AccectableDayFrom = DayFrom;
+            string AccectableDayTo = DayTo;
+            string AccectableTimeFrom = TimeFrom;
+            string AccectableTimeTo = TimeTo;
+            List<string> Result = new List<string>();
+            Result.Add(AccectableDayFrom);
+            Result.Add(AccectableDayTo);
+            Result.Add(AccectableTimeFrom);
+            Result.Add(AccectableTimeTo);
+            return Result;
         }
 
     }

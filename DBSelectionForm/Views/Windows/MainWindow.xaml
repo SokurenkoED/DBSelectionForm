@@ -10,11 +10,11 @@
         xmlns:l="clr-namespace:DBSelectionForm"
         Title="{Binding Path=Title}" Height="800" Width="1200" WindowStartupLocation="CenterScreen"
         Closing="Window_Closing">
-    
+
     <Window.DataContext>
         <vs:MainWindowViewModel/>
     </Window.DataContext>
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <conv:ValuesToColorConverters x:Key="ValuesToColorConverters"/>
@@ -35,14 +35,14 @@
         <TabControl>
             <TabItem Header="Создание списка элементов" FontSize="16">
                 <Grid>
-                    
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="5*"/>
                         <RowDefinition Height="10*"/>
                         <RowDefinition Height="1.5*"/>
                         <RowDefinition Height="2*"/>
                     </Grid.RowDefinitions>
-                    
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="2*"/>
@@ -178,25 +178,33 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"/>
                         <RowDefinition Height="50"/>
-                        <RowDefinition Height="100"/>
                         <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="100"/>
                         <RowDefinition/>
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
 
+                    <Label  HorizontalContentAlignment="Left" Content="Путь до среза данных" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Margin="31,6,0,0" Grid.Row="0"/>
+                    <TextBox IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding SlicePathDB}" VerticalAlignment="Center" Width="279" Height="22" Margin="312,0,0,0" Grid.Row="0" />
+                    <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Command="{Binding OpenFileDialogForSlicePathCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="618,0,0,0" Grid.Row="0"/>
 
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до папки с данными" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Margin="31,6,0,0" />
-                    <TextBox HorizontalAlignment="Left" Text="{Binding PathToFolder}" VerticalAlignment="Center" Width="238" Height="21" Margin="312,0,0,0"  />
-                    <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="578,0,0,0"/>
+                    <Label  HorizontalContentAlignment="Left" Content="Путь до папки с данными" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Margin="31,6,0,0" Grid.Row="1" />
+                    <TextBox IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding PathToFolder}" VerticalAlignment="Center" MinWidth="238" Height="22" Margin="312,0,0,0" Width="279" Grid.Row="1" />
+                    <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="618,0,0,0" Grid.Row="1"/>
+                    
+                    <Label HorizontalContentAlignment="Left" Content="Имя датчика" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Grid.Row="4" Margin="31,15,0,0" />
+                    <TextBox AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left" Text="{Binding SensorName}" VerticalAlignment="Center" MinWidth="278" MinHeight="70" Grid.Row="4" Margin="313,0,0,0"  />
 
-                    <Label  HorizontalContentAlignment="Center" Content="Путь до среза данных" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Margin="31,6,0,0" Grid.Row="1"/>
-                    <TextBox HorizontalAlignment="Left" Text="{Binding SlicePathDB}" VerticalAlignment="Center" Width="238" Height="21" Margin="312,0,0,0" Grid.Row="1" />
-                    <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Command="{Binding OpenFileDialogForSlicePathCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="578,0,0,0" Grid.Row="1"/>
+                    <Label HorizontalContentAlignment="Left" Content="Допустимый интервал" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" Margin="31,0,0,0" FontSize="16" Grid.Row="2" />
+                    <TextBox IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding AcceptableTimeTo}" MinWidth="85" VerticalAlignment="Center"  Grid.Row="2" Margin="506,0,0,0"  />
+                    <TextBox MinWidth="30" IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding AcceptableDayTo}" VerticalAlignment="Center"  Grid.Row="2" Margin="465,0,0,0"  />
 
-                    <Label HorizontalContentAlignment="Center" Content="Имя датчика" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" FontSize="16" Grid.Row="2" Margin="31,0,0,0" />
-                    <TextBox AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Left" Text="{Binding SensorName}" VerticalAlignment="Center" Width="237" MinHeight="70" Grid.Row="2" Margin="313,0,0,0"  />
+                    <Label Content=" - " HorizontalAlignment="Left"  VerticalAlignment="Top"  Grid.Row="2" Margin="438,6,0,0" FontSize="18" />
+                    <TextBox IsReadOnly="True" HorizontalAlignment="Left" Margin="353,0,0,0" Text="{Binding AcceptableTimeFrom}" MinWidth="85" VerticalAlignment="Center"  Grid.Row="2"  />
+                    <TextBox MinWidth="30" IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding AcceptableDayFrom}" VerticalAlignment="Center"  Grid.Row="2" Margin="312,0,0,0"  />
 
-                    <Label HorizontalContentAlignment="Center" Content="Период времени" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" Margin="31,0,0,0" FontSize="16" Grid.Row="3" />
+                    <Label HorizontalContentAlignment="Left" Content="Пользовательский интервал" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" MinWidth="214" Margin="31,0,0,0" FontSize="16" Grid.Row="3" />
                     <TextBox HorizontalAlignment="Left" Text="{Binding TimeTo}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="3" Margin="506,0,0,0"  />
                     <TextBox HorizontalAlignment="Left" Text="{Binding DayTo}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="3" Margin="465,0,0,0"  />
 
@@ -204,13 +212,13 @@
                     <TextBox HorizontalAlignment="Left" Margin="353,0,0,0" Text="{Binding TimeFrom}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="3"  />
                     <TextBox HorizontalAlignment="Left" Text="{Binding DayFrom}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="3" Margin="312,0,0,0"  />
 
-                    <Grid Grid.Row="5">
+                    <Grid Grid.Row="6">
                         <Button Command="{Binding GetDataCommand}" Content="Создать выборку" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Margin="0,0,230,0"/>
 
                         <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Column="1" Margin="0,0,5,0"/>
                     </Grid>
 
-                    <Grid Grid.Row="4">
+                    <Grid Grid.Row="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                             <RowDefinition/>
@@ -224,6 +232,6 @@
             </TabItem>
 
         </TabControl>
-        
+
     </DockPanel>
 </Window>

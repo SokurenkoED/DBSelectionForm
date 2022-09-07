@@ -22,6 +22,70 @@ namespace DBSelectionForm.ViewModels
         private FileIOService _fileIOservice;
         private InfoData _InfoData;
 
+        #region Работа с допустимыми интервалами
+
+        #region AcceptableTimeFrom
+
+        private string _AcceptableTimeFrom;
+
+        public string AcceptableTimeFrom
+        {
+            get => _AcceptableTimeFrom;
+            set
+            {
+                Set(ref _AcceptableTimeFrom, value);
+            }
+        }
+
+        #endregion
+
+        #region AcceptableTimeTo
+
+        private string _AcceptableTimeTo;
+
+        public string AcceptableTimeTo
+        {
+            get => _AcceptableTimeTo;
+            set
+            {
+                Set(ref _AcceptableTimeTo, value);
+            }
+        }
+
+        #endregion
+
+        #region AcceptableDayFrom
+
+        private string _AcceptableDayFrom;
+
+        public string AcceptableDayFrom
+        {
+            get => _AcceptableDayFrom;
+            set
+            {
+                Set(ref _AcceptableDayFrom, value);
+            }
+        }
+
+        #endregion
+
+        #region AcceptableDayTo
+
+        private string _AcceptableDayTo;
+
+        public string AcceptableDayTo
+        {
+            get => _AcceptableDayTo;
+            set
+            {
+                Set(ref _AcceptableDayTo, value);
+            }
+        }
+
+        #endregion
+
+        #endregion
+
         #region SlicePathDB
 
         private string _SlicePathDB;
@@ -400,11 +464,35 @@ namespace DBSelectionForm.ViewModels
         private void OnOpenFileDialogCommandExecuted(object p)
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-            //dialog.InitialDirectory = "C:\\Users";
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 PathToFolder =  dialog.FileName;
+
+                #region Стереть допустимый интервал
+
+                AcceptableDayFrom = null;
+                AcceptableDayTo = null;
+                AcceptableTimeFrom = null;
+                AcceptableTimeTo = null;
+
+                #endregion
+
+                #region Вызываем функцию для определения допустимого интервала
+                List<string> TimeData = new List<string>();
+                TimeData = GetData.CheckAccectableTime(_InfoData);
+                AcceptableDayFrom = TimeData[0];
+                AcceptableDayTo = TimeData[1];
+                AcceptableTimeFrom = TimeData[2];
+                AcceptableTimeTo = TimeData[3];
+
+                #endregion
+                
+
+                // TODO:
+                // 1) Стереть допустимый интервал
+                // 2) Вызвать функцию для определения допустимого интервала
+                // 3) Записать допустимый интервал
             }
         }
 
