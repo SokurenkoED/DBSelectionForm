@@ -200,7 +200,7 @@
                     <TextBox HorizontalAlignment="Left" Text="{Binding TimeTo}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="3" Margin="506,0,0,0"  />
                     <TextBox HorizontalAlignment="Left" Text="{Binding DayTo}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="3" Margin="465,0,0,0"  />
 
-                    <Label Content=" - " HorizontalAlignment="Left"  VerticalAlignment="Top"  Grid.Row="2" Margin="438,6,0,0" FontSize="18" />
+                    <Label Content=" - " HorizontalAlignment="Left"  VerticalAlignment="Top"  Grid.Row="3" Margin="438,6,0,0" FontSize="18" />
                     <TextBox HorizontalAlignment="Left" Margin="353,0,0,0" Text="{Binding TimeFrom}" VerticalAlignment="Center" Width="85" Height="22" Grid.Row="3"  />
                     <TextBox HorizontalAlignment="Left" Text="{Binding DayFrom}" VerticalAlignment="Center" Width="30" Height="22" Grid.Row="3" Margin="312,0,0,0"  />
 

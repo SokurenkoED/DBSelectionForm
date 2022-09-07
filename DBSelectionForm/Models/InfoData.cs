@@ -28,5 +28,7 @@ namespace DBSelectionForm.Models
 
         public string EndDayForListBD { get; set; }
         public string EndTimeForListBD { get; set; }
+
+        public string SlicePathDB { get; set; }
     }
 }

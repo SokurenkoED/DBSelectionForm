@@ -380,7 +380,7 @@ namespace DBSelectionForm.ViewModels
         {
             try
             {
-                _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo };
+                _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo };
                 _fileIOservice.SaveData(_InfoData);
 
                 Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB));
@@ -510,7 +510,7 @@ namespace DBSelectionForm.ViewModels
         {
             try
             {
-                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
+                _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
                 _fileIOservice.SaveData(_InfoData);
                 try
                 {
@@ -622,6 +622,10 @@ namespace DBSelectionForm.ViewModels
             if (_InfoData.EndTimeForListBD != null)
             {
                 _EndTimeForListBD = _InfoData.EndTimeForListBD;
+            }
+            if (_InfoData.SlicePathDB != null)
+            {
+                _SlicePathDB = _InfoData.SlicePathDB;
             }
 
 
