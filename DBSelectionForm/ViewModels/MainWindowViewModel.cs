@@ -480,7 +480,7 @@ namespace DBSelectionForm.ViewModels
 
                 #region Вызываем функцию для определения допустимого интервала
                 List<string> TimeData = new List<string>();
-                TimeData = GetData.CheckAccectableTime(_InfoData);
+                TimeData = GetData.CheckAccectableTime(PathToFolder);
                 AcceptableDayFrom = TimeData[0];
                 AcceptableDayTo = TimeData[1];
                 AcceptableTimeFrom = TimeData[2];
@@ -714,6 +714,19 @@ namespace DBSelectionForm.ViewModels
             if (_InfoData.SlicePathDB != null)
             {
                 _SlicePathDB = _InfoData.SlicePathDB;
+            }
+            if (_InfoData.PathToFolder != null)
+            {
+                #region Вызываем функцию для определения допустимого интервала
+
+                List<string> TimeData = new List<string>();
+                TimeData = GetData.CheckAccectableTime(PathToFolder);
+                AcceptableDayFrom = TimeData[0];
+                AcceptableDayTo = TimeData[1];
+                AcceptableTimeFrom = TimeData[2];
+                AcceptableTimeTo = TimeData[3];
+
+                #endregion
             }
 
 

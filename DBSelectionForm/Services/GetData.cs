@@ -5,34 +5,43 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace DBSelectionForm.Services
 {
+    class TimeValueData
+    {
+        public DateTime DataTime;
+        public string DataValue;
+    }
     class GetData
     {
-        private static string LineInterpol(string[] Values1, string[] Values2, string X) // Линейная интерполяция
+        private static string LineInterpol(TimeValueData Values1, TimeValueData Values2, DateTime X) // Линейная интерполяция
         {
             double result;
-            bool IsDouble_Values1 = Double.TryParse(Values1[1], out result);
-            bool IsDouble_Values2 = Double.TryParse(Values2[1], out result);
-
+            bool IsDouble_Values1 = Double.TryParse(Values1.DataValue, out result);
+            bool IsDouble_Values2 = Double.TryParse(Values2.DataValue, out result);
+            var var_dt = Values1.DataTime.Subtract(Values2.DataTime);
+            var another_var_dt = X.Subtract(Values1.DataTime);
             if (IsDouble_Values1 != false && IsDouble_Values2 != false)
             {
-                return (((double.Parse(Values1[1]) - double.Parse(Values2[1])) / (double.Parse(Values1[0]) - double.Parse(Values2[0]))) * (double.Parse(X) - double.Parse(Values1[0])) + double.Parse(Values1[1])).ToString();
+                return (((double.Parse(Values1.DataValue) - double.Parse(Values2.DataValue)) / (var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60)) * (another_var_dt.Seconds + another_var_dt.Minutes * 60 + another_var_dt.Hours * 60 * 60) + double.Parse(Values1.DataValue)).ToString();
             }
             else
             {
                 if (IsDouble_Values1 == false)
                 {
-                    return Values1[1];
+                    return Values1.DataValue;
                 }
                 else
                 {
-                    return Values2[1];
+                    return Values2.DataValue;
                 }
             }
         }
@@ -60,14 +69,35 @@ namespace DBSelectionForm.Services
             string DayTo = _InfoData.DayTo;
             string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             string TempTimeFrom = _InfoData.TimeFrom.Trim();
-            string TimeFrom = ConvertDataFormat(_InfoData.TimeFrom, DayFrom, formatter);
-            string TimeTo = ConvertDataFormat(_InfoData.TimeTo, DayTo, formatter);
+            string TimeFrom = null;
+            string TimeTo = null;
+            //string TimeFrom = ConvertDataFormat(_InfoData.TimeFrom, DayFrom, formatter);
+            //string TimeTo = ConvertDataFormat(_InfoData.TimeTo, DayTo, formatter);
+
+            DateTime DT_From = new DateTime(
+                int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                int.Parse(_InfoData.TimeFrom.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                int.Parse(_InfoData.TimeFrom.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                int.Parse(_InfoData.TimeFrom.Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                );
+            DateTime DT_To = new DateTime(
+                int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                int.Parse(_InfoData.TimeTo.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                int.Parse(_InfoData.TimeTo.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                int.Parse(_InfoData.TimeTo.Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                );
 
             #endregion
 
             #region Setup
 
             List<string[]> ListData = new List<string[]>();
+            List<TimeValueData> NewListData = new List<TimeValueData>();
+            List<DateTime> Dates = new List<DateTime>();
             double Date;
             string DateStr;
             string[] example;
@@ -95,6 +125,7 @@ namespace DBSelectionForm.Services
             {
 
                 ListData.Clear();
+                NewListData.Clear();
 
                 RuteName = SensorName[k].Substring(2, 3);
 
@@ -123,10 +154,25 @@ namespace DBSelectionForm.Services
                                     DateDayArr = example[0].Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
                                     Date = double.Parse(DateArr[0], formatter) * 3600 + double.Parse(DateArr[1], formatter) * 60 + double.Parse(DateArr[2], formatter) + (double.Parse(DateDayArr[0], formatter) - 6) * 24 * 3600;
                                     DateStr = Date.ToString();
-                                    #endregion
+
+                                    DateTime DT = new DateTime(
+                                        int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                                        int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                        int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                        int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                        int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                        int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                        );                              
 
                                     
+                                    #endregion
+
+
                                     ListData.Add(new string[] { DateStr, example[3] });
+                                    NewListData.Add(new TimeValueData()
+                                        { DataTime = DT
+                                        , DataValue = example[3] 
+                                    });
                                 }
                             }
                         }
@@ -177,6 +223,10 @@ namespace DBSelectionForm.Services
                     {
                         throw new Exception($"\nОшибка! Датчик {SensorName[k]} не был найден!");
                     }
+                    if (NewListData.Count == 0)
+                    {
+                        throw new Exception($"\nОшибка! Датчик {SensorName[k]} не был найден!");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -191,54 +241,67 @@ namespace DBSelectionForm.Services
                 using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, System.Text.Encoding.Default))
                 {
                     //sw.WriteLine($"Time {SensorName}");
-                    string LastTime = null;
+                    DateTime LastTime = new DateTime(0, 0, 0);
                     int i = 0;
                     int CountNods = 0;
-                    foreach (var item in ListData)
+                    foreach (var item in NewListData) // item[0] - время, item[1] - значение датчика
                     {
-                        if (double.Parse(item[0], formatter) >= double.Parse(TimeFrom, formatter) && double.Parse(item[0], formatter) <= double.Parse(TimeTo, formatter))
+                        if (item.DataTime >= DT_From && item.DataTime <= DT_To)
                         {
-                            LastTime = item[0];
+                            LastTime = item.DataTime;
 
                             if (CountNods == 0) // Логика для крайнего первого значения
                             {
-                                if (double.Parse(item[0], formatter) == double.Parse(TimeFrom, formatter)) // Если значение времени ОТ есть в массиве
+                                if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
                                 {
-                                    sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                    TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
-                                else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item != ListData[0])
+                                else if (item.DataTime != DT_From && item != NewListData[0])
                                 {
-                                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i], TimeFrom)}");
-                                    sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                    sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                    TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    //sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                    //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
-                                else if (double.Parse(item[0], formatter) != double.Parse(TimeFrom, formatter) && item == ListData[0])
+                                else if (item.DataTime != DT_From && item == NewListData[0])
                                 {
-                                    sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[k]}");
-                                    sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                    sw.WriteLine($"{0} {ColdReactor[k]}");
+                                    TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    //sw.WriteLine($"{0} {ColdReactor[k]}");
+                                    //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
                             }
                             else
                             {
-                                sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
+                                TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                             }
                             CountNods++;
                         }
-                        else if (double.Parse(item[0], formatter) > double.Parse(TimeTo, formatter))
+                        else if (item.DataTime > DT_To)
                         {
                             break; // Так как больше совпадений не будет
                         }
                         i++;
                     }
-                    if (LastTime == null)
+                    if (LastTime == new DateTime(0, 0, 0))
                     {
-                        sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
+                        sw.WriteLine($"{0} {ColdReactor[0]}");
+                        //sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
                         _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         // MessageBox.Show($"\nЗначение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         continue;
                     }
-                    if (double.Parse(LastTime, formatter) != double.Parse(TimeTo, formatter) && LastTime != ListData[ListData.Count - 1][0])
+                    if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
                     {
-                        sw.WriteLine($"{double.Parse(TimeTo, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeTo)}");
+                        TimeSpan var_dt = DT_To.Subtract(DT_From);
+                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                        //sw.WriteLine($"{double.Parse(TimeTo, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeTo)}");
                     }
                 }
 
@@ -251,7 +314,12 @@ namespace DBSelectionForm.Services
             _TextInformation.Add($"{_TextInformation.Count + 1}) Выборка завершена!");
         }
 
-        public static List<string> CheckAccectableTime(InfoData _InfoData)
+        /// <summary>
+        /// Записываю допустимое время выборки
+        /// </summary>
+        /// <param name="PathToFolder"></param>
+        /// <returns></returns>
+        public static List<string> CheckAccectableTime(string PathToFolder)
         {
 
             #region Настроечные данные
@@ -263,14 +331,11 @@ namespace DBSelectionForm.Services
 
             #endregion
 
-            string RelatePath = _InfoData.PathToFolder;
+            string RelatePath = PathToFolder;
             string[] filePaths = null;
-            string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             string RuteName;
-            string DayFrom = null;
-            string DayTo = null;
-            string TimeFrom = null;
-            string TimeTo = null;
+            List<DateTime> DT_list_from = new List<DateTime>();
+            List<DateTime> DT_list_to = new List<DateTime>();
 
             try
             {
@@ -282,7 +347,8 @@ namespace DBSelectionForm.Services
                 return new List<string>();
             }
 
-            RuteName = SensorName[0].Substring(2, 3);
+            //RuteName = SensorName[0].Substring(2, 3);
+            RuteName = "JKT";
 
 
             foreach (string item in filePaths)
@@ -299,18 +365,34 @@ namespace DBSelectionForm.Services
                             line = sr.ReadLine();
                         }
                         string[] MainStr = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
-                        DayFrom = MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
-                        TimeFrom = MainStr[5];
-                        DayTo = MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
-                        TimeTo = MainStr[8];
+                        DT_list_from.Add(new DateTime(
+                            int.Parse(MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                            int.Parse(MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[5].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[5].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[5].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
+                            ));
+
+                        DT_list_to.Add(new DateTime(
+                            int.Parse(MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                            int.Parse(MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
+                            ));
                     }
                 }
             }
+            // Определить минимальную и максимальную даты
 
-            string AccectableDayFrom = DayFrom;
-            string AccectableDayTo = DayTo;
-            string AccectableTimeFrom = TimeFrom;
-            string AccectableTimeTo = TimeTo;
+            //Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-GB");
+            string AccectableDayFrom = DT_list_from.Min().ToString("dd.MM.yy");
+            string AccectableTimeFrom = DT_list_from.Min().ToString("HH:mm:ss");
+            string AccectableDayTo = DT_list_to.Max().ToString("dd.MM.yy");
+            string AccectableTimeTo = DT_list_to.Max().ToString("HH:mm:ss");
+
             List<string> Result = new List<string>();
             Result.Add(AccectableDayFrom);
             Result.Add(AccectableDayTo);
