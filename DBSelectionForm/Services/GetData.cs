@@ -125,6 +125,15 @@ namespace DBSelectionForm.Services
 
             #endregion
 
+            #region Проверка на пустое значение в имени датчиков
+
+            if (String.IsNullOrEmpty(_InfoData.SensorName))
+            {
+                MessageBox.Show("Введите имена датчиков!");
+                return;
+            }
+
+            #endregion
 
             #region Setup
 
@@ -160,7 +169,17 @@ namespace DBSelectionForm.Services
                 ListData.Clear();
                 NewListData.Clear();
 
-                RuteName = SensorName[k].Substring(2, 3);
+
+                try
+                {
+                    RuteName = SensorName[k].Substring(2, 3);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    MessageBox.Show($"Введено некорректное название датчика '{SensorName[k]}'");
+                    return;
+                }
+                
 
                 _TextInformation.Add($"{_TextInformation.Count + 1}) Началось составление файла для датчика {SensorName[k]}.");
 
