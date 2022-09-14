@@ -52,7 +52,6 @@ namespace DBSelectionForm.Services
         }
         public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath)
         {
-            _TextInformation.Clear();
 
             #region Настроечные данные
 
@@ -63,35 +62,69 @@ namespace DBSelectionForm.Services
 
             #endregion
 
-            #region Ввод данных из модели
+            // проверка на временные интервалы
+            if (_InfoData.DayFrom == null || _InfoData.TimeFrom == null || _InfoData.DayTo == null || _InfoData.DayFrom == null)
+            {
+                MessageBox.Show("Не введены временные интервалы");
+                return;
+            }
 
-            string DayFrom = _InfoData.DayFrom;
-            string DayTo = _InfoData.DayTo;
-            string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            string TempTimeFrom = _InfoData.TimeFrom.Trim();
-            string TimeFrom = null;
-            string TimeTo = null;
-            //string TimeFrom = ConvertDataFormat(_InfoData.TimeFrom, DayFrom, formatter);
-            //string TimeTo = ConvertDataFormat(_InfoData.TimeTo, DayTo, formatter);
+            #region Получаем допустимый временной интервал
 
-            DateTime DT_From = new DateTime(
-                int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
-                int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
-                int.Parse(_InfoData.TimeFrom.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
-                int.Parse(_InfoData.TimeFrom.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                int.Parse(_InfoData.TimeFrom.Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
-                );
-            DateTime DT_To = new DateTime(
-                int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
-                int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
-                int.Parse(_InfoData.TimeTo.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
-                int.Parse(_InfoData.TimeTo.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                int.Parse(_InfoData.TimeTo.Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
-                );
+            var CI = new CultureInfo("de_DE");
+            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder);
+            DateTime AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
+            DateTime AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
 
             #endregion
+
+            _TextInformation.Clear();
+
+            #region Ввод данных из модели
+
+            string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string TempTimeFrom = _InfoData.TimeFrom.Trim();
+
+            DateTime DT_From = DateTime.Now;
+            DateTime DT_To = DateTime.Now;
+
+            try
+            {
+                DT_From = new DateTime(
+                    int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                    int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                    int.Parse(_InfoData.DayFrom.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                    int.Parse(_InfoData.TimeFrom.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                    int.Parse(_InfoData.TimeFrom.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                    int.Parse(_InfoData.TimeFrom.Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                );
+                DT_To = new DateTime(
+                    int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                    int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                    int.Parse(_InfoData.DayTo.Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                    int.Parse(_InfoData.TimeTo.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                    int.Parse(_InfoData.TimeTo.Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                    int.Parse(_InfoData.TimeTo.Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                    );
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Введен неверный формат временного интервала!");
+                return;
+            }
+
+            #endregion
+
+            #region Проверка на правильность ввода временного интервала
+
+            if (DT_From < AcceptableTimeFrom || DT_To > AcceptableTimeTo)
+            {
+                MessageBox.Show("Указан неверный временной интервал");
+                return;
+            }
+
+            #endregion
+
 
             #region Setup
 
@@ -241,7 +274,7 @@ namespace DBSelectionForm.Services
                 using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, System.Text.Encoding.Default))
                 {
                     //sw.WriteLine($"Time {SensorName}");
-                    DateTime LastTime = new DateTime(0, 0, 0);
+                    DateTime LastTime = new DateTime(2000, 1, 1);
                     int i = 0;
                     int CountNods = 0;
                     foreach (var item in NewListData) // item[0] - время, item[1] - значение датчика
@@ -256,30 +289,24 @@ namespace DBSelectionForm.Services
                                 {
                                     TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                     sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
-                                    //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
                                 else if (item.DataTime != DT_From && item != NewListData[0])
                                 {
                                     sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
                                     TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                     sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
-                                    //sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
-                                    //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
                                 else if (item.DataTime != DT_From && item == NewListData[0])
                                 {
                                     sw.WriteLine($"{0} {ColdReactor[k]}");
                                     TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                     sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
-                                    //sw.WriteLine($"{0} {ColdReactor[k]}");
-                                    //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                                 }
                             }
                             else
                             {
                                 TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                 sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
-                                //sw.WriteLine($"{double.Parse(item[0], formatter) - double.Parse(TimeFrom, formatter)} {item[1]}");
                             }
                             CountNods++;
                         }
@@ -289,10 +316,9 @@ namespace DBSelectionForm.Services
                         }
                         i++;
                     }
-                    if (LastTime == new DateTime(0, 0, 0))
+                    if (LastTime == new DateTime(2000, 1, 1))
                     {
                         sw.WriteLine($"{0} {ColdReactor[0]}");
-                        //sw.WriteLine($"{double.Parse(TimeFrom, formatter) - double.Parse(TimeFrom, formatter)} {ColdReactor[0]}");
                         _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         // MessageBox.Show($"\nЗначение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         continue;
@@ -301,7 +327,6 @@ namespace DBSelectionForm.Services
                     {
                         TimeSpan var_dt = DT_To.Subtract(DT_From);
                         sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
-                        //sw.WriteLine($"{double.Parse(TimeTo, formatter) - double.Parse(TimeFrom, formatter)} {LineInterpol(ListData[i - 1], ListData[i + 1], TimeTo)}");
                     }
                 }
 
@@ -309,7 +334,6 @@ namespace DBSelectionForm.Services
 
                 _TextInformation.Add($"{_TextInformation.Count + 1}) Файл для датчика {SensorName[k]} составлен!");
 
-                //MessageBox.Show($"\nЗапись датчика {SensorName[k]} завершена.");
             }
             _TextInformation.Add($"{_TextInformation.Count + 1}) Выборка завершена!");
         }
