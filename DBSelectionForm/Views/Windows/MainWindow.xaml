@@ -193,7 +193,7 @@
                     <TextBox IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding PathToFolder}" VerticalAlignment="Center" MinWidth="238" Height="22" Margin="312,0,0,0" Width="372" Grid.Row="1" />
                     <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="703,0,0,0" Grid.Row="1"/>
 
-                    <Label HorizontalContentAlignment="Left" Content="Имя датчика" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Grid.Row="4" Margin="31,15,0,0" />
+                    <Label HorizontalContentAlignment="Left" Content="Имя датчиков" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Grid.Row="4" Margin="31,15,0,0" />
 
                     <TextBox HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="371" MinHeight="120" Grid.Row="4" Margin="313,0,0,0"  VerticalScrollBarVisibility="Auto" BorderBrush="Black" Background="#FFF0F0F0" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding SensorName}"/>
 
