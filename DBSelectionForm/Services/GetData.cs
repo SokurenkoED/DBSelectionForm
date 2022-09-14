@@ -141,10 +141,7 @@ namespace DBSelectionForm.Services
             List<TimeValueData> NewListData = new List<TimeValueData>();
             List<DateTime> Dates = new List<DateTime>();
             double Date;
-            string DateStr;
             string[] example;
-            string[] DateArr;
-            string[] DateDayArr;
             string RuteName;
             string RelatePath = _InfoData.PathToFolder;
             string[] filePaths = null;
@@ -180,7 +177,6 @@ namespace DBSelectionForm.Services
                     return;
                 }
                 
-
                 _TextInformation.Add($"{_TextInformation.Count + 1}) Началось составление файла для датчика {SensorName[k]}.");
 
                 #region Запись данных в массив
@@ -196,39 +192,50 @@ namespace DBSelectionForm.Services
                             string line;
                             while ((line = sr.ReadLine()) != null)
                             {
-                                if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], SensorName[k]) == 0)
+
+                                // если элемент - ЗАДВИЖКА
+                                if (SensorName[k].Contains("AA1") && SensorName[k].Contains("_Z0"))
                                 {
+                                    if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], $"{SensorName[k]}#0") == 0 ||
+                                        String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], $"{SensorName[k]}#1") == 0)
+                                    {
+                                        Console.WriteLine(22);
+                                    }
+                                }
+                                // если другой элемент
+                                else
+                                {
+                                    if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], SensorName[k]) == 0)
+                                    {
 
-                                    #region Обработка данных
+                                        #region Определили время
 
-                                    example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
-                                    DateArr = example[1].Trim().Replace(",", ".").Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-                                    DateDayArr = example[0].Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-                                    Date = double.Parse(DateArr[0], formatter) * 3600 + double.Parse(DateArr[1], formatter) * 60 + double.Parse(DateArr[2], formatter) + (double.Parse(DateDayArr[0], formatter) - 6) * 24 * 3600;
-                                    DateStr = Date.ToString();
+                                        example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                                        DateTime DT = new DateTime(
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                            int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                            int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                            int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                            );
 
-                                    DateTime DT = new DateTime(
-                                        int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
-                                        int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                                        int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
-                                        int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
-                                        int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                                        int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
-                                        );                              
+                                        #endregion
 
-                                    
-                                    #endregion
+                                        #region Добавили значение в массив 
 
+                                        NewListData.Add(new TimeValueData()
+                                        {
+                                            DataTime = DT,
+                                            DataValue = example[3]
+                                        });
 
-                                    ListData.Add(new string[] { DateStr, example[3] });
-                                    NewListData.Add(new TimeValueData()
-                                        { DataTime = DT
-                                        , DataValue = example[3] 
-                                    });
+                                        #endregion
+
+                                    }
                                 }
                             }
                         }
-
                     }
                 }
                 using (StreamReader sr = new StreamReader($"{SlicePath}", ANSI)) // Поиск по срезу для холодного реактора
