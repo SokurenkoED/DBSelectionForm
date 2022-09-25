@@ -196,10 +196,40 @@ namespace DBSelectionForm.Services
                                 // если элемент - ЗАДВИЖКА
                                 if (SensorName[k].Contains("AA1") && SensorName[k].Contains("_Z0"))
                                 {
-                                    if (String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], $"{SensorName[k]}#0") == 0 ||
-                                        String.Compare(line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries)[2], $"{SensorName[k]}#1") == 0)
+                                    example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (String.Compare(example[2], $"{SensorName[k]}#0") == 0)
                                     {
-                                        Console.WriteLine(22);
+                                        DateTime DT = new DateTime(
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                            int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                            int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                            int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                            );
+
+                                        NewListData.Add(new TimeValueData()
+                                        {
+                                            DataTime = DT,
+                                            DataValue = "0"
+                                        });
+                                    }
+                                    else if (String.Compare(example[2], $"{SensorName[k]}#1") == 0)
+                                    {
+                                        DateTime DT = new DateTime(
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                            int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                            int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                            int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                            int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                            );
+
+                                        NewListData.Add(new TimeValueData()
+                                        {
+                                            DataTime = DT,
+                                            DataValue = "100"
+                                        });
                                     }
                                 }
                                 // если другой элемент
@@ -245,9 +275,10 @@ namespace DBSelectionForm.Services
                     int m = 0;
                     while ((line = sr.ReadLine()) != null)
                     {
+                        string[] split_str = line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
                         if (m == 3)
                         {
-                            if (line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[1] == "Время")
+                            if (split_str[1] == "Время")
                             {
                                 KeyVar = 0;
                             }
@@ -259,13 +290,46 @@ namespace DBSelectionForm.Services
                         }
                         if (line.StartsWith(SensorName[k]) && KeyVar == 0)
                         {
-                            ColdReactor.Add(line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[2]);
-                            break;
+                            if (line.StartsWith($"{SensorName[k]}#0"))
+                            {
+                                if (split_str[2] == "НЕТ")
+                                {
+                                    ColdReactor.Add("100");
+                                    break;
+                                }
+                                else if (split_str[2] == "ДА")
+                                {
+                                    ColdReactor.Add("0");
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                ColdReactor.Add(split_str[2]);
+                                break;
+                            }
+                            
 
                         } else if (line.StartsWith(SensorName[k]) && KeyVar == 1)
                         {
-                            ColdReactor.Add(line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries)[1]);
-                            break;
+                            if (line.StartsWith($"{SensorName[k]}#0"))
+                            {
+                                if (split_str[1] == "НЕТ")
+                                {
+                                    ColdReactor.Add("100");
+                                    break;
+                                }
+                                else if (split_str[1] == "ДА")
+                                {
+                                    ColdReactor.Add("0");
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                ColdReactor.Add(split_str[1]);
+                                break;
+                            }
 
                         }
                         m++;
@@ -278,10 +342,6 @@ namespace DBSelectionForm.Services
 
                 try
                 {
-                    if (ListData.Count == 0)
-                    {
-                        throw new Exception($"\nОшибка! Датчик {SensorName[k]} не был найден!");
-                    }
                     if (NewListData.Count == 0)
                     {
                         throw new Exception($"\nОшибка! Датчик {SensorName[k]} не был найден!");
@@ -309,32 +369,65 @@ namespace DBSelectionForm.Services
                         {
                             LastTime = item.DataTime;
 
-                            if (CountNods == 0) // Логика для крайнего первого значения
+                            // если элемент по типу задвижка
+                            if (SensorName[k].Contains("AA1") && SensorName[k].Contains("_Z0"))
                             {
-                                if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
+                                if (CountNods == 0) // Логика для крайнего первого значения
+                                {
+                                    if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
+                                    {
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    }
+                                    else if (item.DataTime != DT_From && item != NewListData[0])
+                                    {
+                                        sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    }
+                                    else if (item.DataTime != DT_From && item == NewListData[0])
+                                    {
+                                        sw.WriteLine($"{0} {ColdReactor[k]}");
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    }
+                                }
+                                else
                                 {
                                     TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                     sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
                                 }
-                                else if (item.DataTime != DT_From && item != NewListData[0])
-                                {
-                                    sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
-                                    TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
-                                }
-                                else if (item.DataTime != DT_From && item == NewListData[0])
-                                {
-                                    sw.WriteLine($"{0} {ColdReactor[k]}");
-                                    TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
-                                }
+                                CountNods++;
                             }
                             else
                             {
-                                TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                if (CountNods == 0) // Логика для крайнего первого значения
+                                {
+                                    if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
+                                    {
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    }
+                                    else if (item.DataTime != DT_From && item != NewListData[0])
+                                    {
+                                        sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    }
+                                    else if (item.DataTime != DT_From && item == NewListData[0])
+                                    {
+                                        sw.WriteLine($"{0} {ColdReactor[k]}");
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                    }
+                                }
+                                else
+                                {
+                                    TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {item.DataValue}");
+                                }
+                                CountNods++;
                             }
-                            CountNods++;
                         }
                         else if (item.DataTime > DT_To)
                         {
@@ -346,14 +439,28 @@ namespace DBSelectionForm.Services
                     {
                         sw.WriteLine($"{0} {ColdReactor[0]}");
                         _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
-                        // MessageBox.Show($"\nЗначение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         continue;
                     }
-                    if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+
+                    // если элемент по типу задвижка
+                    if (SensorName[k].Contains("AA1") && SensorName[k].Contains("_Z0"))
                     {
-                        TimeSpan var_dt = DT_To.Subtract(DT_From);
-                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                        if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                        {
+                            // изменил аргументы для интерполяции
+                            TimeSpan var_dt = DT_To.Subtract(DT_From);
+                            sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
+                        }
                     }
+                    else
+                    {
+                        if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                        {
+                            TimeSpan var_dt = DT_To.Subtract(DT_From);
+                            sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                        }
+                    }
+                    
                 }
 
                 #endregion
