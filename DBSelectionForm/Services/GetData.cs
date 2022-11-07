@@ -368,20 +368,20 @@ namespace DBSelectionForm.Services
                 {
                     if (NewListData.Count == 0)
                     {
-                        throw new Exception($"\nОшибка! Датчик {SensorName[k]} не был найден!");
+                        throw new Exception($"Ошибка! Датчик {SensorName[k]} не был найден!");
                     }
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message);
-                    return;
+                    _TextInformation.Add($"{_TextInformation.Count + 1}) {e.Message}");
+                    continue;
                 }
 
                 #endregion
 
                 #region Запись массива в файл
 
-                using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, System.Text.Encoding.Default))
+                using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.Default))
                 {
                     //sw.WriteLine($"Time {SensorName}");
                     DateTime LastTime = new DateTime(2000, 1, 1);
