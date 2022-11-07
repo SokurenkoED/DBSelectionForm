@@ -186,7 +186,7 @@ namespace DBSelectionForm.Services
                 {
 
                     string filename = Path.GetFileName(item);
-                    if (filename.IndexOf(RuteName) != -1)
+                    if (filename.IndexOf(RuteName) != -1 && !filename.Contains(".dat"))
                     {
 
                         #region Определяем кодировку файла и подставляем необходимую
