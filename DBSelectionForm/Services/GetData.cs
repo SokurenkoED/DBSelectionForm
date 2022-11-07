@@ -18,7 +18,30 @@ namespace DBSelectionForm.Services
     class TimeValueData
     {
         public DateTime DataTime;
-        public string DataValue;
+        string _DataValue;
+        public string DataValue 
+        {
+            get
+            {
+                if (_DataValue == "ДА")
+                {
+                    return "1";
+                }
+                else if (_DataValue == "НЕТ")
+                {
+                    return "0";
+                }
+                else
+                {
+                    return _DataValue;
+                }
+                
+            }
+            set
+            {
+                _DataValue = value;
+            }
+        }
     }
     class GetData
     {
@@ -387,22 +410,22 @@ namespace DBSelectionForm.Services
 
                 #endregion
 
-                #region Проверка на предмет существования датчика в БД
+                //#region Проверка на предмет существования датчика в БД
 
-                try
-                {
-                    if (NewListData.Count == 0)
-                    {
-                        throw new Exception($"Ошибка! Датчик {SensorName[k]} не был найден!");
-                    }
-                }
-                catch (Exception e)
-                {
-                    _TextInformation.Add($"{_TextInformation.Count + 1}) {e.Message}");
-                    continue;
-                }
+                //try
+                //{
+                //    if (NewListData.Count == 0)
+                //    {
+                //        throw new Exception($"Ошибка! Датчик {SensorName[k]} не был найден!");
+                //    }
+                //}
+                //catch (Exception e)
+                //{
+                //    _TextInformation.Add($"{_TextInformation.Count + 1}) {e.Message}");
+                //    //continue;
+                //}
 
-                #endregion
+                //#endregion
 
                 #region Запись массива в файл
 
@@ -485,7 +508,7 @@ namespace DBSelectionForm.Services
                         i++;
                     }
                     if (LastTime == new DateTime(2000, 1, 1))
-                    {
+                    { 
                         sw.WriteLine($"{0} {ColdReactor[0]}");
                         _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         continue;
