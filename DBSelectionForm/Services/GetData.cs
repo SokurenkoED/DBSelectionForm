@@ -191,26 +191,26 @@ namespace DBSelectionForm.Services
 
                         #region Определяем кодировку файла и подставляем необходимую
 
-                        string encoding = string.Empty;
+                        string encoding2 = string.Empty;
 
-                        Stream fs = new FileStream($"{RelatePath}/{filename}", FileMode.Open);
-                        using (StreamReader sr = new StreamReader(fs, true))
-                            encoding = sr.CurrentEncoding.ToString();
+                        Stream fs2 = new FileStream($"{RelatePath}/{filename}", FileMode.Open);
+                        using (StreamReader sr = new StreamReader(fs2, true))
+                            encoding2 = sr.CurrentEncoding.ToString();
 
-                        Encoding ENC = null;
+                        Encoding ENC2 = null;
 
-                        if (encoding.Contains("UTF8"))
+                        if (encoding2.Contains("UTF8"))
                         {
-                            ENC = UTF8;
+                            ENC2 = UTF8;
                         }
                         else
                         {
-                            ENC = ANSI;
+                            ENC2 = ANSI;
                         }
 
                         #endregion
 
-                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ENC))
+                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ENC2))
                         {
 
                             string line;
