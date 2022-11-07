@@ -292,8 +292,33 @@ namespace DBSelectionForm.Services
                         }
                     }
                 }
-                using (StreamReader sr = new StreamReader($"{SlicePath}", ANSI)) // Поиск по срезу для холодного реактора
+
+                #region Определяем кодировку файла и подставляем необходимую
+
+                string encoding = string.Empty;
+
+                Stream fs = new FileStream($"{SlicePath}", FileMode.Open);
+                using (StreamReader sr = new StreamReader(fs, true))
+                    encoding = sr.CurrentEncoding.ToString();
+
+                Encoding ENC = null;
+
+                if (encoding.Contains("UTF8"))
                 {
+                    ENC = UTF8;
+                }
+                else
+                {
+                    ENC = ANSI;
+                }
+
+                #endregion
+
+
+                using (StreamReader sr = new StreamReader($"{SlicePath}", ENC)) // Поиск по срезу для холодного реактора
+                {
+
+
                     string line;
                     int KeyVar = -1; // 0 - старый формат, 1 - новый формат
                     int m = 0;
