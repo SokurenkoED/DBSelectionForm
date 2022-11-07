@@ -59,6 +59,7 @@ namespace DBSelectionForm.Services
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding ANSI = Encoding.GetEncoding(1251);
+            Encoding UTF8 = Encoding.UTF8;
 
             #endregion
 
@@ -183,10 +184,33 @@ namespace DBSelectionForm.Services
 
                 foreach (string item in filePaths)
                 {
+
                     string filename = Path.GetFileName(item);
                     if (filename.IndexOf(RuteName) != -1)
                     {
-                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ANSI))
+
+                        #region Определяем кодировку файла и подставляем необходимую
+
+                        string encoding = string.Empty;
+
+                        Stream fs = new FileStream($"{RelatePath}/{filename}", FileMode.Open);
+                        using (StreamReader sr = new StreamReader(fs, true))
+                            encoding = sr.CurrentEncoding.ToString();
+
+                        Encoding ENC = null;
+
+                        if (encoding.Contains("UTF8"))
+                        {
+                            ENC = UTF8;
+                        }
+                        else
+                        {
+                            ENC = ANSI;
+                        }
+
+                        #endregion
+
+                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ENC))
                         {
 
                             string line;
