@@ -689,21 +689,33 @@ namespace DBSelectionForm.ViewModels
             {
                 _InfoData = new InfoData();
             }
-            if (_InfoData.PathToFolder != null)
+            try
             {
-                _PathToFolder = _InfoData.PathToFolder;
+                if (_InfoData.PathToFolder != null)
+                {
+                    _PathToFolder = _InfoData.PathToFolder;
+
+                    _SensorName = _InfoData.SensorName;
+
+                    _TimeFrom = _InfoData.TimeFrom;
+
+                    _TimeTo = _InfoData.TimeTo;
+
+                    #region Вызываем функцию для определения допустимого интервала
+
+                    List<string> TimeData = new List<string>();
+                    TimeData = GetData.CheckAccectableTime(PathToFolder);
+                    AcceptableDayFrom = TimeData[0];
+                    AcceptableDayTo = TimeData[1];
+                    AcceptableTimeFrom = TimeData[2];
+                    AcceptableTimeTo = TimeData[3];
+
+                    #endregion
+                }
             }
-            if (_InfoData.PathToFolder != null)
+            catch (ArgumentOutOfRangeException)
             {
-                _SensorName = _InfoData.SensorName;
-            }
-            if (_InfoData.PathToFolder != null)
-            {
-                _TimeFrom = _InfoData.TimeFrom;
-            }
-            if (_InfoData.PathToFolder != null)
-            {
-                _TimeTo = _InfoData.TimeTo;
+
             }
             if (_InfoData.PathToDataFile != null)
             {
@@ -736,19 +748,6 @@ namespace DBSelectionForm.ViewModels
             if (_InfoData.SlicePathDB != null)
             {
                 _SlicePathDB = _InfoData.SlicePathDB;
-            }
-            if (_InfoData.PathToFolder != null)
-            {
-                #region Вызываем функцию для определения допустимого интервала
-
-                List<string> TimeData = new List<string>();
-                TimeData = GetData.CheckAccectableTime(PathToFolder);
-                AcceptableDayFrom = TimeData[0];
-                AcceptableDayTo = TimeData[1];
-                AcceptableTimeFrom = TimeData[2];
-                AcceptableTimeTo = TimeData[3];
-
-                #endregion
             }
 
 
