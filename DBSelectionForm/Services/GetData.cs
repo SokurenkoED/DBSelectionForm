@@ -45,6 +45,54 @@ namespace DBSelectionForm.Services
     }
     class GetData
     {
+
+        private static Encoding GetEncoding(string path) // получаем кодировку файла перед чтением
+        {
+            BinaryReader instr = new BinaryReader(File.OpenRead(path));
+            byte[] data = instr.ReadBytes((int)instr.BaseStream.Length);
+            instr.Close();
+
+            // определяем BOM (EF BB BF)
+            if (data.Length > 2 && data[0] == 0xef && data[1] == 0xbb && data[2] == 0xbf)
+            {
+                if (data.Length != 3) return Encoding.UTF8;
+                else return Encoding.Default;
+            }
+
+            int i = 0;
+            while (i < data.Length - 1)
+            {
+                if (data[i] > 0x7f)
+                { // не ANSI-символ
+                    if ((data[i] >> 5) == 6)
+                    {
+                        if ((i > data.Length - 2) || ((data[i + 1] >> 6) != 2))
+                            return Encoding.GetEncoding(1251);
+                        i++;
+                    }
+                    else if ((data[i] >> 4) == 14)
+                    {
+                        if ((i > data.Length - 3) || ((data[i + 1] >> 6) != 2) || ((data[i + 2] >> 6) != 2))
+                            return Encoding.GetEncoding(1251);
+                        i += 2;
+                    }
+                    else if ((data[i] >> 3) == 30)
+                    {
+                        if ((i > data.Length - 4) || ((data[i + 1] >> 6) != 2) || ((data[i + 2] >> 6) != 2) || ((data[i + 3] >> 6) != 2))
+                            return Encoding.GetEncoding(1251);
+                        i += 3;
+                    }
+                    else
+                    {
+                        return Encoding.GetEncoding(1251);
+                    }
+                }
+                i++;
+            }
+
+            return Encoding.UTF8;
+        }
+
         private static string LineInterpol(TimeValueData Values1, TimeValueData Values2, DateTime X) // Линейная интерполяция
         {
             double result;
@@ -81,8 +129,6 @@ namespace DBSelectionForm.Services
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            Encoding ANSI = Encoding.GetEncoding(1251);
-            Encoding UTF8 = Encoding.UTF8;
 
             #endregion
 
@@ -189,6 +235,7 @@ namespace DBSelectionForm.Services
 
                 ListData.Clear();
                 NewListData.Clear();
+                ColdReactor.Clear();
 
 
                 try
@@ -212,28 +259,7 @@ namespace DBSelectionForm.Services
                     if (filename.IndexOf(RuteName) != -1 && !filename.Contains(".dat"))
                     {
 
-                        #region Определяем кодировку файла и подставляем необходимую
-
-                        string encoding2 = string.Empty;
-
-                        Stream fs2 = new FileStream($"{RelatePath}/{filename}", FileMode.Open);
-                        using (StreamReader sr = new StreamReader(fs2, true))
-                            encoding2 = sr.CurrentEncoding.ToString();
-
-                        Encoding ENC2 = null;
-
-                        if (encoding2.Contains("UTF8"))
-                        {
-                            ENC2 = UTF8;
-                        }
-                        else
-                        {
-                            ENC2 = ANSI;
-                        }
-
-                        #endregion
-
-                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ENC2))
+                        using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", GetEncoding($"{RelatePath}/{filename}")))
                         {
 
                             string line;
@@ -316,32 +342,9 @@ namespace DBSelectionForm.Services
                     }
                 }
 
-                #region Определяем кодировку файла и подставляем необходимую
 
-                string encoding = string.Empty;
-
-                Stream fs = new FileStream($"{SlicePath}", FileMode.Open);
-                using (StreamReader sr = new StreamReader(fs, true))
-                    encoding = sr.CurrentEncoding.ToString();
-
-                Encoding ENC = null;
-
-                if (encoding.Contains("UTF8"))
+                using (StreamReader sr = new StreamReader($"{SlicePath}", GetEncoding(SlicePath))) // Поиск по срезу для холодного реактора
                 {
-                    ENC = UTF8;
-                }
-                else
-                {
-                    ENC = ANSI;
-                }
-
-                #endregion
-
-
-                using (StreamReader sr = new StreamReader($"{SlicePath}", ENC)) // Поиск по срезу для холодного реактора
-                {
-
-
                     string line;
                     int KeyVar = -1; // 0 - старый формат, 1 - новый формат
                     int m = 0;
@@ -399,6 +402,16 @@ namespace DBSelectionForm.Services
                             }
                             else
                             {
+                                if (split_str[1] == "ДА")
+                                {
+                                    ColdReactor.Add("1");
+                                    break;
+                                }
+                                if (split_str[1] == "НЕТ")
+                                {
+                                    ColdReactor.Add("0");
+                                    break;
+                                }
                                 ColdReactor.Add(split_str[1]);
                                 break;
                             }
@@ -410,26 +423,19 @@ namespace DBSelectionForm.Services
 
                 #endregion
 
-                //#region Проверка на предмет существования датчика в БД
+                #region Проверка, нашелся ли сигнал в срезе
 
-                //try
-                //{
-                //    if (NewListData.Count == 0)
-                //    {
-                //        throw new Exception($"Ошибка! Датчик {SensorName[k]} не был найден!");
-                //    }
-                //}
-                //catch (Exception e)
-                //{
-                //    _TextInformation.Add($"{_TextInformation.Count + 1}) {e.Message}");
-                //    //continue;
-                //}
+                if (ColdReactor.Count == 0)
+                {
+                    _TextInformation.Add($"{_TextInformation.Count + 1}) Сигнал {SensorName[k]} не был найден в срезе. Полностью отсутствует информация!");
+                    continue;
+                }
 
-                //#endregion
+                #endregion
 
                 #region Запись массива в файл
 
-                using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, UTF8))
+                using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
                 {
                     //sw.WriteLine($"Time {SensorName}");
                     DateTime LastTime = new DateTime(2000, 1, 1);
