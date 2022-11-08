@@ -121,7 +121,19 @@ namespace DBSelectionForm.Services
             string[] SplitStr = OldFormat.Trim().Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
             return ((double.Parse(Day, formatter) - 6) * 3600 * 24 + double.Parse(SplitStr[0], formatter) * 3600 + double.Parse(SplitStr[1], formatter) * 60 + double.Parse(SplitStr[2], formatter)).ToString();
         }
-        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath)
+        private static double ConvertDementionToDouble(string Demention) // конвертируем строкове определение единичного отрезка времени в числовое значение
+        {
+            if (Demention == "сек")
+            {
+                return 1;
+            }
+            if (Demention == "мин")
+            {
+                return 60;
+            }
+            return 3600;
+        }
+        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention)
         {
 
             #region Настроечные данные
@@ -435,12 +447,15 @@ namespace DBSelectionForm.Services
 
                 #region Запись массива в файл
 
+               
+
                 using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
                 {
                     //sw.WriteLine($"Time {SensorName}");
                     DateTime LastTime = new DateTime(2000, 1, 1);
                     int i = 0;
                     int CountNods = 0;
+                    double DementionValue = ConvertDementionToDouble(TimeDemention);
                     foreach (var item in NewListData) // item[0] - время, item[1] - значение датчика
                     {
                         if (item.DataTime >= DT_From && item.DataTime <= DT_To)
@@ -455,25 +470,25 @@ namespace DBSelectionForm.Services
                                     if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
                                     {
                                         TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                     }
                                     else if (item.DataTime != DT_From && item != NewListData[0])
                                     {
                                         sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
                                         TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                     }
                                     else if (item.DataTime != DT_From && item == NewListData[0])
                                     {
                                         sw.WriteLine($"{0} {ColdReactor[k]}");
                                         TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                     }
                                 }
                                 else
                                 {
                                     TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                 }
                                 CountNods++;
                             }
@@ -484,25 +499,25 @@ namespace DBSelectionForm.Services
                                     if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
                                     {
                                         TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                     }
                                     else if (item.DataTime != DT_From && item != NewListData[0])
                                     {
                                         sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
                                         TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                     }
                                     else if (item.DataTime != DT_From && item == NewListData[0])
                                     {
                                         sw.WriteLine($"{0} {ColdReactor[k]}");
                                         TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                        sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                     }
                                 }
                                 else
                                 {
                                     TimeSpan var_dt = item.DataTime.Subtract(DT_From);
-                                    sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {item.DataValue}");
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                 }
                                 CountNods++;
                             }
@@ -527,7 +542,7 @@ namespace DBSelectionForm.Services
                         {
                             // изменил аргументы для интерполяции
                             TimeSpan var_dt = DT_To.Subtract(DT_From);
-                            sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
+                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
                         }
                     }
                     else
@@ -535,7 +550,7 @@ namespace DBSelectionForm.Services
                         if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
                         {
                             TimeSpan var_dt = DT_To.Subtract(DT_From);
-                            sw.WriteLine($"{var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
                         }
                     }
                     

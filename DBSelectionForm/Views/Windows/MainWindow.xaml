@@ -180,6 +180,7 @@
                         <RowDefinition Height="50"/>
                         <RowDefinition Height="50"/>
                         <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
                         <RowDefinition Height="150"/>
                         <RowDefinition/>
                         <RowDefinition Height="50"/>
@@ -193,9 +194,13 @@
                     <TextBox IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding PathToFolder}" VerticalAlignment="Center" MinWidth="238" Height="22" Margin="312,0,0,0" Width="372" Grid.Row="1" />
                     <Button VerticalContentAlignment="Top" FontSize="11" Content=". . ." Command="{Binding OpenFileDialogCommand}" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="22" Width="26" Margin="703,0,0,0" Grid.Row="1"/>
 
-                    <Label HorizontalContentAlignment="Left" Content="Имя датчиков" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Grid.Row="4" Margin="31,15,0,0" />
+                    <Label HorizontalContentAlignment="Left" Content="Единичный отрезок" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Grid.Row="4" Margin="31,6,0,0" />
+                    <ComboBox VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="4" SelectedIndex="0" ToolTip="Определение временного единичного отрезка для вывода результатов" Width="150" Height="30"  SelectedItem="{Binding SelectedTimeDimension}" ItemsSource="{Binding TimeDimension}"  Margin="312,0,0,0"/>
 
-                    <TextBox HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="371" MinHeight="120" Grid.Row="4" Margin="313,0,0,0"  VerticalScrollBarVisibility="Auto" BorderBrush="Black" Background="#FFF0F0F0" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding SensorName}"/>
+
+                    <Label HorizontalContentAlignment="Left" Content="Имя датчиков" HorizontalAlignment="Left"  VerticalAlignment="Top" Height="30" Width="214" FontSize="16" Grid.Row="5" Margin="31,15,0,0" />
+
+                    <TextBox HorizontalAlignment="Left" VerticalAlignment="Center" MinWidth="371" MinHeight="120" Grid.Row="5" Margin="313,0,0,0"  VerticalScrollBarVisibility="Auto" BorderBrush="Black" Background="#FFF0F0F0" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding SensorName}"/>
 
                     <Label HorizontalContentAlignment="Left" Content="Допустимый интервал" HorizontalAlignment="Left"  VerticalAlignment="Center" Height="30" Width="214" Margin="31,0,0,0" FontSize="16" Grid.Row="2" />
                     <TextBox IsReadOnly="True" HorizontalAlignment="Left" Text="{Binding AcceptableTimeTo}" MinWidth="75" VerticalAlignment="Center"  Grid.Row="2" Margin="609,0,0,0"  />
@@ -213,13 +218,13 @@
                     <TextBox HorizontalAlignment="Left" Margin="405,0,0,0" Text="{Binding TimeFrom}" VerticalAlignment="Center" Width="75" Height="22" Grid.Row="3"  />
                     <TextBox HorizontalAlignment="Left" Text="{Binding DayFrom}" VerticalAlignment="Center" Width="75" Height="22" Grid.Row="3" Margin="312,0,0,0"  />
 
-                    <Grid Grid.Row="6">
+                    <Grid Grid.Row="7">
                         <Button Command="{Binding GetDataCommand}" Content="Создать выборку" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Margin="0,0,230,0"/>
 
                         <Button Command="{Binding ColseApplicationCommand}" Content="Отмена" HorizontalAlignment="Right" VerticalAlignment="Center" Height="37" Width="200" Grid.Column="1" Margin="0,0,5,0"/>
                     </Grid>
 
-                    <Grid Grid.Row="5">
+                    <Grid Grid.Row="6">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                             <RowDefinition/>

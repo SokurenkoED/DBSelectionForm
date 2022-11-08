@@ -135,6 +135,28 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region SelectedTimeDimension
+
+        private string _SelectedTimeDimension;
+        public string SelectedTimeDimension
+        {
+            get => _SelectedTimeDimension;
+            set => Set(ref _SelectedTimeDimension, value);
+        }
+
+        #endregion
+
+        #region TimeDimension
+
+        private List<string> _TimeDimension = new List<string>() { "сек", "мин", "час" };
+        public List<string> TimeDimension
+        {
+            get => _TimeDimension;
+            set => Set(ref _TimeDimension, value);
+        }
+
+        #endregion
+
         #region DataBaseFormat
 
         private List<string> _DataBaseFormat = new List<string>() { "06.07.2018", "22.02.2022" };
@@ -447,7 +469,7 @@ namespace DBSelectionForm.ViewModels
                 _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo };
                 _fileIOservice.SaveData(_InfoData);
 
-                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB));
+                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension));
             }
             catch (ArgumentException)
             {
