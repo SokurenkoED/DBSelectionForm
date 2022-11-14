@@ -237,7 +237,7 @@ namespace DBSelectionForm.Services
                 return;
             }
             
-            List<string> ColdReactor = new List<string>();
+            List<string> ColdReactor = new List<string>(); // Не обновляем
             _TextInformation.Clear();
 
             #endregion
@@ -247,7 +247,6 @@ namespace DBSelectionForm.Services
 
                 ListData.Clear();
                 NewListData.Clear();
-                ColdReactor.Clear();
 
 
                 try
