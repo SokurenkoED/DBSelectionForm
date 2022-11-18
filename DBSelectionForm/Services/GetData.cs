@@ -267,7 +267,7 @@ namespace DBSelectionForm.Services
                 {
 
                     string filename = Path.GetFileName(item);
-                    if (filename.IndexOf(RuteName) != -1 && !filename.Contains(".dat"))
+                    if (filename.IndexOf(RuteName) != -1 && filename.Contains(".txt"))
                     {
 
                         using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", GetEncoding($"{RelatePath}/{filename}")))
