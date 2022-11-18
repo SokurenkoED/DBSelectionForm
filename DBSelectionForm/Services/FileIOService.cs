@@ -7,7 +7,7 @@ using System.Text;
 
 namespace DBSelectionForm.Services
 {
-    internal class FileIOService
+    public class FileIOService
     {
         private readonly string Path;
         public FileIOService(string path)
@@ -15,7 +15,7 @@ namespace DBSelectionForm.Services
             this.Path = path;
         }
 
-        internal InfoData LoadData()
+        public InfoData LoadData()
         {
             var fileExist = File.Exists(Path);
             if (!fileExist)

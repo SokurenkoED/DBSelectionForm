@@ -676,6 +676,7 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+
         #endregion
 
         public MainWindowViewModel()

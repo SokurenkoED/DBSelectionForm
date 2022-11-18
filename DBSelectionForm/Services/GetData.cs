@@ -43,8 +43,17 @@ namespace DBSelectionForm.Services
             }
         }
     }
-    class GetData
+    public class GetData
     {
+        
+        #region GetCurrentlyDirectory
+
+        public string GetCurrentluDirectory()
+        {
+            return Environment.CurrentDirectory;
+        }
+
+        #endregion
 
         private static Encoding GetEncoding(string path) // получаем кодировку файла перед чтением
         {
@@ -133,7 +142,7 @@ namespace DBSelectionForm.Services
             }
             return 3600;
         }
-        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention)
+        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, string PathForTest = "")
         {
 
             #region Настроечные данные
@@ -446,9 +455,13 @@ namespace DBSelectionForm.Services
 
                 #region Запись массива в файл
 
-               
 
-                using (StreamWriter sw = new StreamWriter($"{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
+                if (PathForTest != "") // создаем дирректорию для тестов
+                {
+                    Directory.CreateDirectory(PathForTest.Replace(@"\\", ""));
+                }
+                
+                using (StreamWriter sw = new StreamWriter($"{PathForTest}{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
                 {
                     //sw.WriteLine($"Time {SensorName}");
                     DateTime LastTime = new DateTime(2000, 1, 1);
