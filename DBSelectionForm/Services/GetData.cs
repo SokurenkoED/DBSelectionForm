@@ -596,6 +596,10 @@ namespace DBSelectionForm.Services
             string RelatePath = PathToFolder;
             string[] filePaths = null;
             string RuteName;
+            if (_InfoData.SensorName == null)
+            {
+                return new List<string>();
+            }
             string SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0];
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
