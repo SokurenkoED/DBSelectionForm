@@ -38,11 +38,17 @@ namespace AutoTests
 
             #endregion
 
-            if (!FirstPoints.FirstPointNO1(_InfoData, ref _TextInformation, _TimeDimension))
-            {
-                return;
-            }
-            
+            FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+
+            FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
+
+            FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+
+            LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
+
+            LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
+
+            LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
 
         }
     }

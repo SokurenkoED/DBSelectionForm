@@ -163,9 +163,15 @@ namespace DBSelectionForm.Services
             #region Получаем допустимый временной интервал
 
             var CI = new CultureInfo("de_DE");
-            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
-            DateTime AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
-            DateTime AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
+            List<string> AcceptableDate = new List<string>();
+            DateTime AcceptableTimeFrom = new DateTime();
+            DateTime AcceptableTimeTo = new DateTime();
+            if (_InfoData.PathToFolder != "")
+            {
+                AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
+                AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
+                AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
+            }
 
             #endregion
 
@@ -208,10 +214,13 @@ namespace DBSelectionForm.Services
 
             #region Проверка на правильность ввода временного интервала
 
-            if (DT_From < AcceptableTimeFrom || DT_To > AcceptableTimeTo)
+            if (AcceptableTimeFrom == new DateTime() || AcceptableTimeTo == new DateTime())
             {
-                MessageBox.Show("Указан неверный временной интервал");
-                return;
+                if (DT_From < AcceptableTimeFrom || DT_To > AcceptableTimeTo)
+                {
+                    MessageBox.Show("Указан неверный временной интервал");
+                    return;
+                }
             }
 
             #endregion
@@ -559,11 +568,21 @@ namespace DBSelectionForm.Services
                     }
                     else
                     {
-                        if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                        if (LastTime != DT_To && (NewListData.Count - 1) != i - 1 && NewListData[i-1].DataTime != DT_To) // не последний элемент
                         {
                             TimeSpan var_dt = DT_To.Subtract(DT_From);
-                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
                         }
+                        else if (LastTime != DT_To && (NewListData.Count - 1) == i - 1 && NewListData[i - 1].DataTime != DT_To)
+                        {
+                            TimeSpan var_dt = DT_To.Subtract(DT_From);
+                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
+                        }
+                        //if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                        //{
+                        //    TimeSpan var_dt = DT_To.Subtract(DT_From);
+                        //    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                        //}
                     }
                     
                 }
@@ -615,11 +634,6 @@ namespace DBSelectionForm.Services
             catch (DirectoryNotFoundException)
             {
                 MessageBox.Show($"Нет файлов по адресу {RelatePath}");
-                return new List<string>();
-            }
-            catch (ArgumentException err)
-            {
-                MessageBox.Show($"{err}");
                 return new List<string>();
             }
 
