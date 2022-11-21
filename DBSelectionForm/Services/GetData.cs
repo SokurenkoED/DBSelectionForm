@@ -622,7 +622,7 @@ namespace DBSelectionForm.Services
             foreach (string item in filePaths)
             {
                 string filename = Path.GetFileName(item);
-                if (filename.IndexOf(RuteName) != -1)
+                if (filename.IndexOf(RuteName) != -1 && filename.Contains(".txt"))
                 {
                     using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ANSI))
                     {
