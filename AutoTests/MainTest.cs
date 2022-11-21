@@ -6,6 +6,7 @@ using System.Text;
 using DBSelectionForm.Models;
 using DBSelectionForm.Services;
 using AutoTests.AutoTest.SensorsTest;
+using AutoTests.SensorsTest;
 
 namespace AutoTests
 {
@@ -38,17 +39,19 @@ namespace AutoTests
 
             #endregion
 
-            FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+            //FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
-            FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
+            //FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
 
-            FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+            //FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
 
-            LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
+            //LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
 
-            LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
+            //LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
 
-            LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
+            //LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
+
+            BodyPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
         }
     }

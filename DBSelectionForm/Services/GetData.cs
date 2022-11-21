@@ -111,7 +111,12 @@ namespace DBSelectionForm.Services
             var another_var_dt = X.Subtract(Values1.DataTime);
             if (IsDouble_Values1 != false && IsDouble_Values2 != false)
             {
-                return (((double.Parse(Values1.DataValue) - double.Parse(Values2.DataValue)) / (var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60)) * (another_var_dt.Seconds + another_var_dt.Minutes * 60 + another_var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) + double.Parse(Values1.DataValue)).ToString();
+                double y_12 = double.Parse(Values1.DataValue) - double.Parse(Values2.DataValue); // y1 - y2
+                double x_12 = (var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60); // x1 - x2
+                double X_x1 = (another_var_dt.Seconds + another_var_dt.Minutes * 60 + another_var_dt.Hours * 60 * 60 + another_var_dt.Days * 24 * 60 * 60);
+                double first_slagaemoe = (y_12 / x_12) * X_x1;
+                double finale = first_slagaemoe + double.Parse(Values1.DataValue);
+                return finale.ToString();
             }
             else
             {
