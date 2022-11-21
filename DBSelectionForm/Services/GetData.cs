@@ -163,7 +163,7 @@ namespace DBSelectionForm.Services
             #region Получаем допустимый временной интервал
 
             var CI = new CultureInfo("de_DE");
-            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder);
+            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
             DateTime AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
             DateTime AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
 
@@ -542,7 +542,7 @@ namespace DBSelectionForm.Services
                     }
                     if (LastTime == new DateTime(2000, 1, 1))
                     { 
-                        sw.WriteLine($"{0} {ColdReactor[0]}");
+                        sw.WriteLine($"{0} {ColdReactor[k]}");
                         _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         continue;
                     }
@@ -581,7 +581,7 @@ namespace DBSelectionForm.Services
         /// </summary>
         /// <param name="PathToFolder"></param>
         /// <returns></returns>
-        public static List<string> CheckAccectableTime(string PathToFolder)
+        public static List<string> CheckAccectableTime(string PathToFolder, InfoData _InfoData)
         {
 
             #region Настроечные данные
@@ -596,6 +596,7 @@ namespace DBSelectionForm.Services
             string RelatePath = PathToFolder;
             string[] filePaths = null;
             string RuteName;
+            string SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0];
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
 
@@ -608,9 +609,14 @@ namespace DBSelectionForm.Services
                 MessageBox.Show($"Нет файлов по адресу {RelatePath}");
                 return new List<string>();
             }
+            catch (ArgumentException err)
+            {
+                MessageBox.Show($"{err}");
+                return new List<string>();
+            }
 
-            //RuteName = SensorName[0].Substring(2, 3);
-            RuteName = "JKT";
+            RuteName = SensorName.Substring(2, 3);
+            //RuteName = "JKT";
 
 
             foreach (string item in filePaths)
@@ -645,6 +651,7 @@ namespace DBSelectionForm.Services
                             int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
                             ));
                     }
+                    break;
                 }
             }
             // Определить минимальную и максимальную даты
