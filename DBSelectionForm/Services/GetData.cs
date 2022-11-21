@@ -596,11 +596,15 @@ namespace DBSelectionForm.Services
             string RelatePath = PathToFolder;
             string[] filePaths = null;
             string RuteName;
-            if (_InfoData.SensorName == null)
+            string SensorName = null;
+            if (_InfoData.SensorName != null)
             {
-                return new List<string>();
+                SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0];
             }
-            string SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0];
+            else
+            {
+                SensorName = "10KBA20CF001_XQ01";
+            }
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
 
