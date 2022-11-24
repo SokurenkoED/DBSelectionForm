@@ -163,7 +163,7 @@ namespace DBSelectionForm.Services
             #region Получаем допустимый временной интервал
 
             var CI = new CultureInfo("de_DE");
-            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder);
+            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
             DateTime AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
             DateTime AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
 
@@ -175,6 +175,8 @@ namespace DBSelectionForm.Services
 
             string[] SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             string TempTimeFrom = _InfoData.TimeFrom.Trim();
+            string[] TempDayFromSplit = _InfoData.DayFrom.Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            string TempDayFrom = $"20{TempDayFromSplit[2]}.{TempDayFromSplit[1]}.{TempDayFromSplit[0]}";
 
             DateTime DT_From = DateTime.Now;
             DateTime DT_To = DateTime.Now;
@@ -461,7 +463,7 @@ namespace DBSelectionForm.Services
                     Directory.CreateDirectory(PathForTest.Replace(@"\\", ""));
                 }
                 
-                using (StreamWriter sw = new StreamWriter($"{PathForTest}{SensorName[k]}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
+                using (StreamWriter sw = new StreamWriter($"{PathForTest}{SensorName[k]}_{TempDayFrom.Replace(".", "-")}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
                 {
                     //sw.WriteLine($"Time {SensorName}");
                     DateTime LastTime = new DateTime(2000, 1, 1);
@@ -542,7 +544,7 @@ namespace DBSelectionForm.Services
                     }
                     if (LastTime == new DateTime(2000, 1, 1))
                     { 
-                        sw.WriteLine($"{0} {ColdReactor[0]}");
+                        sw.WriteLine($"{0} {ColdReactor[k]}");
                         _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                         continue;
                     }
@@ -581,7 +583,7 @@ namespace DBSelectionForm.Services
         /// </summary>
         /// <param name="PathToFolder"></param>
         /// <returns></returns>
-        public static List<string> CheckAccectableTime(string PathToFolder)
+        public static List<string> CheckAccectableTime(string PathToFolder, InfoData _InfoData)
         {
 
             #region Настроечные данные
@@ -608,9 +610,9 @@ namespace DBSelectionForm.Services
                 MessageBox.Show($"Нет файлов по адресу {RelatePath}");
                 return new List<string>();
             }
-
-            //RuteName = SensorName[0].Substring(2, 3);
-            RuteName = "JKT";
+            
+            RuteName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0].Substring(2, 3);
+            //RuteName = "KBA"; // нужно зайти в какойнибудь файл
 
 
             foreach (string item in filePaths)
