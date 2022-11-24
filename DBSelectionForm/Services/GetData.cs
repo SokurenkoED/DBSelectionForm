@@ -111,7 +111,12 @@ namespace DBSelectionForm.Services
             var another_var_dt = X.Subtract(Values1.DataTime);
             if (IsDouble_Values1 != false && IsDouble_Values2 != false)
             {
-                return (((double.Parse(Values1.DataValue) - double.Parse(Values2.DataValue)) / (var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60)) * (another_var_dt.Seconds + another_var_dt.Minutes * 60 + another_var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) + double.Parse(Values1.DataValue)).ToString();
+                double y_12 = double.Parse(Values1.DataValue) - double.Parse(Values2.DataValue); // y1 - y2
+                double x_12 = (var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60); // x1 - x2
+                double X_x1 = (another_var_dt.Seconds + another_var_dt.Minutes * 60 + another_var_dt.Hours * 60 * 60 + another_var_dt.Days * 24 * 60 * 60);
+                double first_slagaemoe = (y_12 / x_12) * X_x1;
+                double finale = first_slagaemoe + double.Parse(Values1.DataValue);
+                return finale.ToString();
             }
             else
             {
@@ -163,9 +168,15 @@ namespace DBSelectionForm.Services
             #region Получаем допустимый временной интервал
 
             var CI = new CultureInfo("de_DE");
-            List<string> AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
-            DateTime AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
-            DateTime AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
+            List<string> AcceptableDate = new List<string>();
+            DateTime AcceptableTimeFrom = new DateTime();
+            DateTime AcceptableTimeTo = new DateTime();
+            if (_InfoData.PathToFolder != "")
+            {
+                AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
+                AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
+                AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
+            }
 
             #endregion
 
@@ -210,10 +221,13 @@ namespace DBSelectionForm.Services
 
             #region Проверка на правильность ввода временного интервала
 
-            if (DT_From < AcceptableTimeFrom || DT_To > AcceptableTimeTo)
+            if (AcceptableTimeFrom == new DateTime() || AcceptableTimeTo == new DateTime())
             {
-                MessageBox.Show("Указан неверный временной интервал");
-                return;
+                if (DT_From < AcceptableTimeFrom || DT_To > AcceptableTimeTo)
+                {
+                    MessageBox.Show("Указан неверный временной интервал");
+                    return;
+                }
             }
 
             #endregion
@@ -561,11 +575,21 @@ namespace DBSelectionForm.Services
                     }
                     else
                     {
-                        if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                        if (LastTime != DT_To && (NewListData.Count - 1) != i - 1 && NewListData[i-1].DataTime != DT_To) // не последний элемент
                         {
                             TimeSpan var_dt = DT_To.Subtract(DT_From);
-                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
                         }
+                        else if (LastTime != DT_To && (NewListData.Count - 1) == i - 1 && NewListData[i - 1].DataTime != DT_To)
+                        {
+                            TimeSpan var_dt = DT_To.Subtract(DT_From);
+                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
+                        }
+                        //if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                        //{
+                        //    TimeSpan var_dt = DT_To.Subtract(DT_From);
+                        //    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
+                        //}
                     }
                     
                 }
@@ -598,6 +622,15 @@ namespace DBSelectionForm.Services
             string RelatePath = PathToFolder;
             string[] filePaths = null;
             string RuteName;
+            string SensorName = null;
+            if (_InfoData.SensorName != null)
+            {
+                SensorName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0];
+            }
+            else
+            {
+                SensorName = "10KBA20CF001_XQ01";
+            }
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
 
@@ -610,15 +643,15 @@ namespace DBSelectionForm.Services
                 MessageBox.Show($"Нет файлов по адресу {RelatePath}");
                 return new List<string>();
             }
-            
-            RuteName = _InfoData.SensorName.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0].Substring(2, 3);
-            //RuteName = "KBA"; // нужно зайти в какойнибудь файл
+
+            RuteName = SensorName.Substring(2, 3);
+            //RuteName = "JKT";
 
 
             foreach (string item in filePaths)
             {
                 string filename = Path.GetFileName(item);
-                if (filename.IndexOf(RuteName) != -1)
+                if (filename.IndexOf(RuteName) != -1 && filename.Contains(".txt"))
                 {
                     using (StreamReader sr = new StreamReader($"{RelatePath}/{filename}", ANSI))
                     {
@@ -647,6 +680,7 @@ namespace DBSelectionForm.Services
                             int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
                             ));
                     }
+                    break;
                 }
             }
             // Определить минимальную и максимальную даты

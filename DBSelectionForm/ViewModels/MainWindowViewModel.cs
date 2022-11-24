@@ -503,10 +503,13 @@ namespace DBSelectionForm.ViewModels
                 #region Вызываем функцию для определения допустимого интервала
                 List<string> TimeData = new List<string>();
                 TimeData = GetData.CheckAccectableTime(PathToFolder, _InfoData);
-                AcceptableDayFrom = TimeData[0];
-                AcceptableDayTo = TimeData[1];
-                AcceptableTimeFrom = TimeData[2];
-                AcceptableTimeTo = TimeData[3];
+                if (TimeData.Count != 0)
+                {
+                    AcceptableDayFrom = TimeData[0];
+                    AcceptableDayTo = TimeData[1];
+                    AcceptableTimeFrom = TimeData[2];
+                    AcceptableTimeTo = TimeData[3];
+                }
 
                 #endregion
                 
