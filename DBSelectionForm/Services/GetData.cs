@@ -55,8 +55,10 @@ namespace DBSelectionForm.Services
 
         #endregion
 
-        private static Encoding GetEncoding(string path) // получаем кодировку файла перед чтением
+        public static Encoding GetEncoding(string path) // получаем кодировку файла перед чтением
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             BinaryReader instr = new BinaryReader(File.OpenRead(path));
             int instr_length = (int)instr.BaseStream.Length;
             if (instr_length < 0)
