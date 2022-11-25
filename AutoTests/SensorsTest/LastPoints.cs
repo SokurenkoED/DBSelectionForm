@@ -54,8 +54,10 @@ namespace AutoTests.AutoTest.SensorsTest
 
             #region Считываем полученный файл
 
+            string[] TempDayFromSplit = _InfoData.DayFrom.Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            string TempDayFrom = $"20{TempDayFromSplit[2]}.{TempDayFromSplit[1]}.{TempDayFromSplit[0]}";
             List<string> ResultData = new List<string>();
-            using (StreamReader sr = new StreamReader($"{_InfoData.SensorName}_{_InfoData.TimeFrom.Trim().Replace(":", "-")}.dat"))
+            using (StreamReader sr = new StreamReader($"{_InfoData.SensorName}_{TempDayFrom.Replace(".", "-")}_{_InfoData.TimeFrom.Trim().Replace(":", "-")}.dat"))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)
@@ -120,8 +122,10 @@ namespace AutoTests.AutoTest.SensorsTest
 
             #region Считываем полученный файл
 
+            string[] TempDayFromSplit = _InfoData.DayFrom.Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            string TempDayFrom = $"20{TempDayFromSplit[2]}.{TempDayFromSplit[1]}.{TempDayFromSplit[0]}";
             List<string> ResultData = new List<string>();
-            using (StreamReader sr = new StreamReader($"{_InfoData.SensorName}_{_InfoData.TimeFrom.Trim().Replace(":", "-")}.dat"))
+            using (StreamReader sr = new StreamReader($"{_InfoData.SensorName}_{TempDayFrom.Replace(".", "-")}_{_InfoData.TimeFrom.Trim().Replace(":", "-")}.dat"))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)
@@ -185,8 +189,10 @@ namespace AutoTests.AutoTest.SensorsTest
 
             #region Считываем полученный файл
 
+            string[] TempDayFromSplit = _InfoData.DayFrom.Trim().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            string TempDayFrom = $"20{TempDayFromSplit[2]}.{TempDayFromSplit[1]}.{TempDayFromSplit[0]}";
             List<string> ResultData = new List<string>();
-            using (StreamReader sr = new StreamReader($"{_InfoData.SensorName}_{_InfoData.TimeFrom.Trim().Replace(":", "-")}.dat"))
+            using (StreamReader sr = new StreamReader($"{_InfoData.SensorName}_{TempDayFrom.Replace(".", "-")}_{_InfoData.TimeFrom.Trim().Replace(":", "-")}.dat"))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)

@@ -15,7 +15,7 @@ using System.Xml.Linq;
 
 namespace DBSelectionForm.Services
 {
-    class TimeValueData
+    public class TimeValueData
     {
         public DateTime DataTime;
         string _DataValue;
@@ -107,7 +107,7 @@ namespace DBSelectionForm.Services
             return Encoding.UTF8;
         }
 
-        private static string LineInterpol(TimeValueData Values1, TimeValueData Values2, DateTime X) // Линейная интерполяция
+        public static string LineInterpol(TimeValueData Values1, TimeValueData Values2, DateTime X) // Линейная интерполяция
         {
             double result;
             bool IsDouble_Values1 = Double.TryParse(Values1.DataValue, out result);

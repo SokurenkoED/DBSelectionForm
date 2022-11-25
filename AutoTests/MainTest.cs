@@ -39,6 +39,8 @@ namespace AutoTests
 
             #endregion
 
+            //Interpol.InterpolTestNO1();
+
             //FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
             //FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
@@ -52,6 +54,8 @@ namespace AutoTests
             //LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
 
             BodyPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+
+
 
         }
     }
