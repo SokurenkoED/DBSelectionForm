@@ -63,7 +63,9 @@ namespace AutoTests
 
             #region Тестирование работы программы в различных БД
 
-            DBTest.EncodingTest.EncodingTestNO1();
+            //DBTest.EncodingTest.EncodingTestNO1();
+
+            DBTest.EncodingTest.EncodingTestNO2();
 
             #endregion
 
