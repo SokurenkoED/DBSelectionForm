@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using DBSelectionForm.Models;
 using DBSelectionForm.Services;
-using AutoTests.AutoTest.SensorsTest;
+using AutoTests.AutoTest;
 using AutoTests.SensorsTest;
 using AutoTests.DBTest;
 
@@ -40,8 +40,7 @@ namespace AutoTests
 
             #endregion
 
-
-            //#region Тестирование работы с датчиками
+            #region Тестирование работы с датчиками
 
             //Interpol.InterpolTestNO1();
 
@@ -59,17 +58,25 @@ namespace AutoTests
 
             //BodyPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
-            //#endregion
+            #endregion
+
+            #region Тестирование работы с задвижками
+
+            AutoTest.ValvesTest.FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+
+            AutoTest.ValvesTest.FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
+
+            AutoTest.ValvesTest.FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+
+            #endregion
 
             #region Тестирование работы программы в различных БД
 
             //DBTest.EncodingTest.EncodingTestNO1();
 
-            DBTest.EncodingTest.EncodingTestNO2();
+            //DBTest.EncodingTest.EncodingTestNO2();
 
             #endregion
-
-
 
         }
     }

@@ -327,7 +327,6 @@ namespace DBSelectionForm.Services
                                                 int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
                                                 int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
                                                 );
-
                                             NewListData.Add(new TimeValueData()
                                             {
                                                 DataTime = DT,
@@ -513,7 +512,14 @@ namespace DBSelectionForm.Services
                                         }
                                         else if (item.DataTime != DT_From && item != NewListData[0])
                                         {
-                                            sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                            if (NewListData[i - 1].DataValue == NewListData[i].DataValue) // если последние 2 значения одинаковы
+                                            {
+                                                sw.WriteLine($"{0} {NewListData[i].DataValue}");
+                                            }
+                                            else // если последние 2 значения разные
+                                            {
+                                                    sw.WriteLine($"{0} не определено");
+                                            }
                                             TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                             sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                         }
