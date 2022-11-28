@@ -583,11 +583,22 @@ namespace DBSelectionForm.Services
                         // если элемент по типу задвижка
                         if (SensorName[k].Contains("AA1") && SensorName[k].Contains("_Z0"))
                         {
-                            if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
+                            if (LastTime != DT_To && (NewListData.Count - 1) != i - 1 && NewListData[i - 1].DataTime != DT_To) // не последний элемент
                             {
-                                // изменил аргументы для интерполяции
                                 TimeSpan var_dt = DT_To.Subtract(DT_From);
-                                sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
+                                if (NewListData[i - 1].DataValue == NewListData[i].DataValue) // если последние 2 значения одинаковы
+                                {
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i].DataValue}");
+                                }
+                                else // если последние 2 значения разные
+                                {
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} не определено");
+                                }
+                            }
+                            else if (LastTime != DT_To && (NewListData.Count - 1) == i - 1 && NewListData[i - 1].DataTime != DT_To)
+                            {
+                                TimeSpan var_dt = DT_To.Subtract(DT_From);
+                                sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
                             }
                         }
                         else
@@ -602,11 +613,6 @@ namespace DBSelectionForm.Services
                                 TimeSpan var_dt = DT_To.Subtract(DT_From);
                                 sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
                             }
-                            //if (LastTime != DT_To && LastTime != NewListData[NewListData.Count - 1].DataTime)
-                            //{
-                            //    TimeSpan var_dt = DT_To.Subtract(DT_From);
-                            //    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i + 1], DT_To)}");
-                            //}
                         }
                     
                     }

@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using System.Windows;
 
-namespace AutoTests.AutoTest.SensorsTest
+namespace AutoTests.AutoTest.ValvesTest
 {
     class LastPoints
     {
@@ -29,12 +29,12 @@ namespace AutoTests.AutoTest.SensorsTest
             InfoData _InfoData = new InfoData()
             {
                 DayFrom = "29.10.21",
-                DayTo = "30.10.21",
+                DayTo = "02.11.21",
                 SlicePathDB = @"D:\\Archive_LAES2\\29_10_2021\\20220222_srez_29.10.txt",
                 TimeFrom = "00:00:00",
-                TimeTo = "12:00:00",
+                TimeTo = "07:22:37",
                 PathToFolder = @"D:\\Archive_LAES2\\29_10_2021", // Начал заполнять пути до файлов
-                SensorName = "10KBA20CF001_XQ01"
+                SensorName = "10KBA15AA101_Z0"
             };
 
             #endregion
@@ -42,7 +42,7 @@ namespace AutoTests.AutoTest.SensorsTest
             #region Указываем  то что должно получиться
 
             List<string> CorrectData = new List<string>();
-            CorrectData.Add("129600 0.43535858855877185");
+            CorrectData.Add("372157 100");
 
             #endregion
 
@@ -72,10 +72,10 @@ namespace AutoTests.AutoTest.SensorsTest
 
             if (CorrectData[0] != ResultData[ResultData.Count-1])
             {
-                Console.WriteLine(@"Тест 'Правильное заполнение датчика' => 'Проверка последнего значения' => 'Тест NO1' => Не пройден! Ошибка!");
+                Console.WriteLine(@"Тест 'Правильное заполнение задвижки' => 'Проверка последнего значения' => 'Тест NO1' => Не пройден! Ошибка!");
                 return false;
             }
-            Console.WriteLine(@"Тест 'Правильное заполнение датчика' => 'Проверка последнего значения' => 'Тест NO1' => Пройден!");
+            Console.WriteLine(@"Тест 'Правильное заполнение задвижки' => 'Проверка последнего значения' => 'Тест NO1' => Пройден!");
             return true;
 
             #endregion
@@ -100,9 +100,9 @@ namespace AutoTests.AutoTest.SensorsTest
                 DayTo = "08.11.21",
                 SlicePathDB = @"D:\\Archive_LAES2\\29_10_2021\\20220222_srez_29.10.txt",
                 TimeFrom = "00:00:00",
-                TimeTo = "08:15:00",
+                TimeTo = "23:59:59",
                 PathToFolder = @"D:\\Archive_LAES2\\29_10_2021", // Начал заполнять пути до файлов
-                SensorName = "10KBA20CF001_XQ01"
+                SensorName = "10KBA15AA101_Z0"
             };
 
             #endregion
@@ -110,7 +110,7 @@ namespace AutoTests.AutoTest.SensorsTest
             #region Указываем  то что должно получиться
 
             List<string> CorrectData = new List<string>();
-            CorrectData.Add("893700 0.4");
+            CorrectData.Add("950399 0");
 
             #endregion
 
@@ -140,10 +140,10 @@ namespace AutoTests.AutoTest.SensorsTest
 
             if (CorrectData[0] != ResultData[ResultData.Count - 1])
             {
-                Console.WriteLine(@"Тест 'Правильное заполнение датчика' => 'Проверка последнего значения' => 'Тест NO2' => Не пройден! Ошибка!");
+                Console.WriteLine(@"Тест 'Правильное заполнение задвижки' => 'Проверка последнего значения' => 'Тест NO2' => Не пройден! Ошибка!");
                 return false;
             }
-            Console.WriteLine(@"Тест 'Правильное заполнение датчика' => 'Проверка последнего значения' => 'Тест NO2' => Пройден!");
+            Console.WriteLine(@"Тест 'Правильное заполнение задвижки' => 'Проверка последнего значения' => 'Тест NO2' => Пройден!");
             return true;
 
             #endregion
@@ -164,12 +164,12 @@ namespace AutoTests.AutoTest.SensorsTest
             InfoData _InfoData = new InfoData()
             {
                 DayFrom = "29.10.21",
-                DayTo = "08.11.21",
+                DayTo = "31.10.21",
                 SlicePathDB = @"D:\\Archive_LAES2\\29_10_2021\\20220222_srez_29.10.txt",
                 TimeFrom = "00:00:00",
-                TimeTo = "08:13:33",
+                TimeTo = "07:09:44",
                 PathToFolder = @"D:\\Archive_LAES2\\29_10_2021", // Начал заполнять пути до файлов
-                SensorName = "10KBA20CF001_XQ01"
+                SensorName = "10KBA15AA101_Z0"
             };
 
             #endregion
@@ -177,7 +177,7 @@ namespace AutoTests.AutoTest.SensorsTest
             #region Указываем  то что должно получиться
 
             List<string> CorrectData = new List<string>();
-            CorrectData.Add("893613 0.5");
+            CorrectData.Add("198584 100");
 
             #endregion
 
@@ -207,10 +207,10 @@ namespace AutoTests.AutoTest.SensorsTest
 
             if (CorrectData[0] != ResultData[ResultData.Count - 1])
             {
-                Console.WriteLine(@"Тест 'Правильное заполнение датчика' => 'Проверка последнего значения' => 'Тест NO3' => Не пройден! Ошибка!");
+                Console.WriteLine(@"Тест 'Правильное заполнение задвижки' => 'Проверка последнего значения' => 'Тест NO3' => Не пройден! Ошибка!");
                 return false;
             }
-            Console.WriteLine(@"Тест 'Правильное заполнение датчика' => 'Проверка последнего значения' => 'Тест NO3' => Пройден!");
+            Console.WriteLine(@"Тест 'Правильное заполнение задвижки' => 'Проверка последнего значения' => 'Тест NO3' => Пройден!");
             return true;
 
             #endregion

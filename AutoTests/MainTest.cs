@@ -62,11 +62,17 @@ namespace AutoTests
 
             #region Тестирование работы с задвижками
 
-            AutoTest.ValvesTest.FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+            //AutoTest.ValvesTest.FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
-            AutoTest.ValvesTest.FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
+            //AutoTest.ValvesTest.FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
 
-            AutoTest.ValvesTest.FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+            //AutoTest.ValvesTest.FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+
+            //AutoTest.ValvesTest.LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
+
+            //AutoTest.ValvesTest.LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
+
+            //AutoTest.ValvesTest.LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
 
             #endregion
 
