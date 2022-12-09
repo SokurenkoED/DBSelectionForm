@@ -42,45 +42,45 @@ namespace AutoTests
 
             #region Тестирование работы с датчиками
 
-            //Interpol.InterpolTestNO1();
+            Interpol.InterpolTestNO1();
 
-            //FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
-            //FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
 
-            //FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
 
-            //LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
 
-            //LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
 
-            //LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
 
-            //BodyPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+            BodyPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
             #endregion
 
             #region Тестирование работы с задвижками
 
-            //AutoTest.ValvesTest.FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+            AutoTest.ValvesTest.FirstPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
 
-            //AutoTest.ValvesTest.FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
+            AutoTest.ValvesTest.FirstPoints.FirstPointNO2(ref _TextInformation, _TimeDimension);
 
-            //AutoTest.ValvesTest.FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
+            AutoTest.ValvesTest.FirstPoints.FirstPointNO3(ref _TextInformation, _TimeDimension);
 
-            //AutoTest.ValvesTest.LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
+            AutoTest.ValvesTest.LastPoints.LastPointNO1(ref _TextInformation, _TimeDimension);
 
-            //AutoTest.ValvesTest.LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
+            AutoTest.ValvesTest.LastPoints.LastPointNO2(ref _TextInformation, _TimeDimension);
 
-            //AutoTest.ValvesTest.LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
+            AutoTest.ValvesTest.LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
 
             #endregion
 
             #region Тестирование работы программы в различных БД
 
-            //DBTest.EncodingTest.EncodingTestNO1();
+            DBTest.EncodingTest.EncodingTestNO1();
 
-            //DBTest.EncodingTest.EncodingTestNO2();
+            DBTest.EncodingTest.EncodingTestNO2();
 
             #endregion
 
