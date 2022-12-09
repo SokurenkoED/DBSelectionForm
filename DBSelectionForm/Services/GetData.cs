@@ -18,7 +18,7 @@ namespace DBSelectionForm.Services
     public class TimeValueData
     {
         public DateTime DataTime;
-        string _DataValue;
+        public string _DataValue;
         public string DataValue 
         {
             get
@@ -373,11 +373,22 @@ namespace DBSelectionForm.Services
 
                                             #region Добавили значение в массив 
 
-                                            NewListData.Add(new TimeValueData()
+                                            if (example[3] == "ДА" || example[3] == "НЕТ")
                                             {
-                                                DataTime = DT,
-                                                DataValue = example[3]
-                                            });
+                                                NewListData.Add(new TimeValueData()
+                                                {
+                                                    DataTime = DT,
+                                                    DataValue = example[5]
+                                                });
+                                            }
+                                            else
+                                            {
+                                                NewListData.Add(new TimeValueData()
+                                                {
+                                                    DataTime = DT,
+                                                    DataValue = example[3]
+                                                });
+                                            }
 
                                             #endregion
 
@@ -426,6 +437,16 @@ namespace DBSelectionForm.Services
                                 }
                                 else
                                 {
+                                    if (split_str[2] == "НЕТ")
+                                    {
+                                        ColdReactor.Add("0");
+                                        break;
+                                    }
+                                    else if (split_str[2] == "ДА")
+                                    {
+                                        ColdReactor.Add("1");
+                                        break;
+                                    }
                                     ColdReactor.Add(split_str[2]);
                                     break;
                                 }
@@ -548,7 +569,14 @@ namespace DBSelectionForm.Services
                                         }
                                         else if (item.DataTime != DT_From && item != NewListData[0])
                                         {
-                                            sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                            if (NewListData[i]._DataValue == "ДА" || NewListData[i]._DataValue == "НЕТ")
+                                            {
+                                                sw.WriteLine($"{0} {NewListData[i - 1].DataValue}");
+                                            }
+                                            else
+                                            {
+                                                sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                            }
                                             TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                             sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                         }
@@ -606,7 +634,14 @@ namespace DBSelectionForm.Services
                             if (LastTime != DT_To && (NewListData.Count - 1) != i - 1 && NewListData[i-1].DataTime != DT_To) // не последний элемент
                             {
                                 TimeSpan var_dt = DT_To.Subtract(DT_From);
-                                sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
+                                if (NewListData[i]._DataValue == "ДА" || NewListData[i]._DataValue == "НЕТ")
+                                {
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
+                                }
+                                else
+                                {
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {LineInterpol(NewListData[i - 1], NewListData[i], DT_To)}");
+                                }
                             }
                             else if (LastTime != DT_To && (NewListData.Count - 1) == i - 1 && NewListData[i - 1].DataTime != DT_To)
                             {
