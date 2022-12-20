@@ -56,7 +56,8 @@ namespace AutoTests
 
             AutoTest.SensorsTest.LastPoints.LastPointNO3(ref _TextInformation, _TimeDimension);
 
-            BodyPoints.FirstPointNO1(ref _TextInformation, _TimeDimension);
+            AutoTest.SensorsTest.BodyPoints.BodyTestNO1(ref _TextInformation, _TimeDimension);
+
 
             #endregion
 
@@ -83,6 +84,13 @@ namespace AutoTests
             DBTest.EncodingTest.EncodingTestNO2();
 
             #endregion
+
+            #region Тестирование работы с накладками
+
+
+
+            #endregion
+
 
         }
     }

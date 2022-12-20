@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 
-namespace AutoTests.SensorsTest
+namespace AutoTests.AutoTest.SensorsTest
 {
     internal class BodyPoints
     {
@@ -16,7 +16,7 @@ namespace AutoTests.SensorsTest
         /// <param name="_TextInformation"></param>
         /// <param name="TimeDemention"></param>
         /// <returns></returns>
-        static public bool FirstPointNO1(ref ObservableCollection<string> _TextInformation, List<string> TimeDemention)
+        static public bool BodyTestNO1(ref ObservableCollection<string> _TextInformation, List<string> TimeDemention)
         {
 
             #region Указываем начальные данные
@@ -73,7 +73,6 @@ namespace AutoTests.SensorsTest
                 "893614 0.4",
                 "950399 0.4"
             };
-            //Перезаписать эталонные значения для элементов изза изменения работы 
 
             #endregion
 

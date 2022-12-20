@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using System.Windows;
 
-namespace AutoTests.AutoTest.SensorsTest
+namespace AutoTests.AutoTest.OverlayTest
 {
     class LastPoints
     {
