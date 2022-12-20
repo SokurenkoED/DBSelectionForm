@@ -11,7 +11,7 @@ namespace AutoTests.AutoTest.SensorsTest
     internal class BodyPoints
     {
         /// <summary>
-        /// Тест #1. Проверка тела графика.
+        /// Тест #1. Проверка тела графика для датчика.
         /// </summary>
         /// <param name="_TextInformation"></param>
         /// <param name="TimeDemention"></param>

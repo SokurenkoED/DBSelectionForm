@@ -11,7 +11,7 @@ namespace AutoTests.AutoTest.OverlayTest
     internal class BodyPoints
     {
         /// <summary>
-        /// Тест #1. Проверка тела графика.
+        /// Тест #1. Проверка тела графика для накладки.
         /// </summary>
         /// <param name="_TextInformation"></param>
         /// <param name="TimeDemention"></param>
