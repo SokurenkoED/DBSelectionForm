@@ -90,7 +90,7 @@ namespace DBSelectionForm.Services
         }
         private static string GetCategory(string str)
         {
-            if ((str.IndexOf("CQ") != -1 && CheckForNums(str, "CQ")) || (str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX")) || (str.IndexOf("FF") != -1 && CheckForNums(str, "FF")) || (str.IndexOf("FP") != -1 && CheckForNums(str, "FP")) || (str.IndexOf("FT") != -1 && CheckForNums(str, "FT")) || (str.IndexOf("FL") != -1 && CheckForNums(str, "FL"))) // категория 0 (Каналы измерения)
+            if ((str.IndexOf("CE") != -1 && CheckForNums(str, "CE")) || (str.IndexOf("CS") != -1 && CheckForNums(str, "CS")) || (str.IndexOf("CQ") != -1 && CheckForNums(str, "CQ")) || (str.IndexOf("CP") != -1 && CheckForNums(str, "CP")) || (str.IndexOf("CT") != -1 && CheckForNums(str, "CT")) || (str.IndexOf("CL") != -1 && CheckForNums(str, "CL")) || (str.IndexOf("CF") != -1 && CheckForNums(str, "CF")) || (str.IndexOf("FX") != -1 && CheckForNums(str, "FX")) || (str.IndexOf("FF") != -1 && CheckForNums(str, "FF")) || (str.IndexOf("FP") != -1 && CheckForNums(str, "FP")) || (str.IndexOf("FT") != -1 && CheckForNums(str, "FT")) || (str.IndexOf("FL") != -1 && CheckForNums(str, "FL"))) // категория 0 (Каналы измерения)
             {
                 return "0";
             }
@@ -110,13 +110,41 @@ namespace DBSelectionForm.Services
             {
                 return "5";
             }
-            else if ((str.IndexOf("DU") != -1 && CheckForNums(str, "DU")) || (str.IndexOf("CG9") != -1 && CheckForNums(str, "CG")) || (str.IndexOf("EU") != -1 && CheckForNums(str, "EU")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER")) || (str.IndexOf("EG") != -1 && CheckForNums(str, "EG")) || (str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6 (Алгоритмы)
+            else if ((str.IndexOf("DE001_") != -1) || (str.IndexOf("CH") != -1 && CheckForNums(str, "CH")) || (str.IndexOf("DF2") != -1 && CheckForNums(str, "DF")) || (str.IndexOf("CG6") != -1 && CheckForNums(str, "CG")) || str.IndexOf("10JEF10DP911") != -1 || str.IndexOf("10LBG01DP001") != -1 || str.IndexOf("10LBG02DP001") != -1 || str.IndexOf("10LBG03DP001") != -1 || str.IndexOf("10LBA00DP002") != -1 || str.IndexOf("10MAA10DP001") != -1 || str.IndexOf("10LBA00DP001") != -1 || (str.IndexOf("EB") != -1 && CheckForNums(str, "EB")) || (str.IndexOf("EW") != -1 && CheckForNums(str, "EW")) || (str.IndexOf("EY") != -1 && CheckForNums(str, "EY")) || (str.IndexOf("DU") != -1 && CheckForNums(str, "DU")) || (str.IndexOf("CG9") != -1 && CheckForNums(str, "CG")) || (str.IndexOf("EU") != -1 && CheckForNums(str, "EU")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER")) || (str.IndexOf("EG") != -1 && CheckForNums(str, "EG")) || (str.IndexOf("DL") != -1 && CheckForNums(str, "DL")) || (str.IndexOf("EE") != -1 && CheckForNums(str, "EE"))|| (str.IndexOf("EZ") != -1 && CheckForNums(str, "EZ")) || (str.IndexOf("ED") != -1 && CheckForNums(str, "ED")) || (str.IndexOf("ER") != -1 && CheckForNums(str, "ER"))) // категория 6 (Алгоритмы)
             {
                 return "6";
             }
             else if (str.IndexOf("KIN1.OR") != -1) // Категория 7 (Группы ОР СУЗ)
             {
                 return "7";
+            }
+            else if ((str.IndexOf("CG2") != -1 && CheckForNums(str, "CG"))) // Категория 8
+            {
+                return "8";
+            }
+            else if (str.IndexOf("GX") != -1 && CheckForNums(str, "GX")) // Категория 11
+            {
+                return "11";
+            }
+            else if (str.IndexOf("DE001A") != -1 || str.IndexOf("DE001T") != -1 || str.IndexOf("FU") != -1 && CheckForNums(str, "FU") || str.IndexOf("10LBA00DP001K") != -1) // Категория 12
+            {
+                return "12";
+            }
+            else if (str.IndexOf("EC") != -1 && CheckForNums(str, "EC") && str.IndexOf("TE0") == -1) // Категория 14
+            {
+                return "14";
+            }
+            else if (str.IndexOf("TE0") != -1) // Категория 16
+            {
+                return "16";
+            }
+            else if (str.IndexOf("VL0") != -1) // Категория 17
+            {
+                return "17";
+            }
+            else if (str.IndexOf("DF") != -1 && CheckForNums(str, "DF") || str.IndexOf("10MAN00DP001") != -1 || str.IndexOf("10LAH00DP001") != -1) // Категория 18
+            {
+                return "18";
             }
             else
             {
