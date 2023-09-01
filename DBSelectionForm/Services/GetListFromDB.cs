@@ -179,7 +179,7 @@ namespace DBSelectionForm.Services
                             
                         }
 
-                        string[] ArrOfStr = Line.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] ArrOfStr = Line.ToUpper().Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
 
                         if (ArrOfStr.Length > 1)
                         {
@@ -266,7 +266,7 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
 
-                            StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                            StrArr = Line.ToUpper().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
                             //<------------------------------------------------------------------------------------------------------------>
 
@@ -361,7 +361,7 @@ namespace DBSelectionForm.Services
                                     continue;
                                 }
 
-                                StrArr = Line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                StrArr = Line.ToUpper().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                                 ReplacedName = item.Name.Replace("_XQ08", "");
 
                                 if (StrArr[0].Contains(ReplacedName + "_XC01") && StrArr[2] == "ДА")
@@ -420,7 +420,7 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
 
-                            StrArr = Line.Split(new char[] { '\t' });
+                            StrArr = Line.ToUpper().Split(new char[] { '\t' });
 
                             //<------------------------------------------------------------------------------------------------------------>
 
@@ -516,7 +516,7 @@ namespace DBSelectionForm.Services
                                     continue;
                                 }
 
-                                StrArr = Line.Split(new char[] { '\t' });
+                                StrArr = Line.ToUpper().Split(new char[] { '\t' });
                                 ReplacedName = item.Name.Replace("_XQ08", "");
 
                                 if (StrArr[0].Contains(ReplacedName + "_XC01") && StrArr[1] == "ДА")
@@ -591,7 +591,7 @@ namespace DBSelectionForm.Services
                                     k++;
                                     continue;
                                 }
-                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
+                                lineSplit = line.ToUpper().Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                                 ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
@@ -785,7 +785,7 @@ namespace DBSelectionForm.Services
                                     k++;
                                     continue;
                                 }
-                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
+                                lineSplit = line.ToUpper().Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                                 ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
