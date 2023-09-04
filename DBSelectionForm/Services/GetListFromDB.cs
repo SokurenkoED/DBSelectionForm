@@ -14,13 +14,13 @@ namespace DBSelectionForm.Services
     class GetListFromDB
     {
 
-        private static void IsRegulator_xq08(SignalModel Signal)
+        private static void IsRegulator_XQ08(SignalModel Signal)
         {
             IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-            if (Signal.Name.Contains("_xq08"))
+            if (Signal.Name.Contains("_XQ08"))
             {
                 double IsParse;
-                if ((Signal.Status == "дост" || Signal.Status == "повт.дост") && double.TryParse(Signal.NewValue.ToString(), NumberStyles.Any, formatter, out IsParse) && IsParse <= 0)
+                if ((Signal.Status == "ДОСТ" || Signal.Status == "ПОВТ.ДОСТ") && double.TryParse(Signal.NewValue.ToString(), NumberStyles.Any, formatter, out IsParse) && IsParse <= 0)
                 {
                     Signal.NewValue = 0;
                 }
@@ -162,7 +162,7 @@ namespace DBSelectionForm.Services
                     string Line;
                     while ((Line = sr.ReadLine()) != null)
                     {
-                        Line = Line.Trim();
+                        Line = Line.Trim().ToUpper();
 
                         if (Line.Contains("Обнаружено "))
                         {
@@ -266,6 +266,8 @@ namespace DBSelectionForm.Services
                                 continue;
                             }
 
+                            Line = Line.ToUpper();
+
                             StrArr = Line.ToUpper().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
                             //<------------------------------------------------------------------------------------------------------------>
@@ -278,10 +280,10 @@ namespace DBSelectionForm.Services
                                 {
                                     switch (status = item.Status)
                                     {
-                                        case "дост":
+                                        case "ДОСТ":
                                             result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                             break;
-                                        case "повт.дост":
+                                        case "ПОВТ.ДОСТ":
                                             result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                             break;
                                         default:
@@ -344,7 +346,7 @@ namespace DBSelectionForm.Services
                     }
                 }
 
-                // Нужно проверить массив всех элементов на сигналы _xq08, найти для регулятора сигналы xc01 и xc02 в срезе
+                // Нужно проверить массив всех элементов на сигналы _XQ08, найти для регулятора сигналы xc01 и xc02 в срезе
                 foreach (var item in FoundSignalsInDB)
                 {
                     if (item.Name.Contains("_XQ08"))
@@ -360,6 +362,8 @@ namespace DBSelectionForm.Services
                                     k++;
                                     continue;
                                 }
+
+                                Line = Line.ToUpper();
 
                                 StrArr = Line.ToUpper().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                                 ReplacedName = item.Name.Replace("_XQ08", "");
@@ -419,6 +423,7 @@ namespace DBSelectionForm.Services
                                 k++;
                                 continue;
                             }
+                            Line = Line.ToUpper();
 
                             StrArr = Line.ToUpper().Split(new char[] { '\t' });
 
@@ -432,10 +437,10 @@ namespace DBSelectionForm.Services
                                 {
                                     switch (status = item.Status)
                                     {
-                                        case "дост":
+                                        case "ДОСТ":
                                             result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                             break;
-                                        case "повт.дост":
+                                        case "ПОВТ.ДОСТ":
                                             result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{IC.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                             break;
                                         default:
@@ -499,7 +504,7 @@ namespace DBSelectionForm.Services
                     }
                 }
 
-                // Нужно проверить массив всех элементов на сигналы _xq08, найти для регулятора сигналы xc01 и xc02 в срезе
+                // Нужно проверить массив всех элементов на сигналы _XQ08, найти для регулятора сигналы xc01 и xc02 в срезе
                 foreach (var item in FoundSignalsInDB)
                 {
                     if (item.Name.Contains("_XQ08"))
@@ -515,6 +520,8 @@ namespace DBSelectionForm.Services
                                     k++;
                                     continue;
                                 }
+
+                                Line = Line.ToUpper();
 
                                 StrArr = Line.ToUpper().Split(new char[] { '\t' });
                                 ReplacedName = item.Name.Replace("_XQ08", "");
@@ -591,6 +598,9 @@ namespace DBSelectionForm.Services
                                     k++;
                                     continue;
                                 }
+
+                                line = line.ToUpper();
+
                                 lineSplit = line.ToUpper().Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
@@ -605,10 +615,10 @@ namespace DBSelectionForm.Services
                                     {
                                         switch (status = item.Status)
                                         {
-                                            case "дост":
+                                            case "ДОСТ":
                                                 result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                                 break;
-                                            case "повт.дост":
+                                            case "ПОВТ.ДОСТ":
                                                 result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                                 break;
                                             default:
@@ -651,7 +661,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
+                                        if (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -665,7 +675,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
+                                        if (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -677,19 +687,19 @@ namespace DBSelectionForm.Services
                                 else if (SensorName.Name.IndexOf("_XQ08") != -1)
                                 {
                                     var ReplacedName = SensorName.Name.Replace("_XQ08", "");
-                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
+                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ"))
                                     {
                                         IsFound_XC = true;
                                         FoundSignalsInDBFresh[^1].NewValue = 100;
                                     }
-                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
+                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ"))
                                     {
                                         IsFound_XC = true;
                                         FoundSignalsInDBFresh[^1].NewValue = 0;
                                     }
                                     else if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
+                                        if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
                                         {
                                             if (IsFound_XC)
                                             {
@@ -710,7 +720,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
+                                        if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
                                         {
                                             LastValueOfSensor = lineSplit[3];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -785,6 +795,9 @@ namespace DBSelectionForm.Services
                                     k++;
                                     continue;
                                 }
+
+                                line = line.ToUpper();
+
                                 lineSplit = line.ToUpper().Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
@@ -799,10 +812,10 @@ namespace DBSelectionForm.Services
                                     {
                                         switch (status = item.Status)
                                         {
-                                            case "дост":
+                                            case "ДОСТ":
                                                 result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                                 break;
-                                            case "повт.дост":
+                                            case "ПОВТ.ДОСТ":
                                                 result += (int)Math.Pow(2, int.Parse(item.Name.Replace($"{SensorName.Name}#", ""))) * ConvertBoolStringToInt((string)item.NewValue);
                                                 break;
                                             default:
@@ -845,7 +858,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
+                                        if (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -859,7 +872,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост")
+                                        if (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ")
                                         {
                                             LastValueOfSensor = lineSplit[5];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -871,19 +884,19 @@ namespace DBSelectionForm.Services
                                 else if (SensorName.Name.IndexOf("_XQ08") != -1)
                                 {
                                     var ReplacedName = SensorName.Name.Replace("_XQ08", "");
-                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
+                                    if (lineSplit[2].IndexOf(ReplacedName + "_XC01") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ"))
                                     {
                                         IsFound_XC = true;
                                         FoundSignalsInDBFresh[^1].NewValue = 100;
                                     }
-                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "дост" || lineSplit[6] == "повт.дост"))
+                                    else if (lineSplit[2].IndexOf(ReplacedName + "_XC02") == 0 && lineSplit[5] == "ДА" && (lineSplit[6] == "ДОСТ" || lineSplit[6] == "ПОВТ.ДОСТ"))
                                     {
                                         IsFound_XC = true;
                                         FoundSignalsInDBFresh[^1].NewValue = 0;
                                     }
                                     else if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
+                                        if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
                                         {
                                             if (IsFound_XC)
                                             {
@@ -904,7 +917,7 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "дост" || lineSplit[4] == "повт.дост")
+                                        if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
                                         {
                                             LastValueOfSensor = lineSplit[3];
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
@@ -959,11 +972,11 @@ namespace DBSelectionForm.Services
             }
 
 
-            foreach (var item in StringArrayAfterSort) // Записываем в выходной файл достоверные сигналы
+            foreach (var item in StringArrayAfterSort) // Записываем в выходной файл ДОСТоверные сигналы
             {
                 //string[] ArrOfStr = item.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
                 double d;
-                if (item.Status == "дост" || item.Status == "повт.дост")
+                if (item.Status == "ДОСТ" || item.Status == "ПОВТ.ДОСТ")
                 {
                     if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
                     {
@@ -980,7 +993,7 @@ namespace DBSelectionForm.Services
                         CorrectSignals.Add(item);
                     }
                 }
-                else // Добавляем недостоверные сигналы в массив недостоверных сигналов InvalidSignals
+                else // Добавляем неДОСТоверные сигналы в массив неДОСТоверных сигналов InvalidSignals
                 {
                     if (double.TryParse(item.NewValue.ToString(), NumberStyles.Number, formatter, out d))
                     {
@@ -1018,77 +1031,87 @@ namespace DBSelectionForm.Services
 
             foreach (var item in FinalSignalsList)
             {
-                IsRegulator_xq08(item);
+                IsRegulator_XQ08(item);
             }
 
         }
 
         public static List<SignalModel> GetListMethod(InfoData _InfoData, string EndTimeFormat, string EndDay,ref ObservableCollection<string> _TextInformationFromListDB, string SelectedSliceFormat, string SelectedDataBaseFormat)
         {
-            Stopwatch SW = new Stopwatch();
-            SW.Start();
-            _TextInformationFromListDB.Clear();
-            _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск начался!");
-
-            IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-            bool IsReliable = true;
-            string ReadPathFromDB = _InfoData.PathToDataFile;
-            string WorkPath = _InfoData.PathToListFile;
-            string RelatePathToFolder = _InfoData.PathToFolderForListBD;
-            double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
-
-            //List<string> InvalidSignals = new List<string>(); // Массив с недостоверными сигналами
-            //List<string> NotFoundSignals = new List<string>(); // Массив с ненайденными сигналами
-            List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
-            List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
-            List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
-            List<string> StringArrayFromIC = new List<string>(); // массив сигналов, прочитанных из файла
-
-            List<SignalModel> ReadSignals = new List<SignalModel>(); // Сигналы, которые считали с файла
-            List<SignalModel> FoundSignalsInDB = new List<SignalModel>(); // Сигналы, которые нашлись в срезе
-            List<SignalModel> FoundSignalsInDBFresh = new List<SignalModel>(); // Сигналы, которые нашлись в изменяющейся базе данных
-
-            List<SignalModel> CheckFoundSignals = new List<SignalModel>(); // Массив с сигналами, которые нашлись в срезе
-            List<SignalModel> NotFoundSignals = new List<SignalModel>(); // Не найденные в БД сигналы
-            List<SignalModel> InvalidSignals = new List<SignalModel>(); // Недостоверные сигналы
-            List<SignalModel> FinalSignalsList = new List<SignalModel>(); // Конечный список сигналов
-
-
-            ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
-
-            if (SelectedSliceFormat == "06.07.2018")
+            
+                Stopwatch SW = new Stopwatch();
+                SW.Start();
+                _TextInformationFromListDB.Clear();
+                _TextInformationFromListDB.Add($"{_TextInformationFromListDB.Count + 1}) Поиск начался!");
+            try
             {
-                FindDataInDB_06_07_18(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
+                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                bool IsReliable = true;
+                string ReadPathFromDB = _InfoData.PathToDataFile;
+                string WorkPath = _InfoData.PathToListFile;
+                string RelatePathToFolder = _InfoData.PathToFolderForListBD;
+                double EndTime = ConvertDataFormat(EndTimeFormat, EndDay, formatter);
 
+                //List<string> InvalidSignals = new List<string>(); // Массив с неДОСТоверными сигналами
+                //List<string> NotFoundSignals = new List<string>(); // Массив с ненайденными сигналами
+                List<string> DBName = new List<string>(); // массив для записи тех элементов, которые нашлись в ДБ
+                List<string> StringArrayFromDBFresh = new List<string>(); // конечный массив
+                List<string> StringArrayFromDB = new List<string>();// только со среза, старый массив
+                List<string> StringArrayFromIC = new List<string>(); // массив сигналов, прочитанных из файла
+
+                List<SignalModel> ReadSignals = new List<SignalModel>(); // Сигналы, которые считали с файла
+                List<SignalModel> FoundSignalsInDB = new List<SignalModel>(); // Сигналы, которые нашлись в срезе
+                List<SignalModel> FoundSignalsInDBFresh = new List<SignalModel>(); // Сигналы, которые нашлись в изменяющейся базе данных
+
+                List<SignalModel> CheckFoundSignals = new List<SignalModel>(); // Массив с сигналами, которые нашлись в срезе
+                List<SignalModel> NotFoundSignals = new List<SignalModel>(); // Не найденные в БД сигналы
+                List<SignalModel> InvalidSignals = new List<SignalModel>(); // НеДОСТоверные сигналы
+                List<SignalModel> FinalSignalsList = new List<SignalModel>(); // Конечный список сигналов
+
+
+                ReadDataFromIC(WorkPath, ref ReadSignals); // Прочитали сигналы и добавили в массив имена
+
+                if (SelectedSliceFormat == "06.07.2018")
+                {
+                    FindDataInDB_06_07_18(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
+
+                }
+                else if (SelectedSliceFormat == "22.02.2022")
+                {
+                    FindDataInDB_28_04_22(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
+
+                }
+
+                if (SelectedDataBaseFormat == "06.07.2018")
+                {
+                    FindFreshDataInDB_06_07_18(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
+                }
+                else if (SelectedDataBaseFormat == "22.02.2022")
+                {
+                    FindFreshDataInDB_28_04_22(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
+                }
+
+                IsFoundName(ref ReadSignals, ref NotFoundSignals);
+
+                CreateFinalSignalsList(WorkPath, ref FoundSignalsInDBFresh, IsReliable, NotFoundSignals, InvalidSignals, ref FinalSignalsList);
+
+                SW.Stop();
+                TimeSpan ts = SW.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+                _TextInformationFromListDB.Clear();
+                _TextInformationFromListDB.Add($"Поиск закончился! Время выполнения - {elapsedTime}");
+                MessageBox.Show($"Список создан");
+                return FinalSignalsList;
             }
-            else if (SelectedSliceFormat == "22.02.2022")
+            catch (Exception ex)
             {
-                FindDataInDB_28_04_22(ReadPathFromDB, ref FoundSignalsInDB, ref ReadSignals, ref IsReliable, ref CheckFoundSignals);
-                
+                _TextInformationFromListDB.Clear();
+                _TextInformationFromListDB.Add($"{ex.Message}");
+                return null;
             }
-
-            if (SelectedDataBaseFormat == "06.07.2018")
-            {
-                FindFreshDataInDB_06_07_18(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
-            }
-            else if (SelectedDataBaseFormat == "22.02.2022")
-            {
-                FindFreshDataInDB_28_04_22(ref FoundSignalsInDB, ref FoundSignalsInDBFresh, RelatePathToFolder, EndTime, ref _TextInformationFromListDB);
-            }
-
-            IsFoundName(ref ReadSignals, ref NotFoundSignals);
-
-            CreateFinalSignalsList(WorkPath, ref FoundSignalsInDBFresh, IsReliable, NotFoundSignals, InvalidSignals, ref FinalSignalsList);
-
-            SW.Stop();
-            TimeSpan ts = SW.Elapsed;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-            _TextInformationFromListDB.Clear();
-            _TextInformationFromListDB.Add($"Поиск закончился! Время выполнения - {elapsedTime}");
-            MessageBox.Show($"Список создан");
-            return FinalSignalsList;
+            
         }
 
         public static void WriteDataToIC(InfoData _InfoData, ref List<SignalModel> Signals)
