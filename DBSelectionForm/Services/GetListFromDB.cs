@@ -334,6 +334,18 @@ namespace DBSelectionForm.Services
                                     }
                                     //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
                                     //CheckFoundSignals.Add(IC);
+
+                                    // Если встречается сигнал с давлением (*CP* + XQ01)
+                                    if (IC.Name.Substring(7, 2) == "CP" && IC.Name.Substring(IC.Name.Length - 4, 4) == "XQ01")
+                                    {
+                                        double new_value = double.Parse(StrArr[2], formatter) + 0.101325;
+                                        IC.SetPropOnFindDataInDB(new_value.ToString(), StrArr[3], str, StrArr[1].Replace("<", ""));
+                                        FoundSignalsInDB.Add(IC);
+                                        CheckFoundSignals.Add(IC);
+
+                                        break;
+                                    }
+
                                     IC.SetPropOnFindDataInDB(StrArr[2], StrArr[3], str, StrArr[1].Replace("<", ""));
                                     FoundSignalsInDB.Add(IC);
                                     CheckFoundSignals.Add(IC);
@@ -492,6 +504,16 @@ namespace DBSelectionForm.Services
                                     //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
                                     //CheckFoundSignals.Add(IC);
 
+                                    if (IC.Name.Substring(7, 2) == "CP" && IC.Name.Substring(IC.Name.Length - 4, 4) == "XQ01")
+                                    {
+                                        double new_value = double.Parse(StrArr[1], formatter) + 0.101325;
+                                        IC.SetPropOnFindDataInDB(new_value.ToString(), StrArr[3], str, StrArr[4].Replace("<", ""));
+                                        FoundSignalsInDB.Add(IC);
+                                        CheckFoundSignals.Add(IC);
+
+                                        break;
+                                    }
+
                                     IC.SetPropOnFindDataInDB(StrArr[1], StrArr[3], str, StrArr[4].Replace("<", ""));
                                     FoundSignalsInDB.Add(IC);
                                     CheckFoundSignals.Add(IC);
@@ -601,7 +623,7 @@ namespace DBSelectionForm.Services
 
                                 line = line.ToUpper();
 
-                                lineSplit = line.ToUpper().Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
+                                lineSplit = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries); // Делим строку с большой базы данных
                                 ConvertedDate = double.Parse(lineSplit[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0], formatter);
                                 ConvertedTimeArr = lineSplit[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                                 ConvertedTimeDouble = (ConvertedDate - 6) * 24 * 60 * 60 + double.Parse(ConvertedTimeArr[0], formatter) * 3600 + double.Parse(ConvertedTimeArr[1], formatter) * 60 + double.Parse(ConvertedTimeArr[2], formatter) / 1000;
@@ -722,7 +744,16 @@ namespace DBSelectionForm.Services
                                     {
                                         if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
                                         {
-                                            LastValueOfSensor = lineSplit[3];
+
+                                            // Если датчик с давлением
+                                            if (SensorName.Name.Substring(7, 2) == "CP" && SensorName.Name.Substring(SensorName.Name.Length - 4, 4) == "XQ01")
+                                            {
+                                                LastValueOfSensor = (double.Parse(lineSplit[3], formatter) + 0.101325).ToString();
+                                            }
+                                            else
+                                            {
+                                                LastValueOfSensor = lineSplit[3];
+                                            }
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
                                             FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
                                             FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
@@ -919,7 +950,15 @@ namespace DBSelectionForm.Services
                                     {
                                         if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
                                         {
-                                            LastValueOfSensor = lineSplit[3];
+                                            // Если датчик с давлением
+                                            if (SensorName.Name.Substring(7, 2) == "CP" && SensorName.Name.Substring(SensorName.Name.Length - 4, 4) == "XQ01")
+                                            {
+                                                LastValueOfSensor = (double.Parse(lineSplit[3], formatter) + 0.101325).ToString();
+                                            }
+                                            else
+                                            {
+                                                LastValueOfSensor = lineSplit[3];
+                                            }
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
                                             FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
                                             FoundSignalsInDBFresh[^1].Date = LastDateOfSensor;
