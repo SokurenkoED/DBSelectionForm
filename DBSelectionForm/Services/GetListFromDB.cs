@@ -742,17 +742,30 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
+                                        string status = null;
+                                        int value_index = 0;
+                                        if (lineSplit[4] == ">")
+                                        {
+                                            status = lineSplit[6];
+                                            value_index = 5;
+                                        }
+                                        else
+                                        {
+                                            status = lineSplit[4];
+                                            value_index = 3;
+                                        }
+                                        
+                                        if (status == "ДОСТ" || status == "ПОВТ.ДОСТ")
                                         {
 
                                             // Если датчик с давлением
                                             if (SensorName.Name.Substring(7, 2) == "CP" && SensorName.Name.Substring(SensorName.Name.Length - 4, 4) == "XQ01")
                                             {
-                                                LastValueOfSensor = (double.Parse(lineSplit[3], formatter) + 0.101325).ToString();
+                                                LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
                                             }
                                             else
                                             {
-                                                LastValueOfSensor = lineSplit[3];
+                                                LastValueOfSensor = lineSplit[value_index];
                                             }
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
                                             FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
@@ -948,16 +961,29 @@ namespace DBSelectionForm.Services
                                 {
                                     if (lineSplit[2].IndexOf(SensorName.Name) == 0)
                                     {
-                                        if (lineSplit[4] == "ДОСТ" || lineSplit[4] == "ПОВТ.ДОСТ")
+                                        string status = null;
+                                        int value_index = 0;
+                                        if (lineSplit[4] == ">")
+                                        {
+                                            status = lineSplit[6];
+                                            value_index = 5;
+                                        }
+                                        else
+                                        {
+                                            status = lineSplit[4];
+                                            value_index = 3;
+                                        }
+
+                                        if (status == "ДОСТ" || status == "ПОВТ.ДОСТ")
                                         {
                                             // Если датчик с давлением
                                             if (SensorName.Name.Substring(7, 2) == "CP" && SensorName.Name.Substring(SensorName.Name.Length - 4, 4) == "XQ01")
                                             {
-                                                LastValueOfSensor = (double.Parse(lineSplit[3], formatter) + 0.101325).ToString();
+                                                LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
                                             }
                                             else
                                             {
-                                                LastValueOfSensor = lineSplit[3];
+                                                LastValueOfSensor = lineSplit[value_index];
                                             }
                                             LastDateOfSensor = $"{lineSplit[0]} {lineSplit[1]}";
                                             FoundSignalsInDBFresh[^1].NewValue = LastValueOfSensor;
