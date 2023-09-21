@@ -1180,7 +1180,7 @@ namespace DBSelectionForm.Services
                 MessageBox.Show($"Список создан");
                 return FinalSignalsList;
             }
-            catch (NullReferenceException ex)
+            catch (Exception ex)
             {
                 _TextInformationFromListDB.Clear();
                 _TextInformationFromListDB.Add($"{ex.Message}");
