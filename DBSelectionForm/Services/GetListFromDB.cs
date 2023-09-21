@@ -335,6 +335,11 @@ namespace DBSelectionForm.Services
                                     //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
                                     //CheckFoundSignals.Add(IC);
 
+                                    if (StrArr[2] == "-")
+                                    {
+                                        continue;
+                                    }
+
                                     // Если встречается сигнал с давлением (*CP* + XQ01)
                                     if (IC.Name.Substring(7, 2) == "CP" && IC.Name.Substring(IC.Name.Length - 4, 4) == "XQ01")
                                     {
@@ -503,6 +508,11 @@ namespace DBSelectionForm.Services
                                     }
                                     //DBArray.Add($"{IC}{"\t"}{StrArr[2]}{"\t"}{StrArr[3]}\t{str}\t{StrArr[1].Replace("<", "")}");
                                     //CheckFoundSignals.Add(IC);
+
+                                    if (StrArr[1] == "-")
+                                    {
+                                        continue;
+                                    }
 
                                     if (IC.Name.Substring(7, 2) == "CP" && IC.Name.Substring(IC.Name.Length - 4, 4) == "XQ01")
                                     {
@@ -1170,7 +1180,7 @@ namespace DBSelectionForm.Services
                 MessageBox.Show($"Список создан");
                 return FinalSignalsList;
             }
-            catch (Exception ex)
+            catch (NullReferenceException ex)
             {
                 _TextInformationFromListDB.Clear();
                 _TextInformationFromListDB.Add($"{ex.Message}");
