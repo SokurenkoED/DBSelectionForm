@@ -545,7 +545,31 @@ namespace DBSelectionForm.Services
 
                                     if (IC.Name.Substring(7, 2) == "CP" && IC.Name.Substring(IC.Name.Length - 4, 4) == "XQ01")
                                     {
-                                        double new_value = double.Parse(StrArr[1], formatter) + 0.101325;
+                                        string[] caption_array = StrArr[5].ToUpper().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                        string preasure_dimention = null;
+                                        foreach (var caption in caption_array)
+                                        {
+                                            if (caption == "МПА" || caption == "КПА")
+                                            {
+                                                preasure_dimention = caption;
+                                            }
+                                        }
+
+                                        if (preasure_dimention == null)
+                                        {
+                                            new Exception($"Неверный формат записи в БД для сигнала {IC.Name}");
+                                        }
+
+                                        double new_value = -1;
+                                        if (preasure_dimention == "МПА")
+                                        {
+                                            new_value = double.Parse(StrArr[1], formatter) + 0.101325;
+                                        }
+                                        else if (true)
+                                        {
+                                            new_value = double.Parse(StrArr[1], formatter) + 101.325;
+                                        }
+
                                         IC.SetPropOnFindDataInDB(new_value.ToString(), StrArr[3], str, StrArr[4].Replace("<", ""));
                                         FoundSignalsInDB.Add(IC);
                                         CheckFoundSignals.Add(IC);
@@ -800,7 +824,28 @@ namespace DBSelectionForm.Services
                                             // Если датчик с давлением
                                             if (SensorName.Name.Substring(7, 2) == "CP" && SensorName.Name.Substring(SensorName.Name.Length - 4, 4) == "XQ01")
                                             {
-                                                LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
+                                                string preasure_dimention = null;
+                                                foreach (var caption in lineSplit)
+                                                {
+                                                    if (caption == "МПА" || caption == "КПА")
+                                                    {
+                                                        preasure_dimention = caption;
+                                                    }
+                                                }
+
+                                                if (preasure_dimention == null)
+                                                {
+                                                    new Exception($"Неверный формат записи в БД для сигнала {SensorName.Name}");
+                                                }
+
+                                                if (preasure_dimention == "МПА")
+                                                {
+                                                    LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
+                                                }
+                                                else if (preasure_dimention == "КПА")
+                                                {
+                                                    LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 101.325).ToString();
+                                                }
                                             }
                                             else
                                             {
@@ -1018,7 +1063,29 @@ namespace DBSelectionForm.Services
                                             // Если датчик с давлением
                                             if (SensorName.Name.Substring(7, 2) == "CP" && SensorName.Name.Substring(SensorName.Name.Length - 4, 4) == "XQ01")
                                             {
-                                                LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
+                                                string preasure_dimention = null;
+                                                foreach (var caption in lineSplit)
+                                                {
+                                                    if (caption == "МПА" || caption == "КПА")
+                                                    {
+                                                        preasure_dimention = caption;
+                                                    }
+                                                }
+
+                                                if (preasure_dimention == null)
+                                                {
+                                                    new Exception($"Неверный формат записи в БД для сигнала {SensorName.Name}");
+                                                }
+
+                                                if (preasure_dimention == "МПА")
+                                                {
+                                                    LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
+                                                }
+                                                else if (preasure_dimention == "КПА")
+                                                {
+                                                    LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 101.325).ToString();
+                                                }
+                                                
                                             }
                                             else
                                             {
