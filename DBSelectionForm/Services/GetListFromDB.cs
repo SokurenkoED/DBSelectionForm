@@ -827,7 +827,7 @@ namespace DBSelectionForm.Services
                                                 string preasure_dimention = null;
                                                 foreach (var caption in lineSplit)
                                                 {
-                                                    if (caption == "МПА" || caption == "КПА")
+                                                    if (caption == "МПА" || caption == "КПА" || caption == "КПА(А)")
                                                     {
                                                         preasure_dimention = caption;
                                                     }
@@ -842,7 +842,7 @@ namespace DBSelectionForm.Services
                                                 {
                                                     LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 0.101325).ToString();
                                                 }
-                                                else if (preasure_dimention == "КПА")
+                                                else if (preasure_dimention == "КПА" || preasure_dimention == "КПА(А)")
                                                 {
                                                     LastValueOfSensor = (double.Parse(lineSplit[value_index], formatter) + 101.325).ToString();
                                                 }
@@ -1276,7 +1276,7 @@ namespace DBSelectionForm.Services
                 MessageBox.Show($"Список создан");
                 return FinalSignalsList;
             }
-            catch (Exception ex)
+            catch (DivideByZeroException ex)
             {
                 _TextInformationFromListDB.Clear();
                 _TextInformationFromListDB.Add($"{ex.Message}");
