@@ -306,6 +306,11 @@ namespace DBSelectionForm.Services
 
                             if (IC.Name.IndexOf("_Z0") != -1)// Если встречается датчик со значением Z0
                             {
+                                if (StrArr[2] == "---")
+                                {
+                                    StrArr = Line.ToUpper().Replace("---", "-\t-").Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                }
+
                                 if (StrArr[0].IndexOf(IC.Name) != -1)
                                 {
                                     IsNameWithTag = true;
