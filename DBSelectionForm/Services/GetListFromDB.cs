@@ -270,6 +270,7 @@ namespace DBSelectionForm.Services
 
                             StrArr = Line.ToUpper().Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
+
                             //<------------------------------------------------------------------------------------------------------------>
 
                             if (IsNameWithTag && StrArr[0].IndexOf(IC.Name) == -1) // Если пошел следующий датчик, нам нужно добавить предыдущий с #
@@ -338,6 +339,11 @@ namespace DBSelectionForm.Services
                                     if (StrArr[2] == "-")
                                     {
                                         continue;
+                                    }
+
+                                    if (StrArr[2] == "---")
+                                    {
+                                        StrArr = Line.ToUpper().Replace("---", "-\t-").Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                                     }
 
                                     // Если встречается сигнал с давлением (*CP* + XQ01)
@@ -1178,6 +1184,16 @@ namespace DBSelectionForm.Services
                     else if (item.NewValue.ToString() == "НЕТ")
                     {
                         item.NewValue = 0;
+                        InvalidSignals.Add(item);
+                    }
+                    else if (item.NewValue.ToString() == "РЕМОНТ")
+                    {
+                        item.NewValue = "РЕМОНТ";
+                        InvalidSignals.Add(item);
+                    }
+                    else if (item.NewValue.ToString() == "-")
+                    {
+                        item.NewValue = "-";
                         InvalidSignals.Add(item);
                     }
                     
