@@ -312,7 +312,7 @@ namespace DBSelectionForm.Services
                                 string line;
                                 while ((line = sr.ReadLine()) != null)
                                 {
-
+                                    line = line.Replace("<", "").Replace(">", "");
                                     // если элемент - ЗАДВИЖКА
                                     if (SensorName[k].Contains("AA1") && SensorName[k].Contains("_Z0"))
                                     {
