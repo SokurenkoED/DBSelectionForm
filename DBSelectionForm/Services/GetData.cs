@@ -351,6 +351,67 @@ namespace DBSelectionForm.Services
                                             });
                                         }
                                     }
+                                    // если элемент - НАСОС
+                                    else if (SensorName[k].Contains("AP001") && SensorName[k].Contains("_Z0"))
+                                    {
+                                        example = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
+                                        if (String.Compare(example[2], $"{SensorName[k]}#0") == 0)
+                                        {
+                                            DateTime DT = new DateTime(
+                                                int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                                                int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                                int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                                int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                                int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                                int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                                );
+                                            if (example[5] == "НЕТ")
+                                            {
+                                                NewListData.Add(new TimeValueData()
+                                                {
+                                                    DataTime = DT,
+                                                    DataValue = "1"
+                                                });
+                                            }
+                                            if (example[5] == "ДА")
+                                            {
+                                                NewListData.Add(new TimeValueData()
+                                                {
+                                                    DataTime = DT,
+                                                    DataValue = "0"
+                                                });
+                                            }
+
+                                        }
+                                        else if (String.Compare(example[2], $"{SensorName[k]}#1") == 0)
+                                        {
+                                            DateTime DT = new DateTime(
+                                                int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                                                int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                                int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                                int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                                                int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                                                int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                                );
+
+                                            if (example[5] == "НЕТ")
+                                            {
+                                                NewListData.Add(new TimeValueData()
+                                                {
+                                                    DataTime = DT,
+                                                    DataValue = "0"
+                                                });
+                                            }
+                                            if (example[5] == "ДА")
+                                            {
+                                                NewListData.Add(new TimeValueData()
+                                                {
+                                                    DataTime = DT,
+                                                    DataValue = "1"
+                                                });
+                                            }
+                                        }
+                                    }
                                     // если другой элемент
                                     else
                                     {
@@ -558,6 +619,42 @@ namespace DBSelectionForm.Services
                                     }
                                     CountNods++;
                                 }
+                                else if (SensorName[k].Contains("AP001") && SensorName[k].Contains("_Z0"))
+                                {
+                                    if (CountNods == 0) // Логика для крайнего первого значения
+                                    {
+                                        if (item.DataTime == DT_From) // Если значение времени ОТ есть в массиве
+                                        {
+                                            TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
+                                        }
+                                        else if (item.DataTime != DT_From && item != NewListData[0])
+                                        {
+                                            if (NewListData[i - 1].DataValue == NewListData[i].DataValue) // если последние 2 значения одинаковы
+                                            {
+                                                sw.WriteLine($"{0} {NewListData[i].DataValue}");
+                                            }
+                                            else // если последние 2 значения разные
+                                            {
+                                                sw.WriteLine($"{0} {NewListData[i - 1].DataValue}");
+                                            }
+                                            TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
+                                        }
+                                        else if (item.DataTime != DT_From && item == NewListData[0])
+                                        {
+                                            sw.WriteLine($"{0} {ColdReactor[k]}");
+                                            TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                            sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        TimeSpan var_dt = item.DataTime.Subtract(DT_From);
+                                        sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
+                                    }
+                                    CountNods++;
+                                }
                                 else
                                 {
                                     if (CountNods == 0) // Логика для крайнего первого значения
@@ -629,6 +726,26 @@ namespace DBSelectionForm.Services
                                 sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
                             }
                         }
+                        else if (SensorName[k].Contains("AP001") && SensorName[k].Contains("_Z0"))
+                        {
+                            if (LastTime != DT_To && (NewListData.Count - 1) != i - 1 && NewListData[i - 1].DataTime != DT_To) // не последний элемент
+                            {
+                                TimeSpan var_dt = DT_To.Subtract(DT_From);
+                                if (NewListData[i - 1].DataValue == NewListData[i].DataValue) // если последние 2 значения одинаковы
+                                {
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i].DataValue}");
+                                }
+                                else // если последние 2 значения разные
+                                {
+                                    sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i-1].DataValue}");
+                                }
+                            }
+                            else if (LastTime != DT_To && (NewListData.Count - 1) == i - 1 && NewListData[i - 1].DataTime != DT_To)
+                            {
+                                TimeSpan var_dt = DT_To.Subtract(DT_From);
+                                sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {NewListData[i - 1].DataValue}");
+                            }
+                        }
                         else
                         {
                             if (LastTime != DT_To && (NewListData.Count - 1) != i - 1 && NewListData[i-1].DataTime != DT_To) // не последний элемент
@@ -686,7 +803,7 @@ namespace DBSelectionForm.Services
             List<string> Result = new List<string>();
             string RelatePath = PathToFolder;
             string[] filePaths = null;
-            string RuteName = "JKT";
+            string RuteName = "KBA";
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
 
