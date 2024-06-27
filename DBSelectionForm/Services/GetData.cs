@@ -444,11 +444,34 @@ namespace DBSelectionForm.Services
                                             }
                                             else
                                             {
-                                                NewListData.Add(new TimeValueData()
+                                                if (example[3] == "-")
                                                 {
-                                                    DataTime = DT,
-                                                    DataValue = example[3]
-                                                });
+                                                    if (NewListData.Count >= 1)
+                                                    {
+                                                        NewListData.Add(new TimeValueData()
+                                                        {
+                                                            DataTime = DT,
+                                                            DataValue = NewListData[NewListData.Count - 1].DataValue
+                                                        });
+                                                    }
+                                                    else
+                                                    {
+                                                        NewListData.Add(new TimeValueData()
+                                                        {
+                                                            DataTime = DT,
+                                                            DataValue = example[3]
+                                                        });
+                                                    }
+                                                    
+                                                }
+                                                else
+                                                {
+                                                    NewListData.Add(new TimeValueData()
+                                                    {
+                                                        DataTime = DT,
+                                                        DataValue = example[3]
+                                                    });
+                                                }
                                             }
 
                                             #endregion
