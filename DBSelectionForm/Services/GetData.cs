@@ -154,7 +154,7 @@ namespace DBSelectionForm.Services
             }
             return 3600;
         }
-        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, string PathForTest = "")
+        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, bool? IsUseSlice, string PathForTest = "")
         {
             try
             {
@@ -183,8 +183,17 @@ namespace DBSelectionForm.Services
                 if (_InfoData.PathToFolder != "")
                 {
                     AcceptableDate = CheckAccectableTime(_InfoData.PathToFolder, _InfoData);
-                    AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
-                    AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
+                    if (AcceptableDate.Count != 0)
+                    {
+                        AcceptableTimeFrom = DateTime.Parse($"{AcceptableDate[0]} {AcceptableDate[2]}", CI);
+                        AcceptableTimeTo = DateTime.Parse($"{AcceptableDate[1]} {AcceptableDate[3]}", CI);
+                    }
+                    else
+                    {
+                        AcceptableTimeFrom = DateTime.Parse($"01.01.01 00:00:00", CI);
+                        AcceptableTimeTo = DateTime.Parse($"01.01.30 00:00:00", CI);
+                    }
+                    
                 }
 
                 #endregion
@@ -483,102 +492,117 @@ namespace DBSelectionForm.Services
                         }
                     }
 
-
-                    using (StreamReader sr = new StreamReader($"{SlicePath}", GetEncoding(SlicePath))) // Поиск по срезу для холодного реактора
+                    if (IsUseSlice == true)
                     {
-                        string line;
-                        int KeyVar = -1; // 0 - старый формат, 1 - новый формат
-                        int m = 0;
-                        while ((line = sr.ReadLine()) != null)
+                        using (StreamReader sr = new StreamReader($"{SlicePath}", GetEncoding(SlicePath))) // Поиск по срезу для холодного реактора
                         {
-                            string[] split_str = line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
-                            if (m == 3)
+                            string line;
+                            int KeyVar = -1; // 0 - старый формат, 1 - новый формат
+                            int m = 0;
+                            while ((line = sr.ReadLine()) != null)
                             {
-                                if (split_str[1] == "Время")
+                                string[] split_str = line.Split(new string[] { "\t" }, StringSplitOptions.RemoveEmptyEntries);
+                                if (m == 3)
                                 {
-                                    KeyVar = 0;
-                                }
-                                else
-                                {
-                                    KeyVar = 1;
-                                }
-                            
-                            }
-                            if (line.StartsWith(SensorName[k]) && KeyVar == 0)
-                            {
-                                if (line.StartsWith($"{SensorName[k]}#0"))
-                                {
-                                    if (split_str[2] == "НЕТ")
+                                    if (split_str[1] == "Время")
                                     {
-                                        ColdReactor.Add("100");
-                                        break;
+                                        KeyVar = 0;
                                     }
-                                    else if (split_str[2] == "ДА")
+                                    else
                                     {
-                                        ColdReactor.Add("0");
-                                        break;
+                                        KeyVar = 1;
                                     }
-                                }
-                                else
-                                {
-                                    if (split_str[2] == "НЕТ")
-                                    {
-                                        ColdReactor.Add("0");
-                                        break;
-                                    }
-                                    else if (split_str[2] == "ДА")
-                                    {
-                                        ColdReactor.Add("1");
-                                        break;
-                                    }
-                                    ColdReactor.Add(split_str[2]);
-                                    break;
-                                }
-                            
 
-                            } else if (line.StartsWith(SensorName[k]) && KeyVar == 1)
-                            {
-                                if (line.StartsWith($"{SensorName[k]}#0"))
-                                {
-                                    if (split_str[1] == "НЕТ")
-                                    {
-                                        ColdReactor.Add("100");
-                                        break;
-                                    }
-                                    else if (split_str[1] == "ДА")
-                                    {
-                                        ColdReactor.Add("0");
-                                        break;
-                                    }
                                 }
-                                else
+                                if (line.StartsWith(SensorName[k]) && KeyVar == 0)
                                 {
-                                    if (split_str[1] == "ДА")
+                                    if (line.StartsWith($"{SensorName[k]}#0"))
                                     {
-                                        ColdReactor.Add("1");
+                                        if (split_str[2] == "НЕТ")
+                                        {
+                                            ColdReactor.Add("100");
+                                            break;
+                                        }
+                                        else if (split_str[2] == "ДА")
+                                        {
+                                            ColdReactor.Add("0");
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (split_str[2] == "НЕТ")
+                                        {
+                                            ColdReactor.Add("0");
+                                            break;
+                                        }
+                                        else if (split_str[2] == "ДА")
+                                        {
+                                            ColdReactor.Add("1");
+                                            break;
+                                        }
+                                        ColdReactor.Add(split_str[2]);
                                         break;
                                     }
-                                    if (split_str[1] == "НЕТ")
-                                    {
-                                        ColdReactor.Add("0");
-                                        break;
-                                    }
-                                    ColdReactor.Add(split_str[1]);
-                                    break;
-                                }
 
+
+                                }
+                                else if (line.StartsWith(SensorName[k]) && KeyVar == 1)
+                                {
+                                    if (line.StartsWith($"{SensorName[k]}#0"))
+                                    {
+                                        if (split_str[1] == "НЕТ")
+                                        {
+                                            ColdReactor.Add("100");
+                                            break;
+                                        }
+                                        else if (split_str[1] == "ДА")
+                                        {
+                                            ColdReactor.Add("0");
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (split_str[1] == "ДА")
+                                        {
+                                            ColdReactor.Add("1");
+                                            break;
+                                        }
+                                        if (split_str[1] == "НЕТ")
+                                        {
+                                            ColdReactor.Add("0");
+                                            break;
+                                        }
+                                        ColdReactor.Add(split_str[1]);
+                                        break;
+                                    }
+
+                                }
+                                m++;
                             }
-                            m++;
                         }
+                    }
+                    else // нужно задать ColdReactor значение, чтобы при выводе не было ошибки
+                    {
+                        foreach (var TimeValue in NewListData)
+                        {
+                            if (TimeValue.DataTime > DT_From)
+                            {
+                                ColdReactor.Add(TimeValue.DataValue);
+                                break;
+                            }
+                        }
+                        
                     }
 
                     #endregion
 
                     #region Проверка, нашелся ли сигнал в срезе
 
-                    if (ColdReactor.Count == 0)
+                    if (ColdReactor.Count == 0 && IsUseSlice == true)
                     {
-                        _TextInformation.Add($"{_TextInformation.Count + 1}) Сигнал {SensorName[k]} не был найден в срезе. Полностью отсутствует информация!");
+                        _TextInformation.Add($"{_TextInformation.Count + 1}) Сигнал {SensorName[k]} не был найден в срезе.");
                         continue;
                     }
 
@@ -722,8 +746,11 @@ namespace DBSelectionForm.Services
                             i++;
                         }
                         if (LastTime == new DateTime(2000, 1, 1))
-                        { 
-                            sw.WriteLine($"{0} {ColdReactor[k]}");
+                        {
+                            if (IsUseSlice == true)
+                            {
+                                sw.WriteLine($"{0} {ColdReactor[k]}");
+                            }
                             _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
                             continue;
                         }

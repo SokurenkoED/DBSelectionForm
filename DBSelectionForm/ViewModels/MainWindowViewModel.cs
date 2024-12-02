@@ -397,6 +397,22 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region Используется ли срез
+
+        private bool? _isUseSlice = true;
+
+        /// <summary>Флаг использования среза</summary>
+        public bool? IsUseSlice
+        {
+            get => _isUseSlice;
+            set
+            {
+                Set(ref _isUseSlice, value);
+            }
+        }
+
+        #endregion
+
         #region Путь до папки с БД
 
         private string _PathToFolder;
@@ -466,10 +482,10 @@ namespace DBSelectionForm.ViewModels
         {
             try
             {
-                _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo };
+                _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, IsUseSlice = _isUseSlice};
                 _fileIOservice.SaveData(_InfoData);
 
-                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension));
+                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension, IsUseSlice));
             }
             catch (ArgumentException)
             {
@@ -510,14 +526,16 @@ namespace DBSelectionForm.ViewModels
                     AcceptableTimeFrom = TimeData[2];
                     AcceptableTimeTo = TimeData[3];
                 }
+                else
+                {
+                    AcceptableDayFrom = "01.01.01";
+                    AcceptableDayTo = "01.01.30";
+                    AcceptableTimeFrom = "00:00:00";
+                    AcceptableTimeTo = "00:00:00";
+
+                }
 
                 #endregion
-                
-
-                // TODO:
-                // 1) Стереть допустимый интервал
-                // 2) Вызвать функцию для определения допустимого интервала
-                // 3) Записать допустимый интервал
             }
         }
 
@@ -709,10 +727,21 @@ namespace DBSelectionForm.ViewModels
 
                     List<string> TimeData = new List<string>();
                     TimeData = GetData.CheckAccectableTime(PathToFolder, _InfoData);
-                    AcceptableDayFrom = TimeData[0];
-                    AcceptableDayTo = TimeData[1];
-                    AcceptableTimeFrom = TimeData[2];
-                    AcceptableTimeTo = TimeData[3];
+                    if (TimeData.Count != 0)
+                    {
+                        AcceptableDayFrom = TimeData[0];
+                        AcceptableDayTo = TimeData[1];
+                        AcceptableTimeFrom = TimeData[2];
+                        AcceptableTimeTo = TimeData[3];
+                    }
+                    else
+                    {
+                        AcceptableDayFrom = "01.01.01";
+                        AcceptableDayTo = "01.01.30";
+                        AcceptableTimeFrom = "00:00:00";
+                        AcceptableTimeTo = "00:00:00";
+
+                    }
 
                     #endregion
                 }
@@ -752,6 +781,10 @@ namespace DBSelectionForm.ViewModels
             if (_InfoData.SlicePathDB != null)
             {
                 _SlicePathDB = _InfoData.SlicePathDB;
+            }
+            if (_InfoData.IsUseSlice != null)
+            {
+                IsUseSlice = _InfoData.IsUseSlice;
             }
 
 

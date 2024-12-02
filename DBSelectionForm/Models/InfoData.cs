@@ -31,5 +31,7 @@ namespace DBSelectionForm.Models
         public string EndTimeForListBD { get; set; }
 
         public string SlicePathDB { get; set; }
+
+        public bool? IsUseSlice { get; set; }
     }
 }

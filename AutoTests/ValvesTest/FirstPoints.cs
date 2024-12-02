@@ -47,7 +47,7 @@ namespace AutoTests.AutoTest.ValvesTest
 
             #region Запускаем расчетное ядро
 
-            GetData.GetDataMethod(_InfoData, ref _TextInformation, _InfoData.SlicePathDB, TimeDemention[0]);
+            GetData.GetDataMethod(_InfoData, ref _TextInformation, _InfoData.SlicePathDB, TimeDemention[0], true);
 
             #endregion
 
@@ -115,7 +115,7 @@ namespace AutoTests.AutoTest.ValvesTest
 
             #region Запускаем расчетное ядро
 
-            GetData.GetDataMethod(_InfoData, ref _TextInformation, _InfoData.SlicePathDB, TimeDemention[0]);
+            GetData.GetDataMethod(_InfoData, ref _TextInformation, _InfoData.SlicePathDB, TimeDemention[0], true);
 
             #endregion
 
@@ -182,7 +182,7 @@ namespace AutoTests.AutoTest.ValvesTest
 
             #region Запускаем расчетное ядро
 
-            GetData.GetDataMethod(_InfoData, ref _TextInformation, _InfoData.SlicePathDB, TimeDemention[0]);
+            GetData.GetDataMethod(_InfoData, ref _TextInformation, _InfoData.SlicePathDB, TimeDemention[0], true);
 
             #endregion
 
