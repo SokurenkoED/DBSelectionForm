@@ -494,6 +494,7 @@ namespace DBSelectionForm.Services
 
                     if (IsUseSlice == true)
                     {
+                        ColdReactor.Clear();
                         using (StreamReader sr = new StreamReader($"{SlicePath}", GetEncoding(SlicePath))) // Поиск по срезу для холодного реактора
                         {
                             string line;
