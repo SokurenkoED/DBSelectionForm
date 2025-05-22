@@ -436,7 +436,7 @@ namespace DBSelectionForm.Services
                                                 int.Parse(example[0].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
                                                 int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
                                                 int.Parse(example[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
-                                                int.Parse(example[1].Split(new string[] { ":", "," }, StringSplitOptions.RemoveEmptyEntries)[2])
+                                                int.Parse(example[1].Split(new string[] { ":", ",", "." }, StringSplitOptions.RemoveEmptyEntries)[2])
                                                 );
 
                                             #endregion
@@ -854,7 +854,7 @@ namespace DBSelectionForm.Services
             List<string> Result = new List<string>();
             string RelatePath = PathToFolder;
             string[] filePaths = null;
-            string RuteName = "KBA";
+            string RuteName = "JEC";
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
 
