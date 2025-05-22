@@ -494,7 +494,7 @@ namespace DBSelectionForm.Services
 
                     if (IsUseSlice == true)
                     {
-                        ColdReactor.Clear();
+                        //ColdReactor.Clear();
                         using (StreamReader sr = new StreamReader($"{SlicePath}", GetEncoding(SlicePath))) // Поиск по срезу для холодного реактора
                         {
                             string line;
@@ -753,6 +753,10 @@ namespace DBSelectionForm.Services
                                 sw.WriteLine($"{0} {ColdReactor[k]}");
                             }
                             _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
+                            if (IsUseSlice == false)
+                            {
+                                ColdReactor.Add("Нет данных");
+                            }
                             continue;
                         }
 
