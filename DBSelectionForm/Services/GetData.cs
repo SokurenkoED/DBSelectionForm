@@ -720,7 +720,8 @@ namespace DBSelectionForm.Services
                                             }
                                             else
                                             {
-                                                sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                                //sw.WriteLine($"{0} {LineInterpol(NewListData[i - 1], NewListData[i], DT_From)}");
+                                                sw.WriteLine($"{0} {NewListData[i - 1].DataValue}");
                                             }
                                             TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                             sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
