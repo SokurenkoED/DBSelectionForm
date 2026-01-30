@@ -154,7 +154,7 @@ namespace DBSelectionForm.Services
             }
             return 3600;
         }
-        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, bool? IsUseSlice, string PathForTest = "")
+        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, bool? IsUseSlice, bool IsUseDateInFileName, string PathForTest = "")
         {
             try
             {
@@ -617,7 +617,9 @@ namespace DBSelectionForm.Services
 
                     #endregion
 
-                    using (StreamWriter sw = new StreamWriter($"{PathForTest}{SensorName[k]}_{TempDayFrom.Replace(".", "-")}_{TempTimeFrom.Replace(":", "-")}.dat", false, Encoding.UTF8))
+                    string fileName = IsUseDateInFileName ? $"{PathForTest}{SensorName[k]}_{TempDayFrom.Replace(".", "-")}_{TempTimeFrom.Replace(":", "-")}.dat" : $"{PathForTest}{SensorName[k]}.dat";
+
+                    using (StreamWriter sw = new StreamWriter(fileName, false, Encoding.UTF8))
                     {
                         //sw.WriteLine($"Time {SensorName}");
                         DateTime LastTime = new DateTime(2000, 1, 1);

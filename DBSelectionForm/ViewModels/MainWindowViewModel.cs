@@ -441,6 +441,17 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region IsUseDateInFileName
+
+        private bool _isUseDateInFileName = true;
+        public bool IsUseDateInFileName
+        {
+            get => _isUseDateInFileName;
+            set => Set(ref _isUseDateInFileName, value);
+        }
+
+        #endregion
+
         #region Команды
 
         #region SaveSignalsToList_ICCommand
@@ -485,7 +496,7 @@ namespace DBSelectionForm.ViewModels
                 _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, IsUseSlice = _isUseSlice};
                 _fileIOservice.SaveData(_InfoData);
 
-                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension, IsUseSlice));
+                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension, IsUseSlice, IsUseDateInFileName));
             }
             catch (ArgumentException)
             {
