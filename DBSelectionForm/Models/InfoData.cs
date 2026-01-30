@@ -33,5 +33,7 @@ namespace DBSelectionForm.Models
         public string SlicePathDB { get; set; }
 
         public bool? IsUseSlice { get; set; }
+
+        public bool IsUseDateInFileName { get; set; }
     }
 }

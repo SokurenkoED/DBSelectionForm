@@ -493,7 +493,7 @@ namespace DBSelectionForm.ViewModels
         {
             try
             {
-                _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, IsUseSlice = _isUseSlice};
+                _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, IsUseSlice = _isUseSlice, IsUseDateInFileName = IsUseDateInFileName };
                 _fileIOservice.SaveData(_InfoData);
 
                 Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension, IsUseSlice, IsUseDateInFileName));
@@ -609,7 +609,7 @@ namespace DBSelectionForm.ViewModels
                 {
                     DataToTextBox = sr.ReadToEnd();
                 }
-                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD, IsUseDateInFileName = IsUseDateInFileName };
                 _fileIOservice.SaveData(_InfoData);
             }
             catch (ArgumentException)
@@ -633,7 +633,7 @@ namespace DBSelectionForm.ViewModels
                     sw.WriteLine(DataToTextBox);
                     MessageBox.Show("Файл сохранен!");
                 }
-                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
+                _InfoData = new InfoData { SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD, IsUseDateInFileName = IsUseDateInFileName };
                 _fileIOservice.SaveData(_InfoData);
             }
             catch (ArgumentException)
@@ -652,7 +652,7 @@ namespace DBSelectionForm.ViewModels
         {
             try
             {
-                _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD };
+                _InfoData = new InfoData {SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, PathToFolderForListBD = _PathToFolderForListBD, EndDayForListBD = _EndDayForListBD, EndTimeForListBD = _EndTimeForListBD, IsUseDateInFileName = IsUseDateInFileName };
                 _fileIOservice.SaveData(_InfoData);
                 try
                 {
@@ -797,6 +797,7 @@ namespace DBSelectionForm.ViewModels
             {
                 IsUseSlice = _InfoData.IsUseSlice;
             }
+            IsUseDateInFileName = _InfoData.IsUseDateInFileName;
 
 
 
