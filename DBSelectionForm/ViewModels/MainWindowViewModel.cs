@@ -350,6 +350,21 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
+        #region Сообщения об ошибках для выборки с БД
+
+        private ObservableCollection<string> _ErrorInformation = new AsyncObservableCollection<string>();
+
+        public ObservableCollection<string> ErrorInformation
+        {
+            get => _ErrorInformation;
+            set
+            {
+                Set(ref _ErrorInformation, value);
+            }
+        }
+
+        #endregion
+
         #region Время "С"
 
         private string _TimeFrom;
@@ -496,7 +511,7 @@ namespace DBSelectionForm.ViewModels
                 _InfoData = new InfoData { SlicePathDB = _SlicePathDB, SensorName = _SensorName, PathToFolder = _PathToFolder, TimeTo = _TimeTo, TimeFrom = _TimeFrom, PathToListFile = _PathToListFile, PathToDataFile = _PathToDataFile, DayFrom = _DayFrom, DayTo = _DayTo, IsUseSlice = _isUseSlice, IsUseDateInFileName = IsUseDateInFileName };
                 _fileIOservice.SaveData(_InfoData);
 
-                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension, IsUseSlice, IsUseDateInFileName));
+                Task task = Task.Factory.StartNew(() => GetData.GetDataMethod(_InfoData, ref _TextInformation, SlicePathDB, _SelectedTimeDimension, IsUseSlice, IsUseDateInFileName, ErrorInformation));
             }
             catch (ArgumentException)
             {
@@ -708,7 +723,6 @@ namespace DBSelectionForm.ViewModels
 
         #endregion
 
-
         #endregion
 
         public MainWindowViewModel()
@@ -720,7 +734,7 @@ namespace DBSelectionForm.ViewModels
 
             if ((_InfoData = _fileIOservice.LoadData()) == null)
             {
-                _InfoData = new InfoData();
+                _InfoData = new InfoData { IsUseDateInFileName = true };
             }
             try
             {
@@ -797,7 +811,7 @@ namespace DBSelectionForm.ViewModels
             {
                 IsUseSlice = _InfoData.IsUseSlice;
             }
-            IsUseDateInFileName = _InfoData.IsUseDateInFileName;
+            IsUseDateInFileName = _InfoData == null ? true : _InfoData.IsUseDateInFileName;
 
 
 

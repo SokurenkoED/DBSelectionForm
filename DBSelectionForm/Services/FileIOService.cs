@@ -10,6 +10,7 @@ namespace DBSelectionForm.Services
     public class FileIOService
     {
         private readonly string Path;
+        private static InfoData CreateDefaultInfoData() => new InfoData { IsUseDateInFileName = true };
         public FileIOService(string path)
         {
             this.Path = path;
@@ -21,12 +22,18 @@ namespace DBSelectionForm.Services
             if (!fileExist)
             {
                 File.CreateText(Path).Dispose();
-                return new InfoData();
+                return CreateDefaultInfoData();
             }
             using (var reader = File.OpenText(Path))
             {
                 var fileText = reader.ReadToEnd();
-                return JsonConvert.DeserializeObject<InfoData>(fileText);
+                if (string.IsNullOrWhiteSpace(fileText))
+                {
+                    return CreateDefaultInfoData();
+                }
+
+                var infoData = JsonConvert.DeserializeObject<InfoData>(fileText);
+                return infoData ?? CreateDefaultInfoData();
             }
         }
 

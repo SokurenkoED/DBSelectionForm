@@ -154,7 +154,7 @@ namespace DBSelectionForm.Services
             }
             return 3600;
         }
-        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, bool? IsUseSlice, bool IsUseDateInFileName, string PathForTest = "")
+        public static void GetDataMethod(InfoData _InfoData, ref ObservableCollection<string> _TextInformation, string SlicePath, string TimeDemention, bool? IsUseSlice, bool IsUseDateInFileName, ObservableCollection<string> errorInformation = null, string PathForTest = "")
         {
             try
             {
@@ -282,8 +282,10 @@ namespace DBSelectionForm.Services
                     return;
                 }
             
-                List<string> ColdReactor = new List<string>(); // Не обновляем
                 _TextInformation.Clear();
+                errorInformation?.Clear();
+                int totalSensors = SensorName.Length;
+                int successfulSensors = 0;
 
                 #endregion
 
@@ -292,6 +294,8 @@ namespace DBSelectionForm.Services
 
                     ListData.Clear();
                     NewListData.Clear();
+                    string coldReactorValue = null;
+                    bool hasSliceValue = false;
 
 
                     try
@@ -303,8 +307,6 @@ namespace DBSelectionForm.Services
                         MessageBox.Show($"Введено некорректное название датчика '{SensorName[k]}'");
                         return;
                     }
-                
-                    _TextInformation.Add($"{_TextInformation.Count + 1}) Началось составление файла для датчика {SensorName[k]}.");
 
                     #region Запись данных в массив
 
@@ -494,7 +496,6 @@ namespace DBSelectionForm.Services
 
                     if (IsUseSlice == true)
                     {
-                        //ColdReactor.Clear();
                         using (StreamReader sr = new StreamReader($"{SlicePath}", GetEncoding(SlicePath))) // Поиск по срезу для холодного реактора
                         {
                             string line;
@@ -521,12 +522,14 @@ namespace DBSelectionForm.Services
                                     {
                                         if (split_str[2] == "НЕТ")
                                         {
-                                            ColdReactor.Add("100");
+                                            coldReactorValue = "100";
+                                            hasSliceValue = true;
                                             break;
                                         }
                                         else if (split_str[2] == "ДА")
                                         {
-                                            ColdReactor.Add("0");
+                                            coldReactorValue = "0";
+                                            hasSliceValue = true;
                                             break;
                                         }
                                     }
@@ -534,15 +537,18 @@ namespace DBSelectionForm.Services
                                     {
                                         if (split_str[2] == "НЕТ")
                                         {
-                                            ColdReactor.Add("0");
+                                            coldReactorValue = "0";
+                                            hasSliceValue = true;
                                             break;
                                         }
                                         else if (split_str[2] == "ДА")
                                         {
-                                            ColdReactor.Add("1");
+                                            coldReactorValue = "1";
+                                            hasSliceValue = true;
                                             break;
                                         }
-                                        ColdReactor.Add(split_str[2]);
+                                        coldReactorValue = split_str[2];
+                                        hasSliceValue = true;
                                         break;
                                     }
 
@@ -554,12 +560,14 @@ namespace DBSelectionForm.Services
                                     {
                                         if (split_str[1] == "НЕТ")
                                         {
-                                            ColdReactor.Add("100");
+                                            coldReactorValue = "100";
+                                            hasSliceValue = true;
                                             break;
                                         }
                                         else if (split_str[1] == "ДА")
                                         {
-                                            ColdReactor.Add("0");
+                                            coldReactorValue = "0";
+                                            hasSliceValue = true;
                                             break;
                                         }
                                     }
@@ -567,15 +575,18 @@ namespace DBSelectionForm.Services
                                     {
                                         if (split_str[1] == "ДА")
                                         {
-                                            ColdReactor.Add("1");
+                                            coldReactorValue = "1";
+                                            hasSliceValue = true;
                                             break;
                                         }
                                         if (split_str[1] == "НЕТ")
                                         {
-                                            ColdReactor.Add("0");
+                                            coldReactorValue = "0";
+                                            hasSliceValue = true;
                                             break;
                                         }
-                                        ColdReactor.Add(split_str[1]);
+                                        coldReactorValue = split_str[1];
+                                        hasSliceValue = true;
                                         break;
                                     }
 
@@ -584,13 +595,13 @@ namespace DBSelectionForm.Services
                             }
                         }
                     }
-                    else // нужно задать ColdReactor значение, чтобы при выводе не было ошибки
+                    else // нужно задать значение, чтобы при выводе не было ошибки
                     {
                         foreach (var TimeValue in NewListData)
                         {
                             if (TimeValue.DataTime > DT_From)
                             {
-                                ColdReactor.Add(TimeValue.DataValue);
+                                coldReactorValue = TimeValue.DataValue;
                                 break;
                             }
                         }
@@ -601,9 +612,10 @@ namespace DBSelectionForm.Services
 
                     #region Проверка, нашелся ли сигнал в срезе
 
-                    if (ColdReactor.Count == 0 && IsUseSlice == true)
+                    if (IsUseSlice == true && !hasSliceValue)
                     {
-                        _TextInformation.Add($"{_TextInformation.Count + 1}) Сигнал {SensorName[k]} не был найден в срезе.");
+                        string missingMessage = $"{(errorInformation?.Count ?? 0) + 1}) Сигнал {SensorName[k]} не был найден в срезе.";
+                        errorInformation?.Add(missingMessage);
                         continue;
                     }
 
@@ -657,7 +669,7 @@ namespace DBSelectionForm.Services
                                         }
                                         else if (item.DataTime != DT_From && item == NewListData[0])
                                         {
-                                            sw.WriteLine($"{0} {ColdReactor[k]}");
+                                            sw.WriteLine($"{0} {coldReactorValue ?? "Нет данных"}");
                                             TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                             sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                         }
@@ -693,7 +705,7 @@ namespace DBSelectionForm.Services
                                         }
                                         else if (item.DataTime != DT_From && item == NewListData[0])
                                         {
-                                            sw.WriteLine($"{0} {ColdReactor[k]}");
+                                            sw.WriteLine($"{0} {coldReactorValue ?? "Нет данных"}");
                                             TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                             sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                         }
@@ -730,7 +742,7 @@ namespace DBSelectionForm.Services
                                         }
                                         else if (item.DataTime != DT_From && item == NewListData[0])
                                         {
-                                            sw.WriteLine($"{0} {ColdReactor[k]}");
+                                            sw.WriteLine($"{0} {coldReactorValue ?? "Нет данных"}");
                                             TimeSpan var_dt = item.DataTime.Subtract(DT_From);
                                             sw.WriteLine($"{(var_dt.Seconds + var_dt.Minutes * 60 + var_dt.Hours * 60 * 60 + var_dt.Days * 24 * 60 * 60) / DementionValue} {item.DataValue}");
                                         }
@@ -753,13 +765,10 @@ namespace DBSelectionForm.Services
                         {
                             if (IsUseSlice == true)
                             {
-                                sw.WriteLine($"{0} {ColdReactor[k]}");
+                                sw.WriteLine($"{0} {coldReactorValue ?? "Нет данных"}");
+                                successfulSensors++;
                             }
                             _TextInformation.Add($"{_TextInformation.Count + 1}) Значение датчика {SensorName[k]} не изменялось на заданном приоде времени.");
-                            if (IsUseSlice == false)
-                            {
-                                ColdReactor.Add("Нет данных");
-                            }
                             continue;
                         }
 
@@ -830,9 +839,10 @@ namespace DBSelectionForm.Services
                     #endregion
 
                     _TextInformation.Add($"{_TextInformation.Count + 1}) Файл для датчика {SensorName[k]} составлен!");
+                    successfulSensors++;
 
                 }
-                _TextInformation.Add($"{_TextInformation.Count + 1}) Выборка завершена!");
+                _TextInformation.Add($"{_TextInformation.Count + 1}) Выборка завершена! Успешно обработано {successfulSensors} из {totalSensors}.");
             }
             catch (Exception ex)
             {
