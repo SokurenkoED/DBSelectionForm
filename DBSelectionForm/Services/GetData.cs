@@ -871,7 +871,7 @@ namespace DBSelectionForm.Services
             List<string> Result = new List<string>();
             string RelatePath = PathToFolder;
             string[] filePaths = null;
-            string RuteName = "JEC";
+            string RuteName = "LAB";
             List<DateTime> DT_list_from = new List<DateTime>();
             List<DateTime> DT_list_to = new List<DateTime>();
 
@@ -900,7 +900,9 @@ namespace DBSelectionForm.Services
                             line = sr.ReadLine();
                         }
                         string[] MainStr = line.Split(new string[] { "\t", " " }, StringSplitOptions.RemoveEmptyEntries);
-                        DT_list_from.Add(new DateTime(
+                        try
+                        {
+                            DT_list_from.Add(new DateTime(
                             int.Parse(MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
                             int.Parse(MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
                             int.Parse(MainStr[4].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
@@ -908,8 +910,22 @@ namespace DBSelectionForm.Services
                             int.Parse(MainStr[5].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
                             int.Parse(MainStr[5].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
                             ));
+                        }
+                        catch (Exception)
+                        {
+                            DT_list_from.Add(new DateTime(
+                            int.Parse(MainStr[5].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                            int.Parse(MainStr[5].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[5].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[6].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[6].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[6].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
+                            ));
+                        }
 
-                        DT_list_to.Add(new DateTime(
+                        try
+                        {
+                            DT_list_to.Add(new DateTime(
                             int.Parse(MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
                             int.Parse(MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
                             int.Parse(MainStr[7].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
@@ -917,6 +933,20 @@ namespace DBSelectionForm.Services
                             int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
                             int.Parse(MainStr[8].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
                             ));
+                        }
+                        catch (Exception)
+                        {
+
+                            DT_list_to.Add(new DateTime(
+                            int.Parse(MainStr[8].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[2]) + 2000,
+                            int.Parse(MainStr[8].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[8].Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[9].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0]),
+                            int.Parse(MainStr[9].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[1]),
+                            int.Parse(MainStr[9].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[2])
+                            ));
+                        }
+                        
                     }
                 }
             }
